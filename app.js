@@ -26,13 +26,13 @@ app.use('/js', express.static('js'));
 app.use('/css', express.static('css'));
 
 app.all('*', function (req, res) {
-	res.contentType('text/html')
-	res.render('try1')
+    res.contentType('text/html')
+    res.render('try1')
 })
 
-app.listen(app.get('port'),function(){
-    helpers.readPackageJSON("config").name + " " +
-	helpers.readPackageJSON("version") +
-	" Started & Listening on port:", port +
-	'\nAvailable Network Interfaces:', helpers.getHostNetworkInterfaces()
+app.listen(port, function () {
+    console.log(helpers.readPackageJSON("name") + " " +
+        helpers.readPackageJSON("version") +
+        " Started & Listening on port:", port +
+        '\nAvailable Network Interfaces:', helpers.getHostNetworkInterfaces())
 });
