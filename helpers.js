@@ -1,12 +1,10 @@
 // Import key Libraries
 var crypto = require('crypto')
-var bunyan = require('bunyan')
 var fs = require('fs')
 var https = require('https')
 var os = require('os')
 
 // Initializing
-var log = bunyan.createLogger({ name: "helpers.js" })
 
 /*Pulls the details of the network interfaces connected to the Node-Server in an Array*/
 function getHostNetworkInterfaces() {
@@ -21,7 +19,6 @@ function hourlyState(mySecret) {
 	var shasum = crypto.createHash('sha1')
 	shasum.update(mySecret + Date().substring(0, 19))
 	var hs = shasum.digest('hex').toString()
-	//log.info("Generated Hashed Digest", hs)
 	return hs
 }
 module.exports.hourlyState = exports.hourlyState = hourlyState;
@@ -68,13 +65,13 @@ module.exports.readHTML = exports.readHTML = readHTML;
 function requestHTTPS(options, body, callback) {
 	var response = '';
 	var req = https.request(options, function (x) {
-		log.info("helpers.requestHTTPS: \nstatusCode: ", x.statusCode, "\nheaders: ", x.headers);
+		//log.info("helpers.requestHTTPS: \nstatusCode: ", x.statusCode, "\nheaders: ", x.headers);
 		x.setEncoding('utf8');
 		x.on('data', function (d) { response += d; });
 		x.on('end', function () {
 			if ((response === null) || (response.length === 0)) {
 				options = JSON.stringify(options); body = JSON.stringify(body)
-				log.fatal("\nhelpers.requestHTTPS:=> Fatal Error while calling with \n Options: " + options + "\nBody: " + body + '\n');
+		//		log.fatal("\nhelpers.requestHTTPS:=> Fatal Error while calling with \n Options: " + options + "\nBody: " + body + '\n');
 				callback(null, "helpers.requestHTTPS:=><br>Fatal Error while calling with <br> Options: " + options + "<br>Body: " + body + "<br>Returned StatusCode: " + x.statusCode + "<br>Returned Headers: " + x.rawHeaders + "<br>Returned Trailers: " + x.rawTrailers);
 				return
 			} else {//No Error so just return the response
@@ -87,7 +84,7 @@ function requestHTTPS(options, body, callback) {
 	if (body != undefined) req.write(body);
 	req.end();
 	req.on('error', function (e) {
-		log.fatal("\nhelpers.requestHTTPS: Fatal Error while calling with \n Options:" + options + "\nBody:" + body + "\nError Details:" + e + '\n');
+		//log.fatal("\nhelpers.requestHTTPS: Fatal Error while calling with \n Options:" + options + "\nBody:" + body + "\nError Details:" + e + '\n');
 		callback(null, "helpers.requestHTTPS: Fatal Error while calling with \n Options:" + options + "\nBody:" + body + "\nError Details:" + e);
 	});
 }
