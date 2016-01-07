@@ -1,0 +1,25 @@
+{
+  "name": "jfherowebrtc1",
+  "version": "0.1.0",
+  "description": "webrtc on Heroku try",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julianfrank/jfherowebrtc1.git"
+  },
+  "keywords": [
+    "webrtc"
+  ],
+  "author": "Julian Frank",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julianfrank/jfherowebrtc1/issues"
+  },
+  "homepage": "https://github.com/julianfrank/jfherowebrtc1#readme",
+  "dependencies": {
+    "express": "^4.13.3"
+  }
+}
