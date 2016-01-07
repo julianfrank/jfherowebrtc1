@@ -21,7 +21,7 @@ app.use(cookieparser());
 app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true, secure: false, maxAge: 600000 } })); //maxAge setto 10 mins
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/*.ico', express.static('public'));
+app.use('/public', express.static('public'));
 app.use('/js', express.static('js'));
 app.use('/css', express.static('css'));
 
