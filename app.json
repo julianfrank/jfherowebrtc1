@@ -1,0 +1,14 @@
+{
+  "name": "jfherowebrtc1",
+  "description": "JF Webrtc on Heroku try1",
+  "scripts": {
+  },
+  "env": {
+    "SECRET": {
+      "generator": "secret"
+    }
+  },
+  "addons": [
+
+  ]
+}
