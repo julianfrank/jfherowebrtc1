@@ -10,7 +10,7 @@ var cookieparser = require('cookie-parser') //Sesisons inturn need cookie parsin
 var helpers = require('./helpers')
 
 //Initialization
-var port = process.env.PORT || 4000
+var port = process.env.PORT || 80
  
 //Express Application Initialization
 var app = express()
@@ -22,10 +22,16 @@ app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/public', express.static('public'));
+app.use('/', express.static('public'));
 app.use('/js', express.static('js'));
 app.use('/css', express.static('css'));
 
-app.all('*', function (req, res) {
+app.all('/*.html', function (req, res) {
+    res.contentType('text/html')
+    res.render(req.params[0])
+})
+
+app.all('/test', function (req, res) {
     res.contentType('text/html')
     res.render('try1')
 })
