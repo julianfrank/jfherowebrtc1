@@ -1,28 +1,27 @@
 {
-    "name": "jfherowebrtc1",
-    "version": "0.1.0",
-    "description": "webrtc on Heroku try",
-    "main": "app.js",
-    "scripts": {
-        "start": "node app"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/julianfrank/jfherowebrtc1.git"
-    },
-    "keywords": [
-        "webrtc"
-    ],
-    "author": "Julian Frank",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/julianfrank/jfherowebrtc1/issues"
-    },
-    "homepage": "https://github.com/julianfrank/jfherowebrtc1#readme",
-    "dependencies": {
-        "body-parser": "^1.14.2",
-        "cookie-parser": "^1.4.0",
-        "express": "^4.13.3",
-        "express-session": "^1.12.1"
-    }
+  "name": "jfwrtc",
+  "version": "0.0.1",
+  "description": "WebRTC Experiments",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julianfrank/jfwrtc.git"
+  },
+  "keywords": [
+    "webrtc",
+    "jf"
+  ],
+  "author": "Julian Frank",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/julianfrank/jfwrtc/issues"
+  },
+  "homepage": "https://github.com/julianfrank/jfwrtc#readme",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "express": "^4.13.4"
+  }
 }

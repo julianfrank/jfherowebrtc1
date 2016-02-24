@@ -1,2 +1,1 @@
-# jfherowebrtc1
-WebRTC Testing on Heroku
+# Experimenting WebRTC
