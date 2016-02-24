@@ -10,6 +10,8 @@ Use like below:-
     log.warn('warning style', [1, 5, 7, 11]);
 */
 
+var DEBUGMODE = true
+
 if (typeof log === 'undefined') {
 
     var log = (function (methods, undefined) {
