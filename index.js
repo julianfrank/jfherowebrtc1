@@ -50,8 +50,8 @@ app.all('/', function (req, res) {// Main page
 })
 
 app.all('/me', function (req, res) {// Main page
-    res.contentType('text/json')
-    res.send(req.ips)
+    res.contentType('text/html')
+    res.send(req.ip)
 })
 
 
