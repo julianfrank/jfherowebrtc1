@@ -49,6 +49,11 @@ app.all('/', function (req, res) {// Main page
     res.render('jfwebrtc')
 })
 
+app.all('/me', function (req, res) {// Main page
+    res.contentType('text/json')
+    res.send(req.ips)
+})
+
 
 //MongoClient.connect(mongoLabURL, function (err, db) {
 app.listen(port, function () {
