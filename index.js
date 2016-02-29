@@ -54,6 +54,10 @@ app.all('/me', function (req, res) {// Main page
     res.send(req.ip)
 })
 
+app.all('/try', function (req, res) {// Main page
+    res.contentType('text/html')
+    res.render('wrtctry')
+})
 
 //MongoClient.connect(mongoLabURL, function (err, db) {
 app.listen(port, function () {
