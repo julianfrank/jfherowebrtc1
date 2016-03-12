@@ -2,7 +2,7 @@
   "name": "jfsoio",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "greta.js",
   "scripts": {
     "test": "node greta"
   },
