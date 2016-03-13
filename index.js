@@ -2,7 +2,7 @@
 
 //Key Libraries
 //require('newrelic')
-//var express = require('express')
+var express = require('express')
 //var bodyParser = require('body-parser') //Required to read the body
 //var session = require('express-session') //Required to handle sessions
 //var cookieparser = require('cookie-parser') //Sesisons inturn need cookie parsing
@@ -23,8 +23,8 @@ app.set('views', __dirname + '/pages/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
 //app.use(cookieparser());
 //app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true, secure: false, maxAge: 600000 } })); //maxAge setto 10 mins
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
+//app.use(bodyParser.json());
+//app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/static', express.static('/static'));
 
 app.all('*', function (req, res, next) {
@@ -39,22 +39,12 @@ app.all('/*.html', function (req, res) {// Need this to load test using loader.i
 
 app.all('/favicon.ico', function (req, res) {// Show my Pretty Face ;) on the favicon area
     res.contentType('image/x-icon')
-    res.redirect('/public/favicon.ico')
+    res.redirect('/static/favicon.ico')
 })
 
 app.all('/', function (req, res) {// Main page
     res.contentType('text/html')
-    res.render('s4bpstn')
-})
-
-app.all('/try1', function (req, res) {// Right now will use this to test the try1.html
-    res.contentType('text/html')
-    res.render('try1')
-})
-
-app.all('/s4bpstn', function (req, res) {// Right now will use this to test the s4bpstn.html
-    res.contentType('text/html')
-    res.render('s4bpstn')
+    res.render('jfmain')
 })
 
 //MongoClient.connect(mongoLabURL, function (err, db) {
