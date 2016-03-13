@@ -3,14 +3,12 @@
 //Key Libraries
 //require('newrelic')
 var express = require('express')
+var session = require('express-session');
 //var bodyParser = require('body-parser') //Required to read the body
-//var session = require('express-session') //Required to handle sessions
-//var cookieparser = require('cookie-parser') //Sesisons inturn need cookie parsing
-//var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose')
 var redis = require("redis")
-var session = require('express-session');
 var redisStore = require('connect-redis')(session);
+
 //Add-on Modules
 var helpers = require('./mylibs/helpers')
 
@@ -40,7 +38,7 @@ let redisClient = redis.createClient({
         return Math.max(options.attempt * 100, 3000);
     }
 })
-redisClient.auth(redisLabPASS, (x) => 'RedisLab Connected on ' + redisLabURL + x)
+redisClient.auth(redisLabPASS)
 
 var log = helpers.log
 
@@ -52,20 +50,18 @@ app.set('view engine', 'html'); // register the template engine
 app.use(session({
     secret: helpers.hourlyState(),
     // create new redis store.
-    store: new redisStore({ /*url: redisLabURL, */client: redisClient, ttl: 260 }),
+    store: new redisStore({ url:redisLabURL,client: redisClient, ttl: 260 }),
     saveUninitialized: false,
-    resave: true,
-    cookie: { path: '/', httpOnly: false, secure: true, maxAge: 600000 }
+    resave: false/*,
+    cookie: { path: '/', httpOnly: false, secure: true, maxAge: 600000 }*/
 }));
 
-//app.use(cookieparser());
-//app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true, secure: false, maxAge: 600000 } })); //maxAge setto 10 mins
 //app.use(bodyParser.json());
 //app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/static', express.static('static'));
 
 app.all('*', function(req, res, next) {
-    console.info('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\tsession:' + JSON.stringify(req.session))
+    console.info('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\tsession:' + JSON.stringify(req.session.lastpath))
     return next()
 })
 
@@ -80,7 +76,10 @@ app.all('/favicon.ico', function(req, res) {// Show my Pretty Face ;) on the fav
 })
 
 app.all('/', function(req, res) {// Main page
-    req.session.lastpath = req.hostname + req.originalUrl + req.path
+    if (!req.session.lastpath) {
+        req.session.lastpath = req.hostname + req.originalUrl + req.path
+        console.log(req.session.lastpath)
+    }
     res.contentType('text/html')
     res.render('jfmain')
 })
@@ -91,9 +90,6 @@ mongoConnection.once('open', (err, db) => {
         process.exit(1)
     } else {
         console.info('Going to start Server. Press Control+C to Exit')
-
-
-
         app.listen(port, function() {
             log(helpers.readPackageJSON(__dirname, "name") + " " +
                 helpers.readPackageJSON(__dirname, "version") +
