@@ -8,14 +8,19 @@ var express = require('express')
 //var cookieparser = require('cookie-parser') //Sesisons inturn need cookie parsing
 //var MongoClient = require('mongodb').MongoClient;
 var mongoose = require('mongoose')
+var redis = require("redis")
+var session = require('express-session');
+var redisStore = require('connect-redis')(session);
 //Add-on Modules
 var helpers = require('./mylibs/helpers')
 
 //Initialization
 var port = process.env.PORT || 80
 var mongoLabURL = process.env.mongoLabURL || require('./secrets.js').mongoDBConnectionString.toString()
+var redisLabURL = process.env.redisLabURL || require('./secrets.js').redisConnectionString.toString()
 mongoose.connect(mongoLabURL, () => console.info('Connected to ' + mongoLabURL))
 let mongoConnection = mongoose.connection
+let redisClient = redis.createClient();
 var log = helpers.log
 
 //Express Application Initialization
@@ -23,6 +28,13 @@ var app = express()
 app.engine('html', helpers.readHTML);// define the template engine [(filePath, options, callback)]
 app.set('views', __dirname + '/pages/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
+app.use(session({
+    secret: helpers.hourlyState(),
+    // create new redis store.
+    store: new redisStore({ url: redisLabURL, client: redisClient, ttl: 260 }),
+    saveUninitialized: false,
+    resave: false
+}));
 //app.use(cookieparser());
 //app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true, secure: false, maxAge: 600000 } })); //maxAge setto 10 mins
 //app.use(bodyParser.json());
@@ -55,6 +67,9 @@ mongoConnection.once('open', (err, db) => {
         process.exit(1)
     } else {
         console.info('Going to start Server. Press Control+C to Exit')
+
+
+
         app.listen(port, function() {
             log(helpers.readPackageJSON(__dirname, "name") + " " +
                 helpers.readPackageJSON(__dirname, "version") +
