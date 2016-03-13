@@ -1,0 +1,22 @@
+{
+  "name": "jfwrtc",
+  "version": "0.0.1",
+  "description": "WebRTC App",
+  "main": "index.js",
+  "scripts": {
+    "test": "node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/julianfrank/jfwrtc.git"
+  },
+  "keywords": [
+    "webrtc"
+  ],
+  "author": "Julian Frank",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/julianfrank/jfwrtc/issues"
+  },
+  "homepage": "https://github.com/julianfrank/jfwrtc#readme"
+}
