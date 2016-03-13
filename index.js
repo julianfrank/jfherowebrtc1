@@ -18,9 +18,30 @@ var helpers = require('./mylibs/helpers')
 var port = process.env.PORT || 80
 var mongoLabURL = process.env.mongoLabURL || require('./secrets.js').mongoDBConnectionString.toString()
 var redisLabURL = process.env.redisLabURL || require('./secrets.js').redisConnectionString.toString()
+var redisLabPASS = process.env.redisLabPASS || require('./secrets.js').redisPassword.toString()
 mongoose.connect(mongoLabURL, () => console.info('Connected to ' + mongoLabURL))
 let mongoConnection = mongoose.connection
-let redisClient = redis.createClient();
+let redisClient = redis.createClient({
+    url: redisLabURL,
+    retry_strategy: function(options) {
+        if (options.error.code === 'ECONNREFUSED') {
+            // End reconnecting on a specific error and flush all commands with a individual error
+            return new Error('The RedisLab server refused the connection');
+        }
+        if (options.total_retry_time > 1000 * 60 * 60) {
+            // End reconnecting after a specific timeout and flush all commands with a individual error
+            return new Error('RedisLab Retry time exhausted');
+        }
+        if (options.times_connected > 10) {
+            // End reconnecting with built in error
+            return undefined;
+        }
+        // reconnect after
+        return Math.max(options.attempt * 100, 3000);
+    }
+})
+redisClient.auth(redisLabPASS, (x) => 'RedisLab Connected on ' + redisLabURL + x)
+
 var log = helpers.log
 
 //Express Application Initialization
@@ -31,10 +52,12 @@ app.set('view engine', 'html'); // register the template engine
 app.use(session({
     secret: helpers.hourlyState(),
     // create new redis store.
-    store: new redisStore({ url: redisLabURL, client: redisClient, ttl: 260 }),
+    store: new redisStore({ /*url: redisLabURL, */client: redisClient, ttl: 260 }),
     saveUninitialized: false,
-    resave: false
+    resave: true,
+    cookie: { path: '/', httpOnly: false, secure: true, maxAge: 600000 }
 }));
+
 //app.use(cookieparser());
 //app.use(session({ secret: helpers.hourlyState(), resave: true, saveUninitialized: true, cookie: { path: '/', httpOnly: true, secure: false, maxAge: 600000 } })); //maxAge setto 10 mins
 //app.use(bodyParser.json());
@@ -42,7 +65,7 @@ app.use(session({
 app.use('/static', express.static('static'));
 
 app.all('*', function(req, res, next) {
-    console.info('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr)
+    console.info('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\tsession:' + JSON.stringify(req.session))
     return next()
 })
 
@@ -57,6 +80,7 @@ app.all('/favicon.ico', function(req, res) {// Show my Pretty Face ;) on the fav
 })
 
 app.all('/', function(req, res) {// Main page
+    req.session.lastpath = req.hostname + req.originalUrl + req.path
     res.contentType('text/html')
     res.render('jfmain')
 })
