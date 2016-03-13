@@ -50,12 +50,17 @@ app.all('/', function(req, res) {// Main page
 })
 
 mongoConnection.once('open', (err, db) => {
-    console.info('Going to start Server. Press Control+C to Exit')
-    app.listen(port, function() {
-        log(helpers.readPackageJSON(__dirname, "name") + " " +
-            helpers.readPackageJSON(__dirname, "version") +
-            "\tStarted & Listening on port\t: " + port)
-    })
+    if (err) {
+        console.log('Problem Connecting with ' + mongoLabURL + ' Going to exit')
+        process.exit(1)
+    } else {
+        console.info('Going to start Server. Press Control+C to Exit')
+        app.listen(port, function() {
+            log(helpers.readPackageJSON(__dirname, "name") + " " +
+                helpers.readPackageJSON(__dirname, "version") +
+                "\tStarted & Listening on port\t: " + port)
+        })
+    }
 })
 
 // Start reading from stdin so we don't exit directly.
