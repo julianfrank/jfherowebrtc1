@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html class="no-js" lang="">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Greta being tested Page B</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script type="text/javascript" id="gretaScript" src="https://cdn.greta.io/greta.min.js" data-ac="2ceca168aff56319577c86f7183a995d"></script>
+
+    <script>
+        GRETA_DEBUG = true;
+    </script>
+</head>
+
+<body>
+    <h1>Greta Test Page B</h1>
+    <a href="/">
+        <h2>Home</h2></a>
+    <a href="/gretaa.html">
+        <h2>Page A</h2></a>
+    <a href="/gretab.html">
+        <h2>Page B</h2></a>
+
+    <img data-greta='/kingjulien.jpg'>
+
+    <label id='gretastatus'>Greta Status</label>
+
+    <script>
+        console.log('JF: Going to initiate connection')
+        greta.signaling.connected(function() {
+      console.log('JF: Connected....Next Going to Subscribe')
+      greta.signaling.subscribe({
+        channel: 'MyChannel',
+        message: onmessage
+      });
+      console.log('JF: Connected....Next Going to Publish')
+      greta.signaling.publish({
+        channel: 'MyChannel',
+        message: 'Hello!',
+      });
+    });
+    function onmessage(msg) {
+      console.log('JF: Received Message '+msg);
+      window.setTimeout(function() {
+        greta.signaling.publish({
+          channel: 'MyChannel',
+          message: 'Hello!'
+        });
+      }, 1000);
+    }
+    </script>
+</body>
+
+</html>
