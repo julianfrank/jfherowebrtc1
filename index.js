@@ -2,8 +2,8 @@
 
 //Key Libraries
 //require('newrelic')
-var express = require('express')
-var session = require('express-session');
+const express = require('express')
+const session = require('express-session');
 //var bodyParser = require('body-parser') //Required to read the body
 var mongoose = require('mongoose')
 var redis = require("redis")
@@ -17,27 +17,16 @@ var port = process.env.PORT || 80
 var mongoLabURL = process.env.mongoLabURL || require('./secrets.js').mongoDBConnectionString.toString()
 var redisLabURL = process.env.redisLabURL || require('./secrets.js').redisConnectionString.toString()
 var redisLabPASS = process.env.redisLabPASS || require('./secrets.js').redisPassword.toString()
-mongoose.connect(mongoLabURL, () => console.info('Connected to ' + mongoLabURL))
+var redisRetryStrategy = (options) => {
+    if (options.error.code === 'ECONNREFUSED') { return new Error('The RedisLab server refused the connection'); }// End reconnecting on a specific error and flush all commands with a individual error
+    if (options.total_retry_time > 1000 * 60 * 60) { return new Error('RedisLab Retry time exhausted'); }// End reconnecting after a specific timeout and flush all commands with a individual error
+    if (options.times_connected > 10) { return undefined; }// End reconnecting with built in error
+    return Math.max(options.attempt * 100, 3000);// reconnect after
+}
+
+mongoose.connect(mongoLabURL, () => log('Connected to ' + mongoLabURL))
 let mongoConnection = mongoose.connection
-let redisClient = redis.createClient({
-    url: redisLabURL,
-    retry_strategy: function(options) {
-        if (options.error.code === 'ECONNREFUSED') {
-            // End reconnecting on a specific error and flush all commands with a individual error
-            return new Error('The RedisLab server refused the connection');
-        }
-        if (options.total_retry_time > 1000 * 60 * 60) {
-            // End reconnecting after a specific timeout and flush all commands with a individual error
-            return new Error('RedisLab Retry time exhausted');
-        }
-        if (options.times_connected > 10) {
-            // End reconnecting with built in error
-            return undefined;
-        }
-        // reconnect after
-        return Math.max(options.attempt * 100, 3000);
-    }
-})
+let redisClient = redis.createClient({ url: redisLabURL, retry_strategy: redisRetryStrategy })
 redisClient.auth(redisLabPASS)
 
 var log = helpers.log
@@ -47,13 +36,10 @@ var app = express()
 app.engine('html', helpers.readHTML);// define the template engine [(filePath, options, callback)]
 app.set('views', __dirname + '/pages/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
+app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-    secret: helpers.hourlyState(),
-    // create new redis store.
-    store: new redisStore({ url:redisLabURL,client: redisClient, ttl: 260 }),
-    saveUninitialized: false,
-    resave: false/*,
-    cookie: { path: '/', httpOnly: false, secure: true, maxAge: 600000 }*/
+    store: new redisStore({ url: redisLabURL, client: redisClient, ttl: 260, prefix: 'session.' }),// create new redis store.
+    secret: helpers.hourlyState(), saveUninitialized: false, resave: false
 }));
 
 //app.use(bodyParser.json());
@@ -61,7 +47,7 @@ app.use(session({
 app.use('/static', express.static('static'));
 
 app.all('*', function(req, res, next) {
-    console.info('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\tsession:' + JSON.stringify(req.session.lastpath))
+    log('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\tsession:' + JSON.stringify(req.session.lastpath))
     return next()
 })
 
@@ -78,18 +64,19 @@ app.all('/favicon.ico', function(req, res) {// Show my Pretty Face ;) on the fav
 app.all('/', function(req, res) {// Main page
     if (!req.session.lastpath) {
         req.session.lastpath = req.hostname + req.originalUrl + req.path
-        console.log(req.session.lastpath)
+        log(req.session.lastpath)
     }
     res.contentType('text/html')
     res.render('jfmain')
 })
 
+//Start the server only if DB is Ready
 mongoConnection.once('open', (err, db) => {
     if (err) {
-        console.log('Problem Connecting with ' + mongoLabURL + ' Going to exit')
+        log('Problem Connecting with ' + mongoLabURL + ' Going to exit')
         process.exit(1)
     } else {
-        console.info('Going to start Server. Press Control+C to Exit')
+        log('Going to start Server. Press Control+C to Exit')
         app.listen(port, function() {
             log(helpers.readPackageJSON(__dirname, "name") + " " +
                 helpers.readPackageJSON(__dirname, "version") +
@@ -101,9 +88,9 @@ mongoConnection.once('open', (err, db) => {
 // Start reading from stdin so we don't exit directly.
 process.stdin.resume();
 process.on('SIGINT', () => {
-    console.log('About to exit');
+    log('About to exit');
     mongoConnection.close(() => {
-        console.log('Closed Mongoose Connection : ', mongoLabURL)
+        log('Closed Mongoose Connection : ' + mongoLabURL)
         process.exit(1)
     })
 });
