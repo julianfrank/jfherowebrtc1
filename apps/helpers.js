@@ -105,7 +105,7 @@ module.exports.requestHTTPS = exports.requestHTTPS = requestHTTPS;
 /*Read Variables in package.json
 @variable 	String 	Top level string to be read from 'PAckage.JSON' file*/
 function readPackageJSON(pkgDir,variable) {
-	var packageJSON = require(pkgDir+'/package.json')
+	var packageJSON = require('../package.json')
 	return packageJSON[variable];
 }
 module.exports.readPackageJSON = exports.readPackageJSON = readPackageJSON

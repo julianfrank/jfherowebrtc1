@@ -2,7 +2,7 @@
   "name": "jfwrtc",
   "version": "0.0.3",
   "description": "WebRTC App",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
     "test": "node index"
   },
