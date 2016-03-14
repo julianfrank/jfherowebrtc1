@@ -41,7 +41,7 @@ app.set('views', __dirname + '/pages/'); // specify the views directory
 app.set('view engine', 'html'); // register the template engine
 app.set('trust proxy', 1) // trust first proxy
 app.use(session({
-    store: new redisStore({ url: redisLabURL, client: redisClient, ttl: 260, prefix: 'session.' }),// create new redis store.
+    store: new redisStore({ url: redisLabURL, client: redisClient, ttl: 360, prefix: 'session.' }),// create new redis store.
     secret: helpers.hourlyState(), saveUninitialized: false, resave: false
 }));
 //app.use(bodyParser.json());
@@ -67,7 +67,7 @@ app.all('/favicon.ico', (req, res) => {// Show my Pretty Face ;) on the favicon 
 app.all('/', (req, res) => {// Main page
     if (!req.session.lastpath) {
         req.session.lastpath = req.hostname + req.originalUrl + req.path
-        log(req.session.lastpath)
+        log('No lastpath in session. Setting '+req.session.lastpath)
     }
     res.contentType('text/html')
     res.render('jfmain')
