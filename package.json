@@ -1,6 +1,6 @@
 {
   "name": "jfwrtc",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "WebRTC App",
   "main": "app.js",
   "scripts": {
@@ -24,6 +24,6 @@
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "mongoose": "^4.4.7",
-    "redis": "^2.4.2"
+    "redis": "^2.5.1"
   }
 }

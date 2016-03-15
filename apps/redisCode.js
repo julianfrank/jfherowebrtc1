@@ -1,6 +1,16 @@
 'use strict'
+const redis = require("redis")
+const expressSession = require('express-session');
+const redisStore = require('connect-redis')(expressSession);
+const helpers = require('../apps/helpers')
 
-function initRedis(redis, log, redisClient, redisSessionStore, redisStore, redisLabURL, redisLabPASS) {
+const log = helpers.log
+const redisLabURL = process.env.redis || require('../secrets.js').redis.head + require('../secrets.js').redis.url
+const redisLabPASS = process.env.redis || require('../secrets.js').redis.creds
+let redisClient = null
+let redisSessionStore = null
+
+function initRedis() {
     return new Promise((resolve, reject) => {
         const redisRetryStrategy = (options) => {
             log('Redis Retry being Executed')
@@ -21,7 +31,7 @@ function initRedis(redis, log, redisClient, redisSessionStore, redisStore, redis
                     redisSessionStore.client.info((err, reply) => {
                         if (err) {
                             log('Error Returned by Redis Server :' + err)
-                            reject()
+                            reject(err)
                         } else {
                             log('Redis Session Store Created Successfully')
                             resolve()//Ensure we proceed only if Redis is connected and RedisSessionstore is working
@@ -32,10 +42,8 @@ function initRedis(redis, log, redisClient, redisSessionStore, redisStore, redis
         })
     })
 }
-module.exports.initRedis = exports.initRedis = initRedis
 
-function quitRedis(redis, log, redisLabURL, redisClient) {
-    console.log(redisClient)
+function quitRedis() {
     return new Promise((resolve, reject) => {
         redisClient.quit((err, res) => {
             if (res === 'OK') {
@@ -46,9 +54,10 @@ function quitRedis(redis, log, redisLabURL, redisClient) {
                 })
             } else {
                 log('Error: Redis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway')
-                reject()
+                reject(err)
             }
         })
     })
 }
-module.exports.quitRedis = exports.quitRedis = quitRedis
+
+module.exports = { initRedis, quitRedis, redisSessionStore }
