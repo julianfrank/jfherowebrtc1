@@ -7,7 +7,7 @@ const helpers = require('../apps/helpers')
 const log = helpers.log
 const redisenv = process.env.redis || require('../secrets.js').redis
 const redisLabURL = redisenv.head + redisenv.url
-const redisLabPASS = redisenv.creds
+const redisLabPASS = redisenv.creds.toString()
 let redisClient = null
 let redisSessionStore = null
 
