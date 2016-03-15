@@ -5,10 +5,8 @@ const redisStore = require('connect-redis')(expressSession);
 const helpers = require('../apps/helpers')
 
 const log = helpers.log
-const redisenv = process.env.REDISENV || require('../secrets.js').redis
-const redisLabURL = redisenv.head + redisenv.url
-const redisLabPASS = redisenv.creds
-log((typeof redisenv) + redisenv)
+const redisLabURL = process.env.REDISURL || require('../secrets.js').redisurl
+const redisLabPASS = process.env.REDISCREDS || require('../secrets.js').rediscreds
 let redisClient = null
 let redisSessionStore = null
 
@@ -21,7 +19,7 @@ function initRedis() {
             if (options.times_connected > 10) { return undefined; }// End reconnecting with built in error
             return Math.max(options.attempt * 100, 3000);// reconnect after
         }
-        redisClient = redis.createClient({ url: redisLabURL, retry_strategy: redisRetryStrategy })
+        redisClient = redis.createClient({ url: 'redis://' + redisLabURL, retry_strategy: redisRetryStrategy })
         redisClient.auth(redisLabPASS, () => {
             redisClient.info((err, reply) => {
                 if (err) {
@@ -29,7 +27,7 @@ function initRedis() {
                     reject()
                 } else {
                     log('Connected to ' + redisLabURL)
-                    redisSessionStore = new redisStore({ url: redisLabURL, client: redisClient, ttl: 360, prefix: 'session.' })// create new redis store for Session Management
+                    redisSessionStore = new redisStore({ url: 'redis://' + redisLabURL, client: redisClient, ttl: 360, prefix: 'session.' })// create new redis store for Session Management
                     redisSessionStore.client.info((err, reply) => {
                         if (err) {
                             log('Error Returned by Redis Server :' + err)
