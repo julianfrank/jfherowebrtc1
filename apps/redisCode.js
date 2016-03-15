@@ -5,8 +5,9 @@ const redisStore = require('connect-redis')(expressSession);
 const helpers = require('../apps/helpers')
 
 const log = helpers.log
-const redisLabURL = process.env.redis || require('../secrets.js').redis.head + require('../secrets.js').redis.url
-const redisLabPASS = process.env.redis || require('../secrets.js').redis.creds
+const redisenv = process.env.redis || require('../secrets.js').redis
+const redisLabURL = redisenv.head + redisenv.url
+const redisLabPASS = redisenv.creds
 let redisClient = null
 let redisSessionStore = null
 
