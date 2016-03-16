@@ -20,10 +20,14 @@
   },
   "homepage": "https://github.com/julianfrank/jfwrtc#readme",
   "dependencies": {
+    "body-parser": "^1.15.0",
     "connect-redis": "^3.0.2",
+    "cookie-parser": "^1.4.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "mongoose": "^4.4.7",
+    "passport": "^0.3.2",
+    "passport-azure-ad": "^1.4.1",
     "redis": "^2.5.1"
   }
 }

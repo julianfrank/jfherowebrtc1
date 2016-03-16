@@ -26,8 +26,12 @@ function server() {
 
     //Express Application Initialization
     let myexpress = require('../apps/expressCode')
-    const app = myexpress.app
     const initExpress = () => myexpress.initExpress(redisSessionStore, expressSession)
+    const app = initExpress.app
+
+    //Passport Application Initialization
+    let mypassport = require('../apps/passportCode')
+    const initPassport = () => mypassport.initPassport(app, passport)
 
     const startServer = () => {
         log('Going to start Server. Press Control+C to Exit')

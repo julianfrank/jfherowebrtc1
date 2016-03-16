@@ -1,7 +1,8 @@
 'use strict'
 
 const express = require('express')
-//var bodyParser = require('body-parser') //Required to read the body
+const bodyParser = require('body-parser') //Required to read the body
+const cookieParser = require('cookie-parser')
 const helpers = require('../apps/helpers')
 
 const log = helpers.log
@@ -14,12 +15,15 @@ let initExpress = (redisSessionStore, expressSession) => {
         app.set('views', 'pages'); // specify the views directory
         app.set('view engine', 'html'); // register the template engine
         app.set('trust proxy', 1) // trust first proxy
+        app.use(cookieParser())
         app.use(expressSession({
             store: redisSessionStore,
             secret: helpers.hourlyState(), saveUninitialized: false, resave: false
         }));
-        //app.use(bodyParser.json());
-        //app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(bodyParser.json({ type: 'application/*+json' }));
+        app.use(bodyParser.text({ type: 'text/html' }))
+        app.use(bodyParser.urlencoded({ extended: true }));
+        app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
         app.use('/static', express.static('static'));
 
         //Express Routers
