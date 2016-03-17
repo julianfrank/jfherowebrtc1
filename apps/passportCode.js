@@ -44,7 +44,7 @@ let initPassport = (app) => {
             clientSecret: process.env.CLIENTSECRET || config.clientSecret,
             //oidcIssuer: process.env.ISSUER || config.issuer,
             identityMetadata: process.env.IDENMETA || config.identityMetadata,
-            skipUserProfile: process.env.SKIPUSERPROFILE || config.skipUserProfile,
+            skipUserProfile: true,
             responseType: process.env.RESPTYPE || config.responseType,
             responseMode: process.env.RESPMODE || config.responseMode,
             validateIssuer: true,
