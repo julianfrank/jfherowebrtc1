@@ -46,10 +46,10 @@ let initPassport = (app) => {
         //   with a user object.
         passport.use(new OIDCStrategy({
             callbackURL: process.env.RETURNURL || config.returnURL,
-            realm: process.env.REALM || config.realm,
+            //realm: process.env.REALM || config.realm,
             clientID: process.env.CLIENTID || config.clientID,
             clientSecret: process.env.CLIENTSECRET || config.clientSecret,
-            oidcIssuer: process.env.ISSUER || config.issuer,
+            //oidcIssuer: process.env.ISSUER || config.issuer,
             identityMetadata: process.env.IDENMETA || config.identityMetadata,
             skipUserProfile: process.env.SKIPUSERPROFILE || config.skipUserProfile,
             responseType: process.env.RESPTYPE || config.responseType,
