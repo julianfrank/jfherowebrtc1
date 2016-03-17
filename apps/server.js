@@ -27,11 +27,11 @@ function server() {
     //Express Application Initialization
     let myexpress = require('../apps/expressCode')
     const initExpress = () => myexpress.initExpress(redisSessionStore, expressSession)
-    const app = initExpress.app
+    let app = myexpress.app
 
     //Passport Application Initialization
     let mypassport = require('../apps/passportCode')
-    const initPassport = () => mypassport.initPassport(app, passport)
+    const initPassport = () => mypassport.initPassport(app)
 
     const startServer = () => {
         log('Going to start Server. Press Control+C to Exit')
@@ -50,6 +50,6 @@ function server() {
     const exitProcess = () => process.exit(0)
 
     //Start the Initiation
-    initRedis().then(initMongoose).then(startServer).then(initExpress).catch(stopProcess)
+    initRedis().then(initMongoose).then(initExpress).then(initPassport).then(startServer).catch(stopProcess)
 }
 module.exports.server = exports.server = server

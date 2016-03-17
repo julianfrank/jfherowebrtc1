@@ -3,11 +3,17 @@
 const express = require('express')
 const bodyParser = require('body-parser') //Required to read the body
 const cookieParser = require('cookie-parser')
+let passport = require('passport')
+const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const helpers = require('../apps/helpers')
 
 const log = helpers.log
+let config = require('../secrets');
+// array to hold logged in users
+let users = [];
 
 const app = express()
+app.locals.name = 'Julian Frank\'s WebRTC Application'
 
 let initExpress = (redisSessionStore, expressSession) => {
     return new Promise((resolve, reject) => {
@@ -25,14 +31,13 @@ let initExpress = (redisSessionStore, expressSession) => {
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.raw({ type: 'application/vnd.custom-type' }))
         app.use('/static', express.static('static'));
+        app.use(function(err, req, res, next) { if (!err) reject('Problem in Express with error :' + err) });
 
         //Express Routers
-        app.all('*', (req, res, next) => {
+        app.all('*', (err, req, res, next) => {
             log('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\treq.session:' + !!req.session)
-            if (typeof req.session === 'undefined') {
-                console.trace()
-                exitProcess(0, 'Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
-            }
+            if (typeof req.session === 'undefined') reject('Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
+            if (err) reject('Fatal Error: Error in Express Route ${err}. Going to exit Process.')
             return next()
         })
 
