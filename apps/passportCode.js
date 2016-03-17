@@ -3,9 +3,9 @@
 let passport = require('passport')
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const helpers = require('../apps/helpers')
-
 const log = helpers.log
 let config = require('../secrets');
+
 // array to hold logged in users
 let users = [];
 let newapp = {}
