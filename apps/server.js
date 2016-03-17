@@ -29,7 +29,6 @@ function server() {
     const initExpress = () => myexpress.initExpress(redisSessionStore, expressSession)
     let app = myexpress.app
 
-    
     //Passport Application Initialization
     let mypassport = require('../apps/passportCode')
     const initPassport = () => mypassport.initPassport(app)

@@ -4,7 +4,6 @@ let passport = require('passport')
 const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const helpers = require('../apps/helpers')
 const log = helpers.log
-let config = require('../secrets');
 
 // array to hold logged in users
 let users = [];
@@ -38,15 +37,15 @@ let initPassport = (app) => {
         //   credentials (in this case, an OpenID identifier), and invoke a callback
         //   with a user object.
         passport.use(new OIDCStrategy({
-            callbackURL: process.env.RETURNURL || config.returnURL,
-            //realm: process.env.REALM || config.realm,
-            clientID: process.env.CLIENTID || config.clientID,
-            clientSecret: process.env.CLIENTSECRET || config.clientSecret,
-            //oidcIssuer: process.env.ISSUER || config.issuer,
-            identityMetadata: process.env.IDENMETA || config.identityMetadata,
+            callbackURL: process.env.RETURNURL || require('../secrets.js').returnURL,
+            //realm: process.env.REALM || require('../secrets.js').realm,
+            clientID: process.env.CLIENTID || require('../secrets.js').clientID,
+            clientSecret: process.env.CLIENTSECRET || require('../secrets.js').clientSecret,
+            //oidcIssuer: process.env.ISSUER || require('../secrets.js').issuer,
+            identityMetadata: process.env.IDENMETA || require('../secrets.js').identityMetadata,
             skipUserProfile: true,
-            responseType: process.env.RESPTYPE || config.responseType,
-            responseMode: process.env.RESPMODE || config.responseMode,
+            responseType: process.env.RESPTYPE || require('../secrets.js').responseType,
+            responseMode: process.env.RESPMODE || require('../secrets.js').responseMode,
             validateIssuer: true,
             passReqToCallback: false,
             loggingLevel: 'warn' // valid are 'info', 'warn', 'error'. Error always goes to stderr in Unix.
