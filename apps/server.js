@@ -29,6 +29,7 @@ function server() {
     const initExpress = () => myexpress.initExpress(redisSessionStore, expressSession)
     let app = myexpress.app
 
+    
     //Passport Application Initialization
     let mypassport = require('../apps/passportCode')
     const initPassport = () => mypassport.initPassport(app)
@@ -38,15 +39,13 @@ function server() {
         app.listen(port, () => { log(helpers.readPackageJSON(__dirname, "name") + " " + helpers.readPackageJSON(__dirname, "version") + "\tStarted & Listening on port\t: " + port) })
     }
 
-    // Start reading from stdin so we don't exit directly.
+    // Process Shutdown Zone
     process.stdin.resume();
     process.on('SIGINT', () => { stopProcess('SIGINT') });
-
     const stopProcess = (reason) => {
         log('About to exit due to ' + reason);
         closeMongoose().then(quitRedis).then(exitProcess).catch(exitProcess)
     }
-
     const exitProcess = () => process.exit(0)
 
     //Start the Initiation
