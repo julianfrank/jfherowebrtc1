@@ -3,12 +3,10 @@
 const express = require('express')
 const bodyParser = require('body-parser') //Required to read the body
 const cookieParser = require('cookie-parser')
-let passport = require('passport')
-const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 const helpers = require('../apps/helpers')
 
 const log = helpers.log
-let config = require('../secrets');
+
 // array to hold logged in users
 let users = [];
 
@@ -35,7 +33,7 @@ let initExpress = (redisSessionStore, expressSession) => {
 
         //Express Routers
         app.all('*', (err, req, res, next) => {
-            log('ips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\treq.session:' + !!req.session)
+            log(req.locals.name+'\tips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\treq.session:' + !!req.session)
             if (typeof req.session === 'undefined') reject('Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             if (err) reject('Fatal Error: Error in Express Route ${err}. Going to exit Process.')
             return next()
