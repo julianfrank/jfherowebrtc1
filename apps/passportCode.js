@@ -10,37 +10,30 @@ let config = require('../secrets');
 let users = [];
 let newapp = {}
 
-// Passport session setup. (Section 2)
-
-//   To support persistent login sessions, Passport needs to be able to
-//   serialize users into and deserialize users out of the session.  Typically,
-//   this will be as simple as storing the user ID when serializing, and finding
-//   the user by ID when deserializing.
-passport.serializeUser(function(user, done) {
-    done(null, user.email);
-});
-
-passport.deserializeUser(function(id, done) {
-    findByEmail(id, function(err, user) {
-        done(err, user);
-    });
-});
-
-var findByEmail = function(email, fn) {
-    for (var i = 0, len = users.length; i < len; i++) {
-        var user = users[i];
-        log('we are using user: ', user);
-        if (user.email === email) {
-            return fn(null, user);
-        }
-    }
-    return fn(null, null);
-};
-
 let initPassport = (app) => {
     return new Promise((resolve, reject) => {
-        // Use the OIDCStrategy within Passport. (Section 2) 
-        // 
+
+        passport.serializeUser(function(user, done) {
+            done(null, user.email);
+        });
+
+        passport.deserializeUser(function(id, done) {
+            findByEmail(id, function(err, user) {
+                done(err, user);
+            });
+        });
+
+        var findByEmail = function(email, fn) {
+            for (var i = 0, len = users.length; i < len; i++) {
+                var user = users[i];
+                log('we are using user: ', user);
+                if (user.email === email) {
+                    return fn(null, user);
+                }
+            }
+            return fn(null, null);
+        };
+        // Use the OIDCStrategy within Passport. (Section 2)  
         //   Strategies in passport require a `validate` function, which accept
         //   credentials (in this case, an OpenID identifier), and invoke a callback
         //   with a user object.
@@ -138,6 +131,7 @@ let initPassport = (app) => {
         resolve()
     })
 }
+
 // Simple route middleware to ensure user is authenticated. (Section 4)
 //   Use this route middleware on any resource that needs to be protected.  If
 //   the request is authenticated (typically via a persistent login session),
