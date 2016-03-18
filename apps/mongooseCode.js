@@ -18,7 +18,7 @@ let initMongoose = () => {
                     log('Problem Connecting with ' + mdburl + 'due to ' + err + ' Going to exit')
                     reject()
                 } else {
-                    resolve()
+                    process.nextTick(() => resolve())
                 }
             })
         })

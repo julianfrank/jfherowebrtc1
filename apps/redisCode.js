@@ -34,7 +34,7 @@ function initRedis() {
                             reject(err)
                         } else {
                             log('Redis Session Store Created Successfully')
-                            resolve()//Ensure we proceed only if Redis is connected and RedisSessionstore is working
+                            process.nextTick(() => resolve())//Ensure we proceed only if Redis is connected and RedisSessionstore is working
                         }
                     })
                 }
