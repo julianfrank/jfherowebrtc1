@@ -158,7 +158,7 @@ let initExpress = (redisSessionStore, expressSession) => {
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
                 log.info('We received a POST return from AzureAD.');
-                res.render('secureapp');
+                res.render('secureApp');
             });
 
         app.get('/logout', function(req, res) {
