@@ -38,7 +38,7 @@ let addAzAdRoutes = (processObjects) => {
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
                 log('We received a GET return from AzureAD.');
-                res.render('secureapp');
+                res.render('secureApp');
             });
 
         // POST /oauth2return
