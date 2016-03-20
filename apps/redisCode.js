@@ -41,12 +41,10 @@ function initRedis(processObjects) {
 function quitRedis(processObjects) {
     return new Promise((resolve, reject) => {
 
-        let redisClient = processObjects.redisClient
-
-        redisClient.quit((err, res) => {
+        processObjects.redisClient.quit((err, res) => {
             if (res === 'OK') {
                 log('Closed Redis Connection: ' + redisLabURL)
-                redisSessionStore.client.quit((err, res) => {
+                processObjects.redisSessionStore.client.quit((err, res) => {
                     if (res === 'OK') log('Alert! Redis Session Still seems Not Closed. Continuing to End Process Anyway')
                     resolve(processObjects)
                 })

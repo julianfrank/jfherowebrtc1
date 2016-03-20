@@ -10,7 +10,7 @@ function server() {
     const app = express()
     //Redis Session Store and Express Session Management Module 
     const expressSession = require('express-session');
-    const redis=require('redis')
+    const redis = require('redis')
     const redisStore = require('connect-redis')(expressSession);
     //Passport for Authentication Management
     let passport = require('passport')
@@ -48,14 +48,14 @@ function server() {
             .then(quitRedis)
             .then(exitProcess)
             .catch(exitProcess)
-        exitProcess()
     }
     // Process Shutdown Zone
     const exitProcess = () => process.exit(0)
     process.stdin.resume();
     process.on('SIGINT', () => { stopProcess('SIGINT') });
 
-    let thisProcessObjects = {
+    //Object Packaged to be passed between Boot Loader and Unloaders
+    const thisProcessObjects = {
         express: express,
         app: app,
         expressSession: expressSession,
