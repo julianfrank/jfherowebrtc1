@@ -1,14 +1,14 @@
 'use strict'
 const utils = require('util')
+const helpers = require('../apps/helpers')
+const log = helpers.log
 
 let initExpress = (processObjects) => {
+    log('expressCode.js\t:Initializing Express')
     return new Promise((resolve, reject) => {
 
         const bodyParser = require('body-parser') //Required to read the body
         const cookieParser = require('cookie-parser')
-
-        const helpers = require('../apps/helpers')
-        const log = helpers.log
 
         let app = processObjects.app
         app.locals.name = 'Julian Frank\'s WebRTC Application'
@@ -29,10 +29,10 @@ let initExpress = (processObjects) => {
         app.use('/static', processObjects.express.static('static'));
         //[TODO] Add logic to detect session store initialization
         //if (!req.session) {                reject('Problem in Express. Session Engine not Initialized')            } 
-        app.all('*', (err, req, res, next) => { if (err) reject('Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
+        app.all('*', (err, req, res, next) => { if (err) reject('expressCode.js\t:Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
         app.all('*', (req, res, next) => {//Default Route to log All Access
-            log(app.locals.name + '\tips:' + req.ips + '\tprotocol:' + req.protocol + '\txhr:' + req.xhr + '\treq.session:' + !!req.session)
-            if (typeof req.session === 'undefined') reject('Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
+            log('expressCode.js\t:req.path:' + req.path + '\treq.session:' + !!req.session)
+            if (typeof req.session === 'undefined') reject('expressCode.js\t:Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             //res.send(app.locals.name+' : This is Visit Number '+req.session.visitcount++)//Only for debugging ..remove 
             return next()
         })

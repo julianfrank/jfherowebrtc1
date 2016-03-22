@@ -1,12 +1,11 @@
 'use strict'
+const helpers = require('../apps/helpers')
+const log = helpers.log
 
 let addAzAd = (processObjects) => {
+    log('expressAzAd.js\t:Initializing Passport AzAD Middleware')
     return new Promise((resolve, reject) => {
-
         const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
-
-        const helpers = require('../apps/helpers')
-        const log = helpers.log
 
         // array to hold logged in users
         let users = processObjects.users
@@ -15,17 +14,15 @@ let addAzAd = (processObjects) => {
         passport.serializeUser(function(user, done) {
             done(null, user.email);
         });
-
         passport.deserializeUser(function(id, done) {
             findByEmail(id, function(err, user) {
                 done(err, user);
             });
         });
-
         var findByEmail = function(email, fn) {
             for (var i = 0, len = users.length; i < len; i++) {
                 var user = users[i];
-                log('we are using user: ', user);
+                log('expressAzAd.js\t:we are using user: ', user);
                 if (user.email === email) {
                     return fn(null, user);
                 }
@@ -52,7 +49,7 @@ let addAzAd = (processObjects) => {
         },
             function(iss, sub, profile, accessToken, refreshToken, done) {
                 if (!profile.email) {
-                    return done(new Error("No email found"), null);
+                    return done(new Error("expressAzAd.js\t:No email found"), null);
                 }
                 // asynchronous verification, for effect...
                 process.nextTick(function() {
@@ -79,6 +76,8 @@ let addAzAd = (processObjects) => {
             if (req.isAuthenticated()) { return next(); }
             res.redirect('/login')
         }
+
+        log('expressAzAd.js\t:Adding Passport AzAD Middleware to Express')
 
         let app = processObjects.app
         // Initialize Passport!  Also use passport.session() middleware, to support

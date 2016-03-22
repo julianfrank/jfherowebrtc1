@@ -37,13 +37,13 @@ function server() {
 
     //Start Server
     const startServer = () => {
-        log('Going to start ' + app.locals.name + 'Server. Press Control+C to Exit')
-        app.listen(port, () => { log(helpers.readPackageJSON(__dirname, "name") + " " + helpers.readPackageJSON(__dirname, "version") + "\tStarted & Listening on port\t: " + port) })
+        log('server.js: Going to start ' + app.locals.name + '. Press Control+C to Exit')
+        app.listen(port, () => { log('server.js: ' + app.locals.name + " " + helpers.readPackageJSON(__dirname, "version") + " Started & Listening on port: " + port) })
     }
 
     //Stop PRocess
     const stopProcess = (reason) => {
-        log('About to exit due to ' + reason);
+        log('server.js\t:About to exit due to ' + reason);
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(exitProcess)
@@ -70,7 +70,7 @@ function server() {
         stopProcess: stopProcess
     }
 
-    //Start the Initiation
+    //Start the Application
     initRedis(thisProcessObjects)
         .then(initExpress)
         .then(addAppRoutes)

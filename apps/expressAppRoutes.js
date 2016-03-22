@@ -4,6 +4,7 @@ const helpers = require('../apps/helpers')
 const log = helpers.log
 
 let addAppRoutes = (processObjects) => {
+    log('expressAppRoutes.js\t:Adding Application Routers')
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
@@ -21,7 +22,7 @@ let addAppRoutes = (processObjects) => {
         app.all('/', (req, res) => {// Main page
             if (!req.session.lastpath) {
                 req.session.lastpath = req.hostname + req.originalUrl + req.path
-                log('No lastpath in session. Setting ' + req.session.lastpath)
+                log('expressAppRoutes.js\t:No lastpath in session. Setting ' + req.session.lastpath)
             }
             res.contentType('text/html')
             res.render('jfmain')

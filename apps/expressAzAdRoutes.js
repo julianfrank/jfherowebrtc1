@@ -4,15 +4,16 @@ const helpers = require('../apps/helpers')
 const log = helpers.log
 
 let addAzAdRoutes = (processObjects) => {
+    log('expressAzAdRoutes.js\t:Adding AzAD Related Routes')
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
-        let passport=processObjects.passport
+        let passport = processObjects.passport
 
         app.get('/oauth2signin',
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/login' }),
             function(req, res) {
-                log('Login was called in the Sample');
+                log('expressAzAdRoutes.js\t:Login was called in the Sample');
                 res.redirect('/');
             });
 
@@ -25,7 +26,7 @@ let addAzAdRoutes = (processObjects) => {
         app.get('/auth/openid',
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
-                log('Authenitcation was called in the Sample');
+                log('expressAzAdRoutes.js\t:Authentication was called in the Sample');
                 res.redirect('/');
             })
 
@@ -37,7 +38,7 @@ let addAzAdRoutes = (processObjects) => {
         app.get('/oauth2return',
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
-                log('We received a GET return from AzureAD.');
+                log('expressAzAdRoutes.js\t:We received a GET return from AzureAD.');
                 res.render('secureApp');
             });
 
@@ -49,7 +50,7 @@ let addAzAdRoutes = (processObjects) => {
         app.post('/oauth2return',
             passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
-                log('We received a POST return from AzureAD.');
+                log('expressAzAdRoutes.js\t:We received a POST return from AzureAD.');
                 res.render('secureApp');
             });
 
