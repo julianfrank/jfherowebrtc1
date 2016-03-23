@@ -1,6 +1,7 @@
 'use strict'
 const helpers = require('../apps/helpers')
 const log = helpers.log
+const util = require('util')
 
 let addAzAd = (processObjects) => {
     log('expressAzAd.js\t:Initializing Passport AzAD Middleware')
@@ -12,9 +13,11 @@ let addAzAd = (processObjects) => {
         let passport = processObjects.passport
 
         passport.serializeUser(function(user, done) {
+            log('expressAzAd.js\t:\tSerializing user.email=' + user.email)
             done(null, user.email);
         });
         passport.deserializeUser(function(id, done) {
+            log('expressAzAd.js\t:\tDeserializing id=' + id)
             findByEmail(id, function(err, user) {
                 done(err, user);
             });
@@ -58,10 +61,12 @@ let addAzAd = (processObjects) => {
                             return done(err);
                         }
                         if (!user) {
+                            log('expressAzAd.js\t:Profile being Added -' + util.inspect(profile))
                             // "Auto-registration"
                             users.push(profile);
                             return done(null, profile);
                         }
+                        log('expressAzAd.js\t:Logged in User Table -' + util.inspect(users))
                         return done(null, user);
                     });
                 });
@@ -73,8 +78,11 @@ let addAzAd = (processObjects) => {
         //   the request will proceed.  Otherwise, the user will be redirected to the
         //   login page.
         function ensureAuthenticated(req, res, next) {
-            if (req.isAuthenticated()) { return next(); }
-            res.redirect('/login')
+            if (req.isAuthenticated()) {
+                return next();
+            } else {
+                res.redirect('/oauth2signin')
+            }
         }
 
         log('expressAzAd.js\t:Adding Passport AzAD Middleware to Express')

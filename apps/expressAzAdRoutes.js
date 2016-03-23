@@ -11,7 +11,7 @@ let addAzAdRoutes = (processObjects) => {
         let passport = processObjects.passport
 
         app.get('/oauth2signin',
-            passport.authenticate('azuread-openidconnect', { failureRedirect: '/login' }),
+            passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin' }),
             function(req, res) {
                 log('expressAzAdRoutes.js\t:Login was called in the Sample');
                 res.redirect('/');

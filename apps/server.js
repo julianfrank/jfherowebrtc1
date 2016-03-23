@@ -38,7 +38,9 @@ function server() {
     //Start Server
     const startServer = () => {
         log('server.js: Going to start ' + app.locals.name + '. Press Control+C to Exit')
-        app.listen(port, () => { log('server.js: ' + app.locals.name + " " + helpers.readPackageJSON(__dirname, "version") + " Started & Listening on port: " + port) })
+        app.listen(port, () => { log('server.js: ' + app.locals.name + " " + 
+        helpers.readPackageJSON(__dirname, "version") + 
+        " Started & Listening on port: " + port) })
     }
 
     //Stop PRocess

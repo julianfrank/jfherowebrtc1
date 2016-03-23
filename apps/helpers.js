@@ -10,7 +10,7 @@ var os = require('os')
 @logText    String  Text to be logged with a timestamp
 */
 function log(logText){
-    console.log(Date().substring(4,24)+'\t: '+logText)
+    console.log(Date().substring(4,24)+' |  '+logText)
 }
 module.exports.log = exports.log = log
 
