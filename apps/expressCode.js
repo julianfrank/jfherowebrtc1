@@ -36,10 +36,7 @@ let initExpress = (processObjects) => {
             //res.send(app.locals.name+' : This is Visit Number '+req.session.visitcount++)//Only for debugging ..remove 
             return next()
         })
-        process.nextTick(() => {
-            //log(utils.inspect(processObjects.redisSessionStore))
-            resolve(processObjects)
-        })
+        process.nextTick(() => { resolve(processObjects) })
     })
 }
 

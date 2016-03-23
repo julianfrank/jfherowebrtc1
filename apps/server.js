@@ -58,16 +58,10 @@ function server() {
 
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
-        express: express,
-        app: app,
-        expressSession: expressSession,
-        redis: redis,
-        redisClient: redisClient,
-        redisStore: redisStore,
-        redisSessionStore: redisSessionStore,
+        express: express,app: app,expressSession: expressSession,
+        redis: redis,redisClient: redisClient,redisStore: redisStore,redisSessionStore: redisSessionStore,
         passport: passport,
-        mongoose: mongoose,
-        mongoConnection: mongoConnection,
+        mongoose: mongoose,mongoConnection: mongoConnection,
         users: users,
         stopProcess: stopProcess
     }
@@ -75,9 +69,9 @@ function server() {
     //Start the Application
     initRedis(thisProcessObjects)
         .then(initExpress)
-        .then(addAppRoutes)
         .then(addAzAd)
         .then(addAzAdRoutes)
+        .then(addAppRoutes)
         .then(initMongoose)
         .then(startServer)
         .catch(stopProcess)

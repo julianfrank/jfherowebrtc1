@@ -25,7 +25,11 @@ let addAppRoutes = (processObjects) => {
                 log('expressAppRoutes.js\t:No lastpath in session. Setting ' + req.session.lastpath)
             }
             res.contentType('text/html')
-            res.render('jfmain')
+            if (req.isAuthenticated()) {
+                res.render('secureApp');
+            } else {
+                res.render('jfmain')
+            }
         })
 
         process.nextTick(() => resolve(processObjects))
