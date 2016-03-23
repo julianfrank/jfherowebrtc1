@@ -16,11 +16,11 @@ let initExpress = (processObjects) => {
         app.engine('html', helpers.readHTML);// define the template engine [(filePath, options, callback)]
         app.set('views', 'pages'); // specify the views directory
         app.set('view engine', 'html'); // register the template engine
-        app.set('trust proxy', 1) // trust first proxy
+        app.set('trust proxy', true) // trust first proxy
         app.use(cookieParser())
         app.use(processObjects.expressSession({
             store: processObjects.redisSessionStore,
-            secret: helpers.hourlyState(), saveUninitialized: false, resave: false
+            secret: helpers.hourlyState(), saveUninitialized: false, resave: false,cookie:{secure:true}
         }));
         app.use(bodyParser.json({ type: 'application/*+json' }));
         app.use(bodyParser.text({ type: 'text/html' }))
@@ -31,11 +31,12 @@ let initExpress = (processObjects) => {
         //if (!req.session) {                reject('Problem in Express. Session Engine not Initialized')            } 
         app.all('*', (err, req, res, next) => { if (err) reject('expressCode.js\t:Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
         app.all('*', (req, res, next) => {//Default Route to log All Access
-            log('expressCode.js\t:req.path:' + req.path + '\treq.session:' + !!req.session)
+            log('expressCode.js\t:req.path:' + req.path + '\treq.isAuthenticated:' + !!req.isAuthenticated())
             if (typeof req.session === 'undefined') reject('expressCode.js\t:Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             //res.send(app.locals.name+' : This is Visit Number '+req.session.visitcount++)//Only for debugging ..remove 
             return next()
         })
+        
         process.nextTick(() => { resolve(processObjects) })
     })
 }

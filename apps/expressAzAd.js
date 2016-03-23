@@ -18,8 +18,9 @@ let addAzAd = (processObjects) => {
             done(null, user.email);
         });
         passport.deserializeUser(function(id, done) {
-            log('expressAzAd.js\t:\tDeserializing id=' + id)
+            log('expressAzAd.js\t:\tDeserializing id = ' + id)
             findByEmail(id, function(err, user) {
+                log('expressAzAd.js\t:\tDeserializing user = ' + user + ' Error: ' + err)
                 done(err, user);
             });
         });
@@ -62,29 +63,17 @@ let addAzAd = (processObjects) => {
                             return done(err);
                         }
                         if (!user) {
-                            log('expressAzAd.js\t:Profile being Added -' + util.inspect(profile))
+                            log('expressAzAd.js\t:Profile being Added -' + profile._raw)
                             // "Auto-registration"
                             users.push(profile);
                             return done(null, profile);
                         }
-                        log('expressAzAd.js\t:Logged in User Table -' + util.inspect(users))
+                        log('expressAzAd.js\t:Logged in User Table -' + users.length)
                         return done(null, user);
                     });
                 });
             }
         ));
-        // Simple route middleware to ensure user is authenticated. (Section 4)
-        //   Use this route middleware on any resource that needs to be protected.  If
-        //   the request is authenticated (typically via a persistent login session),
-        //   the request will proceed.  Otherwise, the user will be redirected to the
-        //   login page.
-        function ensureAuthenticated(req, res, next) {
-            if (req.isAuthenticated()) {
-                return next();
-            } else {
-                res.redirect('/oauth2signin')
-            }
-        }
 
         log('expressAzAd.js\t:Adding Passport AzAD Middleware to Express')
 
@@ -93,6 +82,14 @@ let addAzAd = (processObjects) => {
         // persistent login sessions (recommended).
         app.use(passport.initialize());
         app.use(passport.session());
+        //Simple Middleware to add authentication into routes added after this module available with processObjects
+        processObjects.ensureAuthenticated = (req, res, next) => {
+            if (req.isAuthenticated()) {
+                return next();
+            } else {
+                res.redirect('/oauth2signin')
+            }
+        }
 
         process.nextTick(() => resolve(processObjects))
     })

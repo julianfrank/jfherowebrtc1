@@ -5,7 +5,7 @@ function server() {
     const port = process.env.PORT || 80
     const log = helpers.log
     //Key Libraries
-    //require('newrelic')
+    require('newrelic')
     const express = require('express')
     const app = express()
     //Redis Session Store and Express Session Management Module 
@@ -29,7 +29,7 @@ function server() {
     const initExpress = require('../apps/expressCode').initExpress
     const addAzAd = require('../apps/expressAzAd').addAzAd
     const addAzAdRoutes = require('../apps/expressAzAdRoutes').addAzAdRoutes
-    const addAppRoutes = require('../apps/expressAppRoutes').addAppRoutes
+    const addAppRoutes = require('../apps/expressStdAppRoutes').addAppRoutes
 
     //Mongoose Initialisaton
     const initMongoose = require('../apps/mongooseCode').initMongoose
