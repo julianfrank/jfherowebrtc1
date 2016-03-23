@@ -7,6 +7,7 @@ let addAzAd = (processObjects) => {
     log('expressAzAd.js\t:Initializing Passport AzAD Middleware')
     return new Promise((resolve, reject) => {
         const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
+        const BearerStrategy = require('passport-azure-ad').BearerStrategy
 
         // array to hold logged in users
         let users = processObjects.users
