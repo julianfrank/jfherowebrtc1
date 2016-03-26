@@ -18,7 +18,7 @@ function server() {
     const mongoose = require('mongoose')
     let mongoConnection = mongoose.connection
     // array to hold logged in users
-    let users = [], redisClient = { redisClient: 'Yet to be Initialized' }, redisSessionStore = { redisSessionStore: 'Yet to be Initialized' }
+    //let users = [], redisClient = { redisClient: 'Yet to be Initialized' }, redisSessionStore = { redisSessionStore: 'Yet to be Initialized' }
 
     //Redis Initialisation
     const initRedis = require('../apps/redisCode').initRedis
@@ -60,10 +60,9 @@ function server() {
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
         express: express,app: app,expressSession: expressSession,
-        redis: redis,redisClient: redisClient,redisStore: redisStore,redisSessionStore: redisSessionStore,
+        redis: redis,redisStore: redisStore,
         passport: passport,
         mongoose: mongoose,mongoConnection: mongoConnection,
-        users: users,
         stopProcess: stopProcess
     }
 

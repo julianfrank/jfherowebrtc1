@@ -10,7 +10,8 @@ let addAzAd = (processObjects) => {
         const BearerStrategy = require('passport-azure-ad').BearerStrategy
 
         // array to hold logged in users
-        let users = processObjects.users
+        let users=[]
+        processObjects.users = users
         let passport = processObjects.passport
 
         passport.serializeUser(function(user, done) {
@@ -27,8 +28,8 @@ let addAzAd = (processObjects) => {
         var findByEmail = function(email, fn) {
             for (var i = 0, len = users.length; i < len; i++) {
                 var user = users[i];
-                log('expressAzAd.js\t:we are using user: ', user);
                 if (user.email === email) {
+                    log('expressAzAd.js\t:we are using user: ', user.email);
                     return fn(null, user);
                 }
             }

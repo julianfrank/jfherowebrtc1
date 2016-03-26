@@ -5,7 +5,7 @@ const log = helpers.log
 const util = require('util')
 
 let addSignalRoutes = (processObjects) => {
-    log('signallingRoutes.js.js\t:Adding Signalling Routers')
+    log('signallingRoutes.js\t:Adding Signalling Routers')
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
