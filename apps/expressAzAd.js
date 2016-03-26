@@ -21,15 +21,15 @@ let addAzAd = (processObjects) => {
         passport.deserializeUser(function(id, done) {
             log('expressAzAd.js\t:\tDeserializing id = ' + id)
             findByEmail(id, function(err, user) {
-                log('expressAzAd.js\t:\tDeserializing user = ' + user + ' Error: ' + err)
+                log('expressAzAd.js\t:\tDeserializing user = ' + user.email + ' Error: ' + err)
                 done(err, user);
             });
         });
         var findByEmail = function(email, fn) {
+            log('expressAzAd.js\t:Trying to find email: ', email);
             for (var i = 0, len = users.length; i < len; i++) {
                 var user = users[i];
                 if (user.email === email) {
-                    log('expressAzAd.js\t:we are using user: ', user.email);
                     return fn(null, user);
                 }
             }
@@ -64,7 +64,7 @@ let addAzAd = (processObjects) => {
                             return done(err);
                         }
                         if (!user) {
-                            log('expressAzAd.js\t:Profile being Added -' + profile._raw)
+                            log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
                             // "Auto-registration"
                             users.push(profile);
                             return done(null, profile);
