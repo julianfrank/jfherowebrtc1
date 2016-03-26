@@ -20,7 +20,11 @@ let initExpress = (processObjects) => {
         app.use(cookieParser())
         app.use(processObjects.expressSession({
             store: processObjects.redisSessionStore,
-            secret: helpers.hourlyState(), saveUninitialized: false, resave: false,cookie:{secure:true}
+            secret: helpers.hourlyState(), 
+            saveUninitialized: false, 
+            resave: false,
+            proxy:true/*,
+            cookie:{secure:true}*/
         }));
         app.use(bodyParser.json({ type: 'application/*+json' }));
         app.use(bodyParser.text({ type: 'text/html' }))
