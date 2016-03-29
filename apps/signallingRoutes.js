@@ -12,7 +12,7 @@ let addSignalRoutes = (processObjects) => {
         let authCheck = processObjects.ensureAuthenticated
         let users = processObjects.users
 
-        app.all('/signal/me', authCheck, (req, res) => {// Need this to load test using loader.io
+        app.all('/signal/me', authCheck, (req, res) => {
             res.type('json')
             res.send(util.inspect(users))
         })

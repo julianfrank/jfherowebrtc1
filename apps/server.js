@@ -18,14 +18,15 @@ function server() {
     const mongoose = require('mongoose')
     let mongoConnection = mongoose.connection
     // array to hold logged in users
-    //let users = [], redisClient = { redisClient: 'Yet to be Initialized' }, redisSessionStore = { redisSessionStore: 'Yet to be Initialized' }
+    
+    //User Manager Initialization
+    const addUserManager = require('../apps/userManager').addUserManager
 
     //Redis Initialisation
     const initRedis = require('../apps/redisCode').initRedis
     const quitRedis = require('../apps/redisCode').quitRedis
 
-    //Express Application Initialization
-    //let myexpress = 
+    //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
     const addAzAd = require('../apps/expressAzAd').addAzAd
     const addAzAdRoutes = require('../apps/expressAzAdRoutes').addAzAdRoutes
@@ -67,7 +68,8 @@ function server() {
     }
 
     //Start the Application
-    initRedis(thisProcessObjects)
+    addUserManager(thisProcessObjects)
+        .then(initRedis)
         .then(initExpress)
         .then(addAzAd)
         .then(addAzAdRoutes)

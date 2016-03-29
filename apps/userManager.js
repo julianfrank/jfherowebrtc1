@@ -10,7 +10,7 @@ let addUserManager = (processObjects) => {
 
         let app = processObjects.app
         let authCheck = processObjects.ensureAuthenticated
-        processObjects.users
+        processObjects.users = []
 
         process.nextTick(() => resolve(processObjects))
     })
