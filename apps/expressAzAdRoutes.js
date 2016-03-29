@@ -2,6 +2,7 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.log
+const inspect = require('util').inspect
 
 let addAzAdRoutes = (processObjects) => {
     log('expressAzAdRoutes.js\t:Adding AzAD Related Routes')
@@ -9,6 +10,7 @@ let addAzAdRoutes = (processObjects) => {
 
         let app = processObjects.app
         let passport = processObjects.passport
+        let userMan = processObjects.userManager
 
         app.get('/oauth2signin', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
@@ -47,7 +49,10 @@ let addAzAdRoutes = (processObjects) => {
             })
 
         app.get('/logout', (req, res) => {
+            let byebyeuser=req.user.email
+            log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(byebyeuser))
             req.logout()
+            userMan.removeUser(byebyeuser)
             res.redirect('/')
         })
 

@@ -9,17 +9,19 @@ let addAzAd = (processObjects) => {
         const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 
         //Initiate local vars from Global Variable Package (processObjects)
-        let users = processObjects.users
+        //let users = processObjects.users
+        let userMan = processObjects.userManager
         let passport = processObjects.passport
 
         const findByEmail = (email, fn) => {
             log('expressAzAd.js\t:Trying to find email: ' + email)
-            for (var i = 0, len = users.length; i < len; i++) {
+            userMan.findUserByEmail(email,fn)
+            /*for (var i = 0, len = users.length; i < len; i++) {
                 if (users[i].email === email) {
                     return fn(null, users[i])
                 }
             }
-            return fn(null, null)
+            return fn(null, null)*/
         }
         passport.serializeUser((user, done) => {
             log('expressAzAd.js\t:Serializing user.email=' + user.email)
@@ -43,11 +45,9 @@ let addAzAd = (processObjects) => {
         //   credentials (in this case, an OpenID identifier), and invoke a callback
         //   with a user object.
         passport.use(new OIDCStrategy({
-            callbackURL: process.env.RETURNURL || require('../secrets.js').returnURL,
-            //realm: process.env.REALM || require('../secrets.js').realm,
+            callbackURL: process.env.RETURNURL || require('../secrets.js').returnURL,            //realm: process.env.REALM || require('../secrets.js').realm,
             clientID: process.env.CLIENTID || require('../secrets.js').clientID,
-            clientSecret: process.env.CLIENTSECRET || require('../secrets.js').clientSecret,
-            //oidcIssuer: process.env.ISSUER || require('../secrets.js').issuer,
+            clientSecret: process.env.CLIENTSECRET || require('../secrets.js').clientSecret,            //oidcIssuer: process.env.ISSUER || require('../secrets.js').issuer,
             identityMetadata: process.env.IDENMETA || require('../secrets.js').identityMetadata,
             skipUserProfile: true,
             responseType: process.env.RESPTYPE || require('../secrets.js').responseType,
@@ -65,14 +65,13 @@ let addAzAd = (processObjects) => {
                     process.nextTick(() => {
                         //log('expressAzAd.js\t:Trying to find email using profile: ' + inspect(profile))
                         findByEmail(profile.email, (err, user) => {
-                            if (err) {
-                                return done(err);
-                            }
+                            if (err) { return done(err) }
                             if (!user) {
-                                log('expressAzAd.js\t:Profile being Added for email-' + profile.email + '\tUser Table Length-> ' + users.length)
                                 // "Auto-registration"
-                                users.push(profile);
-                                return done(null, profile);
+                                //users.push(profile)
+                                log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
+                                userMan.addUser(profile)
+                                return done(null, profile)
                             }
                             return done(null, user);
                         })
