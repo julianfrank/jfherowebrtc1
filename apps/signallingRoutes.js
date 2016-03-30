@@ -17,6 +17,11 @@ let addSignalRoutes = (processObjects) => {
             res.send(util.inspect(userMan.getLoggedUsers()))
         })
 
+        app.all('/gret*', (req, res) => {
+            res.type('html')
+            res.render(String(req.path).slice(1,-5))
+        })
+
         process.nextTick(() => resolve(processObjects))
     })
 }
