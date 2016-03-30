@@ -49,10 +49,12 @@ let addAzAdRoutes = (processObjects) => {
             })
 
         app.get('/logout', (req, res) => {
-            let byebyeuser=req.user.email
-            log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(byebyeuser))
-            req.logout()
-            userMan.removeUser(byebyeuser)
+            if (typeof req.user != 'undefined') {
+                let byebyeuser = req.user.email
+                log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(byebyeuser))
+                req.logout()
+                userMan.removeUser(byebyeuser)
+            }
             res.redirect('/')
         })
 

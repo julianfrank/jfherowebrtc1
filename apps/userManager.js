@@ -32,8 +32,12 @@ let addUserManager = (processObjects) => {
             }
 
             processObjects.userManager.removeUser = (email) => { //Add new Profile to userArray
-                userArray = userArray.filter((val) => { return (val.email != email) })
                 log('userManager.js\t:User ' + email + ' Removed from userArray. Array now is => ' + inspect(userArray.map((x) => { return x.email })))
+                userArray = userArray.filter((val) => { return (val.email != email) })
+            }
+
+            processObjects.userManager.getLoggedUsers = () => {
+                return userArray.map((x) => { return x.email })
             }
 
         }

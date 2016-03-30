@@ -9,12 +9,12 @@ let addSignalRoutes = (processObjects) => {
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
-        let authCheck = processObjects.ensureAuthenticated
-        let users = processObjects.users
+        //let authCheck = processObjects.ensureAuthenticated
+        let userMan = processObjects.userManager
 
-        app.all('/signal/me', authCheck, (req, res) => {
+        app.all('/signal/me', (req, res) => {
             res.type('json')
-            res.send(util.inspect(users))
+            res.send(util.inspect(userMan.getLoggedUsers()))
         })
 
         process.nextTick(() => resolve(processObjects))
