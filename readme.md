@@ -1,8 +1,5 @@
-Trying out WebRTC here
-[![Build Status](https://travis-ci.org/julianfrank/jfwrtc.svg?branch=master)](https://travis-ci.org/julianfrank/jfwrtc)
+Trying out WebRTC here [![Build Status](https://travis-ci.org/julianfrank/jfwrtc.svg?branch=master)](https://travis-ci.org/julianfrank/jfwrtc)
 
-Hosted on 
+Latest Build Accessible on 
 
-Heroku [https://jfwrtc.herokuapp.com/]
-
-Modulus [https://jfwrtc-60937.onmodulus.net/]
+wrtc.lab4jf.in [https://wrtc.lab4jf.in/]
