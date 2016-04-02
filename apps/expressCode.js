@@ -28,7 +28,8 @@ let initExpress = (processObjects) => {
         app.use(bodyParser.text({ type: 'text/html' }))
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.raw({ type: '*/*' }))
-        app.use('/static', processObjects.express.static('static'));
+        app.use('/js', processObjects.express.static('pages/js'));
+        app.use('/css', processObjects.express.static('pages/css'));
         app.use((req, res, next) => {//Add CORS Support
             res.header("Access-Control-Allow-Origin", "*")//[TODO] Need to update to include only 'Trusted' domains
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

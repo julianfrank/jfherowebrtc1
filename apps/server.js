@@ -32,6 +32,7 @@ function server() {
     const addAzAdRoutes = require('../apps/expressAzAdRoutes').addAzAdRoutes
     const addAppRoutes = require('../apps/expressStdAppRoutes').addAppRoutes
     const addSignalRoutes = require('../apps/signallingRoutes').addSignalRoutes
+    const addLastRoute = require('../apps/expressLastRoute').addLastRoute
 
     //Mongoose Initialisaton
     const initMongoose = require('../apps/mongooseCode').initMongoose
@@ -75,6 +76,7 @@ function server() {
         .then(addAzAdRoutes)
         .then(addAppRoutes)
         .then(addSignalRoutes)
+        .then(addLastRoute)
         .then(initMongoose)
         .then(startServer)
         .catch(stopProcess)

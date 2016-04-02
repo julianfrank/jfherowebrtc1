@@ -14,12 +14,16 @@ let addSignalRoutes = (processObjects) => {
 
         app.all('/signal/me', (req, res) => {
             res.type('json')
-            res.send(util.inspect(userMan.getLoggedUsers()))
+            let loggedUsers = {}
+            userMan.getLoggedUsers().map((val, ind) => { loggedUsers[ind] = val })
+            loggedUsers = JSON.stringify(loggedUsers)
+            log(loggedUsers)
+            res.send(loggedUsers)
         })
 
         app.all('/gret*', (req, res) => {
             res.type('html')
-            res.render(String(req.path).slice(1,-5))
+            res.render(String(req.path).slice(1, -5))
         })
 
         process.nextTick(() => resolve(processObjects))

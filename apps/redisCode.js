@@ -9,6 +9,7 @@ const redisLabPASS = process.env.REDISCREDS || require('../secrets.js').rediscre
 function initRedis(processObjects) {
     log('redisCode.js\t:Initializing Redis')
     return new Promise((resolve, reject) => {
+
         const redisRetryStrategy = (options) => {
             log('redisCode.js\t:Redis Retry being Executed using options-> ' + util.inspect(options))
             if (options.error.code === 'ECONNREFUSED') { return new Error('The RedisLab server refused the connection'); }// End reconnecting on a specific error and flush all commands with a individual error
@@ -16,20 +17,29 @@ function initRedis(processObjects) {
             if (options.times_connected > 10) { return undefined; }// End reconnecting with built in error
             return Math.max(options.attempt * 100, 3000);// reconnect after
         }
-        processObjects.redisClient = processObjects.redis.createClient({ url: 'redis://' + redisLabURL, retry_strategy: redisRetryStrategy })
+
+        processObjects.redisClient = processObjects.redis.createClient({
+            url: 'redis://' + redisLabURL,
+            retry_strategy: redisRetryStrategy
+        })
+
         processObjects.redisClient.auth(redisLabPASS, () => {
             processObjects.redisClient.info((err, reply) => {
                 if (err) {
                     reject('redisCode.js\t:Error Returned by Redis Server :' + err)
                 } else {
                     log('redisCode.js\t:Connected to ' + redisLabURL)
-                    processObjects.redisSessionStore = new processObjects.redisStore({ url: 'redis://' + redisLabURL, client: processObjects.redisClient, ttl: 360, prefix: 'session.' })// create new redis store for Session Management
+                    processObjects.redisSessionStore = new processObjects.redisStore({// create new redis store for Session Management 
+                        url: 'redis://' + redisLabURL,
+                        client: processObjects.redisClient,
+                        ttl: 360,
+                        prefix: 'session.'
+                    })
                     processObjects.redisSessionStore.client.info((err, reply) => {
                         if (err) {
                             reject('redisCode.js\t:Error Returned by Redis Server :' + err)
                         } else {
                             log('redisCode.js\t:Redis Session Store Created Successfully')
-                            //log(utils.inspect(processObjects))
                             process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and RedisSessionstore is working
                         }
                     })
