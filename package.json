@@ -4,7 +4,7 @@
     "description": "WebRTC App",
     "main": "app.js",
     "scripts": {
-        "test": "node index"
+        "test": "node app"
     },
     "repository": {
         "type": "git",
