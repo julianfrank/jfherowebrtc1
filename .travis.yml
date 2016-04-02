@@ -1,3 +1,9 @@
 language: node_js
+
 node_js:
   - "5"
+
+deploy:
+  provider: modulus
+  api_key: "2caa3b9d-0b8b-4c3e-b9e5-f69e9ad99455"
+  project_name: "jfwrtc"
