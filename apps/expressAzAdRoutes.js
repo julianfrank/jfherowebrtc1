@@ -32,7 +32,10 @@ let addAzAdRoutes = (processObjects) => {
         app.get('/oauth2return', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
                 log('expressAzAdRoutes.js\t:We received a GET return from AzureAD.')
-                req.session.save((err) => { if (err === null) log('expressAzAdRoutes.js\t:Error while saving session GET->oauth2return ' + err) })
+                req.session.save((err) => {
+                    //if (err === null) log('expressAzAdRoutes.js\t:Error while saving session GET->oauth2return ' + err) 
+                })
+                res.location('https://lab4jf.in')
                 res.render('secureApp')
             })
 
@@ -51,10 +54,9 @@ let addAzAdRoutes = (processObjects) => {
 
         app.get('/logout', (req, res) => {
             if (typeof req.user != 'undefined') {
-                let byebyeuser = req.user.email
-                log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(byebyeuser))
+                log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(req.user.email))
+                userMan.removeUser(req.user.email)
                 req.logout()
-                userMan.removeUser(byebyeuser)
             }
             res.redirect('/')
         })

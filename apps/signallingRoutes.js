@@ -17,7 +17,6 @@ let addSignalRoutes = (processObjects) => {
             let loggedUsers = {}
             userMan.getLoggedUsers().map((val, ind) => { loggedUsers[ind] = val })
             loggedUsers = JSON.stringify(loggedUsers)
-            log(loggedUsers)
             res.send(loggedUsers)
         })
 

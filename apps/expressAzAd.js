@@ -14,7 +14,7 @@ let addAzAd = (processObjects) => {
 
         const findByEmail = (email, fn) => {
             log('expressAzAd.js\t:Trying to find email: ' + email)
-            userMan.findUserByEmail(email,fn)
+            userMan.findUserByEmail(email, fn)
         }
         passport.serializeUser((user, done) => {
             log('expressAzAd.js\t:Serializing user.email=' + user.email)
@@ -62,6 +62,8 @@ let addAzAd = (processObjects) => {
                             if (!user) {
                                 // "Auto-registration"
                                 log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
+                                profile.accessToken = accessToken
+                                profile.refreshToken = refreshToken
                                 userMan.addUser(profile)
                                 return done(null, profile)
                             }
