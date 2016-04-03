@@ -81,7 +81,7 @@ function server() {
         .then(addAppRoutes)
         .then(addSignalRoutes)
         .then(addLastRoute)
-        .then(initMongoose)
+        //.then(initMongoose)
         .then(startServer)
         .catch(stopProcess)
 

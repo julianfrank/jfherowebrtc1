@@ -80,6 +80,11 @@ function initUMRedisClient(processObjects) {
             prefix: 'userMan.'
         })
 
+        processObjects.umRedisClient.on("error", (err) => { 
+            log("redisCode.js\t: umRedisClient creation Error " + err) 
+            reject(err)
+        })
+
         processObjects.umRedisClient.auth(redisLabPASS, () => {
             processObjects.umRedisClient.info((err, reply) => {
                 if (err) {

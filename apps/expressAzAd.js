@@ -62,8 +62,13 @@ let addAzAd = (processObjects) => {
                             if (!user) {
                                 // "Auto-registration"
                                 log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
+                                //Adding access and Refresh Token to Profile
                                 profile.accessToken = accessToken
                                 profile.refreshToken = refreshToken
+                                //Removing all keys with nested JSON for Redis Compatibility
+                                delete profile._raw
+                                delete profile._json
+                                delete profile.name
                                 userMan.addUser(profile)
                                 return done(null, profile)
                             }

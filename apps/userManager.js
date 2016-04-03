@@ -9,8 +9,7 @@ let addUserManager = (processObjects) => {
     return new Promise((resolve, reject) => {
 
         let redis = processObjects.redis
-        let umRedisClient = processObjects.redisClient
-        umRedisClient.on("error", (err) => { log("userManager.js\t: umRedisClient creation Error " + err) })
+        let umRedisClient = processObjects.umRedisClient
 
         processObjects.userManager = () => {
 
@@ -19,7 +18,14 @@ let addUserManager = (processObjects) => {
             processObjects.userManager.addUser = (profile) => { //Add new Profile to userArray
                 userArray.push(profile)//[TODO]Try to add device specific info also
                 //log('userManager.js\t:Going to push ' + JSON.stringify(profile) + ' into redis')
-                umRedisClient.hmset(profile.email, JSON.stringify(profile), redis.print)//[TODO] [Known Bug] It issues a 'Error: ERR wrong number of arguments for 'hmset' command' error few milliseconds even after successful write
+                log(inspect(typeof JSON.stringify(profile)))
+                umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
+                    if (err) {
+                        log('userManager.js\t: Issue with set, returned ' + err)
+                    } else {
+                        log('userManager.js\t: set Success, Reply ' + reply)
+                    }
+                })//[TODO] [Known Bug] It issues a 'Error: ERR wrong number of arguments for 'hmset' command' error few milliseconds even after successful write
                 log('userManager.js\t:User ' + profile.email + ' added to userArray. Total Logged in users => ' + userArray.length)
                 /*umRedisClient.hmget(profile.email,(err,obj)=>{
                     log(err)
