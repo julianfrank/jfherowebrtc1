@@ -33,7 +33,7 @@ function initRedis(processObjects) {
                     processObjects.redisSessionStore = new processObjects.redisStore({// create new redis store for Session Management 
                         url: 'redis://' + redisLabURL,
                         client: processObjects.redisClient,
-                        ttl: 360,
+                        ttl: 1 * 10 * 60,//TTL in Seconds...Set to 10 minutes
                         prefix: 'redisSessionStore.'
                     })
                     processObjects.redisSessionStore.client.info((err, reply) => {
@@ -80,8 +80,8 @@ function initUMRedisClient(processObjects) {
             prefix: 'userMan.'
         })
 
-        processObjects.umRedisClient.on("error", (err) => { 
-            log("redisCode.js\t: umRedisClient creation Error " + err) 
+        processObjects.umRedisClient.on("error", (err) => {
+            log("redisCode.js\t: umRedisClient creation Error " + err)
             reject(err)
         })
 

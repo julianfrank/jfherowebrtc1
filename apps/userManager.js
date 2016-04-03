@@ -25,12 +25,22 @@ let addUserManager = (processObjects) => {
                     } else {
                         log('userManager.js\t: set Success, Reply ' + reply)
                     }
-                })//[TODO] [Known Bug] It issues a 'Error: ERR wrong number of arguments for 'hmset' command' error few milliseconds even after successful write
+                })
+                umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
+                    if (err) {
+                        log('userManager.js\t: Issue with expire, returned ' + err)
+                    } else {
+                        log('userManager.js\t: expire Success, Reply ' + reply)
+                    }
+                })
                 log('userManager.js\t:User ' + profile.email + ' added to userArray. Total Logged in users => ' + userArray.length)
-                /*umRedisClient.hmget(profile.email,(err,obj)=>{
-                    log(err)
-                    log(obj)
-                })*/
+                umRedisClient.get(profile.email, (err, obj) => {
+                    if (err) {
+                        log('userManager.js\t: Problem in get -> ' + err)
+                    } else {
+                        log('userManager.js\t: get works -> [' + typeof obj + '] ->' + inspect(obj))
+                    }
+                })
             }
 
             processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
