@@ -13,12 +13,7 @@ let addUserManager = (processObjects) => {
 
         processObjects.userManager = () => {
 
-            let userArray = []//User Array Initialization [TODO]move to cloudREDIS or MONGODB
-
             processObjects.userManager.addUser = (profile) => { //Add new Profile to userArray
-                userArray.push(profile)//[TODO]Try to add device specific info also
-                //log('userManager.js\t:Going to push ' + JSON.stringify(profile) + ' into redis')
-                log(inspect(typeof JSON.stringify(profile)))
                 umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
                     if (err) {
                         log('userManager.js\t: Issue with set, returned ' + err)
@@ -33,35 +28,43 @@ let addUserManager = (processObjects) => {
                         log('userManager.js\t: expire Success, Reply ' + reply)
                     }
                 })
-                log('userManager.js\t:User ' + profile.email + ' added to userArray. Total Logged in users => ' + userArray.length)
-                umRedisClient.get(profile.email, (err, obj) => {
+                log('userManager.js\t:User ' + profile.email + ' added to userManager')
+            }
+
+            processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
+                umRedisClient.get(email, (err, reply) => {
                     if (err) {
-                        log('userManager.js\t: Problem in get -> ' + err)
+                        log('userManager.js\t: get for ' + email + ' Failed with Error -> ' + err)
+                        return cb(null, null)
                     } else {
-                        log('userManager.js\t: get works -> [' + typeof obj + '] ->' + inspect(obj))
+                        log('userManager.js\t: get for ' + email + ' Succeeded with reply -> ' + typeof reply)
+                        return cb(null, JSON.parse(reply))
                     }
                 })
             }
 
-            processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
-                let target = userArray.filter((value, index, array) => {
-                    return (value.email === email)
-                })
-                log('userManager.js\t:Searching for email ' + email + '. Resultant Array =>' + inspect(target.map((x) => { return x.name })))
-                if (target.length === 1) {
-                    return cb(null, target[0])
-                } else {
-                    return cb(null, null)
-                }
-            }
-
             processObjects.userManager.removeUser = (email) => { //Add new Profile to userArray
-                log('userManager.js\t:User ' + email + ' Removed from userArray. Array now is => ' + inspect(userArray.map((x) => { return x.email })))
-                userArray = userArray.filter((val) => { return (val.email != email) })
+                umRedisClient.get(email, (err, obj) => {
+                    if (err) {
+                        log('userManager.js\t: Problem in get -> ' + err)
+                    } else {
+                        umRedisClient.del(email, (err, reply) => {
+                            if (err) {
+                                log('userManager.js\t: Problem in del -> ' + err)
+                            } else {
+                                log('userManager.js\t: ' + email + ' deleted with reply -> ' + inspect(reply))
+                            }
+                        })
+                    }
+                })
+
+                log('userManager.js\t:User ' + email + ' Removed from userManager')
             }
 
             processObjects.userManager.getLoggedUsers = () => {
-                return userArray.map((x) => { return x.email })
+                let loggedUsers = umRedisClient.keys('*', (err, reply) => {
+                    log(err + reply)
+                })
             }
 
         }

@@ -15,7 +15,7 @@ let addSignalRoutes = (processObjects) => {
         app.all('/signal/me', (req, res) => {
             res.type('json')
             let loggedUsers = {}
-            userMan.getLoggedUsers().map((val, ind) => { loggedUsers[ind] = val })
+//            userMan.getLoggedUsers().map((val, ind) => { loggedUsers[ind] = val })
             loggedUsers = JSON.stringify(loggedUsers)
             res.send(loggedUsers)
         })
