@@ -24,7 +24,9 @@ function server() {
 
     //Redis Initialisation
     const initRedis = require('../apps/redisCode').initRedis
+    const initUMRedis = require('../apps/redisCode').initUMRedisClient
     const quitRedis = require('../apps/redisCode').quitRedis
+    const quitUMRedis = require('../apps/redisCode').quitUMRedis
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -51,6 +53,7 @@ function server() {
         log('server.js\t:About to exit due to ' + reason);
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
+            .then(quitUMRedis)
             .then(exitProcess)
             .catch(exitProcess)
     }
@@ -70,6 +73,7 @@ function server() {
 
     //Start the Application
     initRedis(thisProcessObjects)
+    .then(initUMRedis)
         .then(addUserManager)
         .then(initExpress)
         .then(addAzAd)
