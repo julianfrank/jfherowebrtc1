@@ -8,7 +8,9 @@ let addUserManager = (processObjects) => {
     log('userManager.js\t:Adding User Management Module')
     return new Promise((resolve, reject) => {
 
-        //processObjects.users = []//tobe removed once this module is ready
+        let redis = processObjects.redis
+        let umRedisClient = processObjects.redisClient
+        umRedisClient.on("error", (err) => { log("userManager.js\t: umRedisClient creation Error " + err) })
 
         processObjects.userManager = () => {
 
@@ -16,6 +18,7 @@ let addUserManager = (processObjects) => {
 
             processObjects.userManager.addUser = (profile) => { //Add new Profile to userArray
                 userArray.push(profile)//[TODO]Try to add device specific info also
+                umRedisClient.hmset(profile.email, 'profile', JSON.stringify(profile), redis.print)
                 log('userManager.js\t:User ' + profile.email + ' added to userArray. Total Logged in users => ' + userArray.length)
             }
 

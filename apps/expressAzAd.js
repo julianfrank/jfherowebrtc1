@@ -9,19 +9,12 @@ let addAzAd = (processObjects) => {
         const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 
         //Initiate local vars from Global Variable Package (processObjects)
-        //let users = processObjects.users
         let userMan = processObjects.userManager
         let passport = processObjects.passport
 
         const findByEmail = (email, fn) => {
             log('expressAzAd.js\t:Trying to find email: ' + email)
             userMan.findUserByEmail(email,fn)
-            /*for (var i = 0, len = users.length; i < len; i++) {
-                if (users[i].email === email) {
-                    return fn(null, users[i])
-                }
-            }
-            return fn(null, null)*/
         }
         passport.serializeUser((user, done) => {
             log('expressAzAd.js\t:Serializing user.email=' + user.email)
@@ -68,7 +61,6 @@ let addAzAd = (processObjects) => {
                             if (err) { return done(err) }
                             if (!user) {
                                 // "Auto-registration"
-                                //users.push(profile)
                                 log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
                                 userMan.addUser(profile)
                                 return done(null, profile)

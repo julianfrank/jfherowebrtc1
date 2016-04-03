@@ -69,8 +69,8 @@ function server() {
     }
 
     //Start the Application
-    addUserManager(thisProcessObjects)
-        .then(initRedis)
+    initRedis(thisProcessObjects)
+        .then(addUserManager)
         .then(initExpress)
         .then(addAzAd)
         .then(addAzAdRoutes)

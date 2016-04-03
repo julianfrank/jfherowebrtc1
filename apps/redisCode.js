@@ -20,7 +20,8 @@ function initRedis(processObjects) {
 
         processObjects.redisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
-            retry_strategy: redisRetryStrategy
+            retry_strategy: redisRetryStrategy,
+            prefix: 'main.'
         })
 
         processObjects.redisClient.auth(redisLabPASS, () => {
