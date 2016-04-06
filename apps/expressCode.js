@@ -28,6 +28,7 @@ let initExpress = (processObjects) => {
         app.use(bodyParser.text({ type: 'text/html' }))
         app.use(bodyParser.urlencoded({ extended: true }));
         app.use(bodyParser.raw({ type: '*/*' }))
+        app.use('/static', processObjects.express.static('pages/static'));
         app.use('/js', processObjects.express.static('pages/js'));
         app.use('/css', processObjects.express.static('pages/css'));
         app.use((req, res, next) => {//Add CORS Support
