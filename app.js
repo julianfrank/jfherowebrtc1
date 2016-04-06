@@ -10,12 +10,12 @@ if (process.env.TRAVIS === 'YES') {
 } else {
     if (cluster.isMaster) {
         console.log('app.js\t:This the Master Process')
-        for (let i = 0; i < num_processes; i++) { 
+        for (let i = 0; i < num_processes; i++) {
             console.log('app.js\t:Going to fork new process')
-            cluster.fork() 
+            cluster.fork()
         }
     } else {
-        console.log('app.js\t:This is a Slave Process')
+        console.log('app.js\t:This is a Slave Process with id ' + cluster.worker.id)
         app()
     }
 }
