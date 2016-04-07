@@ -1,21 +1,15 @@
 'use strict'
 
-const cluster = require('cluster')
+//const cluster = require('cluster')
+//var sticky = require('sticky-session')
 
 let app = require('./apps/server.js').server
-const num_processes = require('os').cpus().length;
+//const num_processes = require('os').cpus().length;
+//const port = process.env.PORT || 80
 
+//Run mainApp only if not inside TRAVIS
 if (process.env.TRAVIS === 'YES') {
     console.log('app.js\t:Not Proceeding to load app as this is inside Travis')
 } else {
-    if (cluster.isMaster) {
-        console.log('app.js\t:This the Master Process')
-        for (let i = 0; i < num_processes; i++) {
-            console.log('app.js\t:Going to fork new process')
-            cluster.fork()
-        }
-    } else {
-        console.log('app.js\t:This is a Slave Process with id ' + cluster.worker.id)
-        app()
-    }
+    app()
 }
