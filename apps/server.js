@@ -50,7 +50,7 @@ function server() {
 
     //Stop PRocess
     const stopProcess = (reason) => {
-        log('server.js\t:About to exit due to ' + reason);
+        log('server.js\t:About to exit due to ' + reason)
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
@@ -58,8 +58,16 @@ function server() {
             .catch(exitProcess)
     }
     // Process Shutdown Zone
-    const exitProcess = () => process.exit(0)
-    process.stdin.resume();
+    const exitProcess = () => {
+        if(process.connected){
+            log('server.js\t:About to Disconnect this Process')
+            process.disconnect()
+        }else{
+            log('server.js\t:About to Exit Process')
+            process.exit(0)    
+        }
+    }
+    process.stdin.resume()
     process.on('SIGINT', () => { stopProcess('SIGINT') });
 
     //Object Packaged to be passed between Boot Loader and Unloaders
