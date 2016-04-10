@@ -1,4 +1,4 @@
-function server() {
+function workerApp() {
     'use strict'
     //Add-on Modules
     const helpers = require('../apps/helpers')
@@ -42,15 +42,15 @@ function server() {
 
     //Start Server
     const startServer = () => {
-        log('server.js: Going to start ' + app.locals.name + '. Press Control+C to Exit')
-        app.listen(port, () => { log('server.js: ' + app.locals.name + " " + 
+        log('workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit')
+        app.listen(port, () => { log('workerApp.js\t: ' + app.locals.name + " " + 
         helpers.readPackageJSON(__dirname, "version") + 
         " Started & Listening on port: " + port) })
     }
 
     //Stop PRocess
     const stopProcess = (reason) => {
-        log('server.js\t:About to exit due to ' + reason)
+        log('workerApp.js\t:About to exit due to ' + reason)
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
@@ -60,10 +60,10 @@ function server() {
     // Process Shutdown Zone
     const exitProcess = () => {
         if(process.connected){
-            log('server.js\t:About to Disconnect this Process')
+            log('workerApp.js\t:About to Disconnect this Process')
             process.disconnect()
         }else{
-            log('server.js\t:About to Exit Process')
+            log('workerApp.js\t:About to Exit Process')
             process.exit(0)    
         }
     }
@@ -94,4 +94,4 @@ function server() {
         .catch(stopProcess)
 
 }
-module.exports.server = exports.server = server
+module.exports = {workerApp}

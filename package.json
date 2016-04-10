@@ -1,38 +1,38 @@
 {
-  "name": "jfwrtc",
-  "version": "0.0.12",
-  "description": "WebRTC App",
-  "main": "app.js",
-  "scripts": {
-    "test": "node app"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/julianfrank/jfwrtc.git"
-  },
-  "keywords": [
-    "webrtc"
-  ],
-  "author": "Julian Frank",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/julianfrank/jfwrtc/issues"
-  },
-  "homepage": "https://github.com/julianfrank/jfwrtc#readme",
-  "dependencies": {
-    "body-parser": "^1.15.0",
-    "connect-redis": "^3.0.2",
-    "cookie-parser": "^1.4.1",
-    "express": "^4.13.4",
-    "express-session": "^1.13.0",
-    "mongoose": "^4.4.11",
-    "newrelic": "^1.26.1",
-    "passport": "^0.3.2",
-    "passport-azure-ad": "^1.4.1",
-    "redis": "^2.5.3",
-    "socket.io-redis": "^1.0.0"
-  },
-  "engines": {
-    "node": "^5.8.0"
-  }
+    "name": "jfwrtc",
+    "version": "0.0.12",
+    "description": "WebRTC App",
+    "main": "procMaster.js",
+    "scripts": {
+        "test": "node procMaster"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/julianfrank/jfwrtc.git"
+    },
+    "keywords": [
+        "webrtc"
+    ],
+    "author": "Julian Frank",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/julianfrank/jfwrtc/issues"
+    },
+    "homepage": "https://github.com/julianfrank/jfwrtc#readme",
+    "dependencies": {
+        "body-parser": "^1.15.0",
+        "connect-redis": "^3.0.2",
+        "cookie-parser": "^1.4.1",
+        "express": "^4.13.4",
+        "express-session": "^1.13.0",
+        "mongoose": "^4.4.11",
+        "newrelic": "^1.26.1",
+        "passport": "^0.3.2",
+        "passport-azure-ad": "^1.4.1",
+        "redis": "^2.5.3",
+        "socket.io-redis": "^1.0.0"
+    },
+    "engines": {
+        "node": "^5.8.0"
+    }
 }
