@@ -104,10 +104,7 @@ function quitUMRedis(processObjects) {
         processObjects.umRedisClient.quit((err, res) => {
             if (res === 'OK') {
                 log('redisCode.js\t:Quit umRedis Connection: ' + redisLabURL)
-                processObjects.redisSessionStore.client.quit((err, res) => {
-                    if (res === 'OK') log('redisCode.js\t:Alert! umRedis Session Still seems Not Closed. Continuing to End Process Anyway')
-                    resolve(processObjects)
-                })
+                resolve(processObjects)
             } else {
                 log('redisCode.js\t:Error: umRedis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway')
                 reject(err)
@@ -116,4 +113,49 @@ function quitUMRedis(processObjects) {
     })
 }
 
-module.exports = { initRedis, initUMRedisClient, quitRedis, quitUMRedis }
+function initSIOPubRedisClient(processObjects) {
+    log('redisCode.js\t:Initializing Socket.io Redis Publisher Client')
+    return new Promise((resolve, reject) => {
+
+        log('redisCode.js\t:Creating sioPubRedisClient for User Management store')
+
+        processObjects.sioPubRedisClient = processObjects.redis.createClient({
+            url: 'redis://' + redisLabURL,
+            retry_strategy: redisRetryStrategy,
+            prefix: 'sioPub.'
+        })
+
+        processObjects.sioPubRedisClient.on("error", (err) => {
+            log("redisCode.js\t: sioPubRedisClient creation Error " + err)
+            reject(err)
+        })
+
+        processObjects.sioPubRedisClient.auth(redisLabPASS, () => {
+            processObjects.sioPubRedisClient.info((err, reply) => {
+                if (err) {
+                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                } else {
+                    log('redisCode.js\t:sioPubRedisClient Connected to ' + redisLabURL)
+                    process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and sioPubRedisClient is working
+                }
+            })
+        })
+    })
+}
+
+function quitSIOPubRedis(processObjects) {
+    log('redisCode.js\t:Quiting sioPubRedisClient')
+    return new Promise((resolve, reject) => {
+        processObjects.sioPubRedisClient.quit((err, res) => {
+            if (res === 'OK') {
+                log('redisCode.js\t:Quit sioPubRedisClient Connection: ' + redisLabURL)
+                resolve(processObjects)
+            } else {
+                log('redisCode.js\t:Error: sioPubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway')
+                reject(err)
+            }
+        })
+    })
+}
+
+module.exports = { initRedis, initUMRedisClient, quitRedis, quitUMRedis, initSIOPubRedisClient, quitSIOPubRedis }

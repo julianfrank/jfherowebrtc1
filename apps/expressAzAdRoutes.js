@@ -57,6 +57,14 @@ let addAzAdRoutes = (processObjects) => {
                 log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(req.user.email))
                 userMan.removeUser(req.user.email)
                 req.logout()
+                let sid = req.session.id
+                req.session.destroy((err) => {
+                    if (err) {
+                        log('expressAzAdRoutes.js\t: Session ' + sid + ' Destroy attempted with error-> ' + err)
+                    } else {
+                        log('expressAzAdRoutes.js\t: Session ' + sid + ' Destroyed')
+                    }
+                })
             }
             res.redirect('/')
         })

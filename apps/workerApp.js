@@ -24,9 +24,11 @@ function workerApp() {
 
     //Redis Initialisation
     const initRedis = require('../apps/redisCode').initRedis
-    const initUMRedis = require('../apps/redisCode').initUMRedisClient
     const quitRedis = require('../apps/redisCode').quitRedis
+    const initUMRedis = require('../apps/redisCode').initUMRedisClient
     const quitUMRedis = require('../apps/redisCode').quitUMRedis
+    const initSIOPubRedis=require('../apps/redisCode').initSIOPubRedisClient
+    const quitSIOPubRedis=require('../apps/redisCode').quitSIOPubRedis
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -57,6 +59,7 @@ function workerApp() {
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
+            .then(quitSIOPubRedis)
             .then(exitProcess)
             .catch(exitProcess)
     }
@@ -75,7 +78,7 @@ function workerApp() {
 
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
-        express: express,app: app,expressSession: expressSession,
+        express: express,app: app,expressSession: expressSession,port:port,
         redis: redis,redisStore: redisStore,
         passport: passport,
         mongoose: mongoose,mongoConnection: mongoConnection,
@@ -90,6 +93,7 @@ function workerApp() {
         .then(addAzAd)
         .then(addAzAdRoutes)
         .then(addAppRoutes)
+        .then(initSIOPubRedis)
         .then(addSocketIORedis)
         .then(addSignalRoutes)
         //.then(initMongoose)

@@ -63,7 +63,7 @@ let addUserManager = (processObjects) => {
 
             processObjects.userManager.getLoggedUsers = () => {
                 let loggedUsers = umRedisClient.keys('*', (err, reply) => {
-                    log(err + reply)
+                    log('userManager.js\t: getLoggedUsers -> ' + err + reply)
                 })
             }
 
