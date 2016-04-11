@@ -35,6 +35,9 @@ function workerApp() {
     const addAppRoutes = require('../apps/expressStdAppRoutes').addAppRoutes
     const addSignalRoutes = require('../apps/signallingRoutes').addSignalRoutes
     const addLastRoute = require('../apps/expressLastRoute').addLastRoute
+    
+    //Socket.io-Redis Initialisaton
+    const addSocketIORedis = require('../apps/socketioCode.js').addSocketIOServices
 
     //Mongoose Initialisaton
     const initMongoose = require('../apps/mongooseCode').initMongoose
@@ -87,9 +90,10 @@ function workerApp() {
         .then(addAzAd)
         .then(addAzAdRoutes)
         .then(addAppRoutes)
+        .then(addSocketIORedis)
         .then(addSignalRoutes)
-        .then(addLastRoute)
         //.then(initMongoose)
+        .then(addLastRoute)
         .then(startServer)
         .catch(stopProcess)
 
