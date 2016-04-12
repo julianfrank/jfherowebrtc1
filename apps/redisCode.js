@@ -117,7 +117,7 @@ function initSIOPubRedisClient(processObjects) {
     log('redisCode.js\t:Initializing Socket.io Redis Publisher Client')
     return new Promise((resolve, reject) => {
 
-        log('redisCode.js\t:Creating sioPubRedisClient for User Management store')
+        log('redisCode.js\t:Creating sioPubRedisClient for SocketIO Services')
 
         processObjects.sioPubRedisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
@@ -158,4 +158,55 @@ function quitSIOPubRedis(processObjects) {
     })
 }
 
-module.exports = { initRedis, initUMRedisClient, quitRedis, quitUMRedis, initSIOPubRedisClient, quitSIOPubRedis }
+function initSIOSubRedisClient(processObjects) {
+    log('redisCode.js\t:Initializing Socket.io Redis Subscriber Client')
+    return new Promise((resolve, reject) => {
+
+        log('redisCode.js\t:Creating sioSubRedisClient for SocketIO Services')
+
+        processObjects.sioSubRedisClient = processObjects.redis.createClient({
+            url: 'redis://' + redisLabURL,
+            retry_strategy: redisRetryStrategy,
+            prefix: 'sioSub.',
+            return_buffers: true
+        })
+
+        processObjects.sioSubRedisClient.on("error", (err) => {
+            log("redisCode.js\t: sioSubRedisClient creation Error " + err)
+            reject(err)
+        })
+
+        processObjects.sioSubRedisClient.auth(redisLabPASS, () => {
+            processObjects.sioSubRedisClient.info((err, reply) => {
+                if (err) {
+                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                } else {
+                    log('redisCode.js\t:sioSubRedisClient Connected to ' + redisLabURL)
+                    process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and sioPubRedisClient is working
+                }
+            })
+        })
+    })
+}
+
+function quitSIOSubRedis(processObjects) {
+    log('redisCode.js\t:Quiting sioSubRedisClient')
+    return new Promise((resolve, reject) => {
+        processObjects.sioSubRedisClient.quit((err, res) => {
+            if (res === 'OK') {
+                log('redisCode.js\t:Quit sioSubRedisClient Connection: ' + redisLabURL)
+                resolve(processObjects)
+            } else {
+                log('redisCode.js\t:Error: sioSubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway')
+                reject(err)
+            }
+        })
+    })
+}
+
+module.exports = {
+    initRedis, quitRedis,
+    initUMRedisClient, quitUMRedis,
+    initSIOPubRedisClient, quitSIOPubRedis,
+    initSIOSubRedisClient, quitSIOSubRedis
+}

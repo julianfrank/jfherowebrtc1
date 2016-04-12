@@ -10,7 +10,8 @@ let addSocketIOServices = (processObjects) => {
 
         let app = processObjects.app
         let sioPub = processObjects.sioPubRedisClient
-        
+        let sioSub = processObjects.sioSubRedisClient
+
         processObjects.socketIO = require('socket.io')(
             require('http').Server(app)
         )
@@ -22,9 +23,9 @@ let addSocketIOServices = (processObjects) => {
 
         var redis = processObjects.redis.createClient
         //var pub = redis(rPort, rHost, { auth_pass: rAuth })
-        var sub = redis(rPort, rHost, { return_buffers: true, auth_pass: rAuth })
+        //var sub = redis(rPort, rHost, { return_buffers: true, auth_pass: rAuth })
 
-        var sirAdapter = require('socket.io-redis')({ pubClient: sioPub, subClient: sub })
+        var sirAdapter = require('socket.io-redis')({ pubClient: sioPub, subClient: sioSub })
 
         io.adapter(sirAdapter)
         sirAdapter.pubClient.on('error', function() { })
