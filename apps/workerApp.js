@@ -29,6 +29,8 @@ function workerApp() {
     const quitUMRedis = require('../apps/redisCode').quitUMRedis
     const initSIOPubRedis=require('../apps/redisCode').initSIOPubRedisClient
     const quitSIOPubRedis=require('../apps/redisCode').quitSIOPubRedis
+    const initSIOSubRedis=require('../apps/redisCode').initSIOSubRedisClient
+    const quitSIOSubRedis=require('../apps/redisCode').quitSIOSubRedis
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -60,6 +62,7 @@ function workerApp() {
             .then(quitRedis)
             .then(quitUMRedis)
             .then(quitSIOPubRedis)
+            .then(quitSIOSubRedis)
             .then(exitProcess)
             .catch(exitProcess)
     }
@@ -94,6 +97,7 @@ function workerApp() {
         .then(addAzAdRoutes)
         .then(addAppRoutes)
         .then(initSIOPubRedis)
+        .then(initSIOSubRedis)
         .then(addSocketIORedis)
         .then(addSignalRoutes)
         //.then(initMongoose)

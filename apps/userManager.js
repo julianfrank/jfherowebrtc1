@@ -37,7 +37,7 @@ let addUserManager = (processObjects) => {
                         log('userManager.js\t: get for ' + email + ' Failed with Error -> ' + err)
                         return cb(null, null)
                     } else {
-                        log('userManager.js\t: get for ' + email + ' Succeeded with reply -> ' + typeof reply)
+                        //log('userManager.js\t: get for ' + email + ' Succeeded with reply -> ' + reply)
                         return cb(null, JSON.parse(reply))
                     }
                 })
@@ -61,9 +61,15 @@ let addUserManager = (processObjects) => {
                 log('userManager.js\t:User ' + email + ' Removed from userManager')
             }
 
-            processObjects.userManager.getLoggedUsers = () => {
-                let loggedUsers = umRedisClient.keys('*', (err, reply) => {
-                    log('userManager.js\t: getLoggedUsers -> ' + err + reply)
+            processObjects.userManager.getLoggedUsers = (res,returnUserList) => {
+                let loggedUsers = umRedisClient.keys('userMan.*', (err, reply) => {
+                    if (err) {
+                        log('userManager.js\t: getLoggedUsers resulted in error -> ' + err)
+                        return null
+                    } else {
+                        log('userManager.js\t: getLoggedUsers resulted in -> ' + reply)
+                        return returnUserList(res,reply)
+                    }
                 })
             }
 

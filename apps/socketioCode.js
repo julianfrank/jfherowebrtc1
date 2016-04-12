@@ -17,9 +17,9 @@ let addSocketIOServices = (processObjects) => {
         )
         let io = processObjects.socketIO
 
-        var rHost = 'pub-redis-14190.us-central1-1-1.gce.garantiadata.com'
+        /*var rHost = 'pub-redis-14190.us-central1-1-1.gce.garantiadata.com'
         var rPort = 14190
-        var rAuth = 'redisPASS'
+        var rAuth = 'redisPASS'*/
 
         var redis = processObjects.redis.createClient
         //var pub = redis(rPort, rHost, { auth_pass: rAuth })
@@ -28,8 +28,8 @@ let addSocketIOServices = (processObjects) => {
         var sirAdapter = require('socket.io-redis')({ pubClient: sioPub, subClient: sioSub })
 
         io.adapter(sirAdapter)
-        sirAdapter.pubClient.on('error', function() { })
-        sirAdapter.subClient.on('error', function() { })
+        sirAdapter.pubClient.on('error', function(err) { log('socketioCode.js\t:Error in Publisher Service->' + err) })
+        sirAdapter.subClient.on('error', function(err) { log('socketioCode.js\t:Error in Subscriber Service->' + err) })
 
         process.nextTick(() => resolve(processObjects))
     })
