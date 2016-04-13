@@ -9,8 +9,9 @@ let addLastRoute = (processObjects) => {
 
         let app = processObjects.app
 
-        app.all('*', (req, res) => {//Capture Unhandled routes Here
+        app.all('*', (req, res,next) => {//Capture Unhandled routes Here
             log('expressLastRoute.js\t:No Route found for\t:' + req.path)
+            return next
         })
 
         process.nextTick(() => resolve(processObjects))

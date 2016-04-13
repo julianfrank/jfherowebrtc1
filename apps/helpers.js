@@ -10,7 +10,7 @@ var os = require('os')
 @logText    String  Text to be logged with a timestamp
 */
 function log(logText) {
-    var date = (process.env.NODE_HOME === "/app/.heroku/node") ? '' : Date().substring(4, 24) + ' |  '
+    var date = (typeof process.env.NODE_HOME === "undefined") ? Date().substring(16, 24) + '| ':'JF>'
     console.log(date + logText)
 }
 module.exports.log = exports.log = log
