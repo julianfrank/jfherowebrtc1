@@ -8,6 +8,9 @@ function workerApp() {
     require('newrelic')
     const express = require('express')
     const app = express()
+    const http = require('http')
+    const server = http.Server(app)
+    
     //Redis Session Store and Express Session Management Module 
     const expressSession = require('express-session');
     const redis = require('redis')
@@ -18,7 +21,7 @@ function workerApp() {
     const mongoose = require('mongoose')
     let mongoConnection = mongoose.connection
     // array to hold logged in users
-    
+
     //User Manager Initialization
     const addUserManager = require('../apps/userManager').addUserManager
 
@@ -27,10 +30,10 @@ function workerApp() {
     const quitRedis = require('../apps/redisCode').quitRedis
     const initUMRedis = require('../apps/redisCode').initUMRedisClient
     const quitUMRedis = require('../apps/redisCode').quitUMRedis
-    const initSIOPubRedis=require('../apps/redisCode').initSIOPubRedisClient
-    const quitSIOPubRedis=require('../apps/redisCode').quitSIOPubRedis
-    const initSIOSubRedis=require('../apps/redisCode').initSIOSubRedisClient
-    const quitSIOSubRedis=require('../apps/redisCode').quitSIOSubRedis
+    //const initSIOPubRedis = require('../apps/redisCode').initSIOPubRedisClient
+    //const quitSIOPubRedis = require('../apps/redisCode').quitSIOPubRedis
+    //const initSIOSubRedis = require('../apps/redisCode').initSIOSubRedisClient
+    //const quitSIOSubRedis = require('../apps/redisCode').quitSIOSubRedis
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -39,9 +42,6 @@ function workerApp() {
     const addAppRoutes = require('../apps/expressStdAppRoutes').addAppRoutes
     const addSignalRoutes = require('../apps/signallingRoutes').addSignalRoutes
     const addLastRoute = require('../apps/expressLastRoute').addLastRoute
-    
-    //Socket.io-Redis Initialisaton
-    const addSocketIORedis = require('../apps/socketioCode.js').addSocketIOServices
 
     //Mongoose Initialisaton
     const initMongoose = require('../apps/mongooseCode').initMongoose
@@ -50,9 +50,11 @@ function workerApp() {
     //Start Server
     const startServer = () => {
         log('workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit')
-        app.listen(port, () => { log('workerApp.js\t: ' + app.locals.name + " " + 
-        helpers.readPackageJSON(__dirname, "version") + 
-        " Started & Listening on port: " + port) })
+        http.createServer(app).listen(port, () => {
+            log('workerApp.js\t: ' + app.locals.name + " " +
+                helpers.readPackageJSON(__dirname, "version") +
+                " Started & Listening on port: " + port)
+        })
     }
 
     //Stop PRocess
@@ -61,19 +63,17 @@ function workerApp() {
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
-            .then(quitSIOPubRedis)
-            .then(quitSIOSubRedis)
             .then(exitProcess)
             .catch(exitProcess)
     }
     // Process Shutdown Zone
     const exitProcess = () => {
-        if(process.connected){
+        if (process.connected) {
             log('workerApp.js\t:About to Disconnect this Process')
             process.disconnect()
-        }else{
+        } else {
             log('workerApp.js\t:About to Exit Process')
-            process.exit(0)    
+            process.exit(0)
         }
     }
     process.stdin.resume()
@@ -81,23 +81,20 @@ function workerApp() {
 
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
-        express: express,app: app,expressSession: expressSession,port:port,
-        redis: redis,redisStore: redisStore,
-        passport: passport,
-        mongoose: mongoose,mongoConnection: mongoConnection,
+        http: http, port: port,
+        express: express, app: app, expressSession: expressSession, passport: passport,
+        redis: redis, redisStore: redisStore,
+        mongoose: mongoose, mongoConnection: mongoConnection,
         stopProcess: stopProcess
     }
 
     //Start the Application
     initRedis(thisProcessObjects)
-    .then(initUMRedis)
+        .then(initUMRedis)
         .then(addUserManager)
         .then(initExpress)
         .then(addAzAd)
         .then(addAzAdRoutes)
-        .then(initSIOPubRedis)
-        .then(initSIOSubRedis)
-        .then(addSocketIORedis)
         .then(addSignalRoutes)
         //.then(initMongoose)
         .then(addAppRoutes)
@@ -106,4 +103,4 @@ function workerApp() {
         .catch(stopProcess)
 
 }
-module.exports = {workerApp}
+module.exports = { workerApp }
