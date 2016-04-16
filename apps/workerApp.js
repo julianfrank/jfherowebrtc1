@@ -11,12 +11,6 @@ function workerApp() {
     const app = express()
     const server = require('http').Server(app)
     const io = require('socket.io')(server)
-    
-    io.on('connection',(socket)=>{
-        socket.on('client ready',(data)=>{
-            socket.emit('server ready','Server Ready')
-        })
-    })
 
     //Redis Session Store and Express Session Management Module 
     const expressSession = require('express-session');
@@ -37,10 +31,13 @@ function workerApp() {
     const quitRedis = require('../apps/redisCode').quitRedis
     const initUMRedis = require('../apps/redisCode').initUMRedisClient
     const quitUMRedis = require('../apps/redisCode').quitUMRedis
-    //const initSIOPubRedis = require('../apps/redisCode').initSIOPubRedisClient
-    //const quitSIOPubRedis = require('../apps/redisCode').quitSIOPubRedis
-    //const initSIOSubRedis = require('../apps/redisCode').initSIOSubRedisClient
-    //const quitSIOSubRedis = require('../apps/redisCode').quitSIOSubRedis
+    const initSIOPubRedis = require('../apps/redisCode').initSIOPubRedisClient
+    const quitSIOPubRedis = require('../apps/redisCode').quitSIOPubRedis
+    const initSIOSubRedis = require('../apps/redisCode').initSIOSubRedisClient
+    const quitSIOSubRedis = require('../apps/redisCode').quitSIOSubRedis
+    
+    //Socket.io Initialisation
+    const initSocket =require('../apps/socketioCode.js').addSocketIOServices
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -71,6 +68,8 @@ function workerApp() {
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
+            .then(quitSIOPubRedis)
+            .then(quitSIOSubRedis)
             .then(exitProcess)
             .catch(exitProcess)
     }
@@ -89,7 +88,7 @@ function workerApp() {
 
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
-        server: server, port: port,
+        server: server, port: port, io: io,
         express: express, app: app, expressSession: expressSession, passport: passport,
         redis: redis, redisStore: redisStore,
         mongoose: mongoose, mongoConnection: mongoConnection,
@@ -100,6 +99,9 @@ function workerApp() {
     initRedis(thisProcessObjects)
         .then(initUMRedis)
         .then(addUserManager)
+        .then(initSIOPubRedis)
+        .then(initSIOSubRedis)
+        .then(initSocket)
         .then(initExpress)
         .then(addAzAd)
         .then(addAzAdRoutes)
