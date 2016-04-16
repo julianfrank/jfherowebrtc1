@@ -13,6 +13,8 @@
     <script>
         GRETA_DEBUG = true;
     </script>
+        <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -25,25 +27,29 @@
         <h2>Page B</h2></a>
 
     <img data-greta='/static/kingjulien.jpg'>
-
+<br>
     <label id='gretastatus'>Greta Status</label>
-
+        <div id='gretaText'></div>
     <script>
-        console.log('JF: Going to initiate connection')
+        function logGreta(text){
+            $('#gretaText').append('<br>'+text)
+        }
+        logGreta('JF: Going to initiate connection')
         greta.signaling.connected(function() {
-      console.log('JF: Connected....Next Going to Subscribe')
+      logGreta('JF: Connected....Next Going to Subscribe')
+      
       greta.signaling.subscribe({
         channel: 'MyChannel',
         message: onmessage
       });
-      console.log('JF: Connected....Next Going to Publish')
+      logGreta('JF: Connected....Next Going to Publish')
       greta.signaling.publish({
         channel: 'MyChannel',
         message: 'Hello!',
       });
     });
     function onmessage(msg) {
-      console.log('JF: Received Message '+msg);
+      logGreta('JF: Received Message '+msg);
       window.setTimeout(function() {
         greta.signaling.publish({
           channel: 'MyChannel',
