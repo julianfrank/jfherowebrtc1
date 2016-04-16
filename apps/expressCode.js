@@ -10,6 +10,8 @@ let initExpress = (processObjects) => {
         const bodyParser = require('body-parser') //Required to read the body
 
         let app = processObjects.app
+        let server = processObjects.server
+        
         app.locals.name = 'Julian Frank\'s WebRTC Application'
 
         app.engine('html', helpers.readHTML);// define the template engine [(filePath, options, callback)]
@@ -42,6 +44,8 @@ let initExpress = (processObjects) => {
             if (typeof req.session === 'undefined') return reject('expressCode.js\t:Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             return next()
         })
+
+        //server.on('request', app)
 
         process.nextTick(() => { return resolve(processObjects) })
     })

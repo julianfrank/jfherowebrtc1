@@ -6,11 +6,18 @@ function workerApp() {
     const log = helpers.log
     //Key Libraries
     require('newrelic')
+    //const server = require('http').createServer()
     const express = require('express')
     const app = express()
-    const http = require('http')
-    const server = http.Server(app)
+    const server = require('http').Server(app)
+    const io = require('socket.io')(server)
     
+    io.on('connection',(socket)=>{
+        socket.on('client ready',(data)=>{
+            socket.emit('server ready','Server Ready')
+        })
+    })
+
     //Redis Session Store and Express Session Management Module 
     const expressSession = require('express-session');
     const redis = require('redis')
@@ -50,7 +57,8 @@ function workerApp() {
     //Start Server
     const startServer = () => {
         log('workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit')
-        http.createServer(app).listen(port, () => {
+
+        server.listen(port, () => {
             log('workerApp.js\t: ' + app.locals.name + " " +
                 helpers.readPackageJSON(__dirname, "version") +
                 " Started & Listening on port: " + port)
@@ -81,7 +89,7 @@ function workerApp() {
 
     //Object Packaged to be passed between Boot Loader and Unloaders
     const thisProcessObjects = {
-        http: http, port: port,
+        server: server, port: port,
         express: express, app: app, expressSession: expressSession, passport: passport,
         redis: redis, redisStore: redisStore,
         mongoose: mongoose, mongoConnection: mongoConnection,

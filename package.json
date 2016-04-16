@@ -1,6 +1,6 @@
 {
   "name": "jfwrtc",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "description": "WebRTC App",
   "main": "procMaster.js",
   "scripts": {
@@ -32,7 +32,8 @@
     "newrelic": "^1.26.2",
     "passport": "^0.3.2",
     "passport-azure-ad": "^1.4.1",
-    "redis": "^2.5.3"
+    "redis": "^2.5.3",
+    "socket.io": "^1.4.5"
   },
   "engines": {
     "node": "^5.8.0"

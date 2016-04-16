@@ -6,4 +6,10 @@ $(document).ready(function () {
         $('#signalme').append(document.createTextNode(x))
         console.log(x, '\nResponse:' + response)
     })
+
+    var socket = io();
+    socket.emit('client ready', 'Client is Ready')
+    socket.on('server ready', function (data) {
+        $('#signalme').append('<br>' + data+'<br>')
+    });
 })
