@@ -20,10 +20,10 @@ let addAppRoutes = (processObjects) => {
         })
 
         app.all('/', (req, res) => {// Main page
-            if (!req.session.lastpath) {//[TODO] Remove this when App Session Management is stable
+            /*if (!req.session.lastpath) {//[TODO] Remove this when App Session Management is stable
                 req.session.lastpath = req.hostname + req.originalUrl + req.path
                 log('expressAppRoutes.js\t:No lastpath in session. Setting ' + req.session.lastpath)
-            }
+            }*/
             res.contentType('text/html')
             if (req.isAuthenticated()) {
                 res.location('https://lab4jf.in')
