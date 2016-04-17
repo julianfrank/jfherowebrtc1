@@ -46,7 +46,7 @@ function hourDiff(date1, date2) {
 module.exports.hourDiff = exports.hourDiff = hourDiff
 
 /*Generic function to read file within express engine declaration...currently planned to be used only for HTML
-Add this into express using this statement =>	app.engine('html', helpers.readHTML);
+Add this into express using this statement =>	app.engine('html', helpers.readHTML);//This sample gets called when any '.html' file is rendered 
 Parameters are called directly by express, so no coding needed*/
 function readHTML(filePath, options, callback) {
     fs.readFile(filePath, function(err, content) {

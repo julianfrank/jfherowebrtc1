@@ -31,7 +31,7 @@ let addSocketIOServices = (processObjects) => {
                 userMan.getLoggedUsers((userList) => {
                     let returnStuff = inspect({
                         loggedUsers: userList,
-                        socket: socket.handshake,
+                        socket: socket.handshake.headers,
                         time: Date()
                     })
                     return socket.emit('server ready', returnStuff)

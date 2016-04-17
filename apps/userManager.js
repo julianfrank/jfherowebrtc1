@@ -80,7 +80,7 @@ let addUserManager = (processObjects) => {
         }
         processObjects.userManager()
 
-        process.nextTick(() => resolve(processObjects))
+        return process.nextTick(() => resolve(processObjects))
     })
 }
 module.exports = { addUserManager }

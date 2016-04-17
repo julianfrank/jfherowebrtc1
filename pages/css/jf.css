@@ -1,5 +1,6 @@
-aside{
+header{
     display: inline-block;
+    vertical-align: top;
     width:20%;
 border: 5px solid;
 border-color: black #444 #888 #ccc;
@@ -7,6 +8,7 @@ overflow: auto;
 }
 article{
     display: inline-block;
+    vertical-align: bottom;
     width:70%;
     border: 5px solid;
 border-color: black #444 #888 #ccc;
