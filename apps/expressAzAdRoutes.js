@@ -35,8 +35,9 @@ let addAzAdRoutes = (processObjects) => {
                 req.session.save((err) => {
                     //if (err === null) log('expressAzAdRoutes.js\t:Error while saving session GET->oauth2return ' + err) 
                 })
-                res.location('https://lab4jf.in')
-                res.render('secureApp')
+                //res.location('https://lab4jf.in')
+                //res.render('secureApp')
+                res.redirect('/')
             })
 
         // POST /oauth2return
@@ -48,8 +49,9 @@ let addAzAdRoutes = (processObjects) => {
             (req, res) => {
                 log('expressAzAdRoutes.js\t:We received a POST return from AzureAD.')
                 req.session.save((err) => { if (err === null) log('expressAzAdRoutes.js\t:Error while saving session POST->oauth2return ' + err) })
-                res.location('https://lab4jf.in')
-                res.render('secureApp')
+                //res.location('https://lab4jf.in')
+                //res.render('secureApp')
+                res.redirect('/')
             })
 
         app.get('/logout', (req, res) => {

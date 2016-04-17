@@ -26,10 +26,8 @@ let addAppRoutes = (processObjects) => {
             }*/
             res.contentType('text/html')
             if (req.isAuthenticated()) {
-                res.location('https://lab4jf.in')
                 res.render('secureApp');
             } else {
-                res.location('https://lab4jf.in')
                 res.render('jfmain')
             }
         })
