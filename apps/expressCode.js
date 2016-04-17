@@ -35,7 +35,7 @@ let initExpress = (processObjects) => {
         app.use((req, res, next) => {//Add CORS Support
             res.header("Access-Control-Allow-Origin", "*")//[TODO] Need to update to include only 'Trusted' domains
             res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")
-            next()
+            return next()
         })
 
         app.use('/static', processObjects.express.static('pages/static'))

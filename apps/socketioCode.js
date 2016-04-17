@@ -18,9 +18,7 @@ let addSocketIOServices = (processObjects) => {
         sirAdapter.pubClient.on('error', function (err) { log('socketioCode.js\t:Error in Publisher Service->' + err) })
         sirAdapter.subClient.on('error', function (err) { log('socketioCode.js\t:Error in Subscriber Service->' + err) })
 
-        //let server=processObjects.server //Just testing node socket directly
-
-        io.on('connection', (socket) => {
+        io.use((socket, next) => {
             let thisUser = socket.handshake.headers.cookie
             log('socketioCode.js\t: connection event -> ' + thisUser)
 
@@ -31,6 +29,8 @@ let addSocketIOServices = (processObjects) => {
             socket.on('client ready', (data) => {
                 socket.emit('server ready', inspect(socket.handshake))
             })
+
+            return next()
         })
 
         process.nextTick(() => resolve(processObjects))
