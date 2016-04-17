@@ -2,7 +2,7 @@ function workerApp() {
     'use strict'
     //Add-on Modules
     const helpers = require('../apps/helpers')
-    const port = process.env.PORT || 80
+    const port = process.env.PORT||process.env.OPENSHIFT_NODEJS_PORT || 80
     const log = helpers.log
 
     //Key Libraries

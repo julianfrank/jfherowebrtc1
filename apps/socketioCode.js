@@ -27,7 +27,8 @@ let addSocketIOServices = (processObjects) => {
             socket.on('lookup', (status) => { log('socketioCode.js\t: lookup Event -> ' + inspect(status)) })
 
             socket.on('client ready', (data) => {
-                socket.emit('server ready', inspect(socket.handshake))
+                let returnStuff = inspect({ socket: socket.handshake, time: Date() })
+                socket.emit('server ready', returnStuff)
             })
 
             return next()
