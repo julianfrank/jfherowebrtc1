@@ -4,9 +4,8 @@ function workerApp() {
     const helpers = require('../apps/helpers')
     const port = process.env.PORT || 80
     const log = helpers.log
+
     //Key Libraries
-    require('newrelic')
-    //const server = require('http').createServer()
     const express = require('express')
     const app = express()
     const server = require('http').Server(app)
@@ -35,9 +34,9 @@ function workerApp() {
     const quitSIOPubRedis = require('../apps/redisCode').quitSIOPubRedis
     const initSIOSubRedis = require('../apps/redisCode').initSIOSubRedisClient
     const quitSIOSubRedis = require('../apps/redisCode').quitSIOSubRedis
-    
+
     //Socket.io Initialisation
-    const initSocket =require('../apps/socketioCode.js').addSocketIOServices
+    const initSocket = require('../apps/socketioCode.js').addSocketIOServices
 
     //Express Application Initialization 
     const initExpress = require('../apps/expressCode').initExpress
@@ -98,9 +97,9 @@ function workerApp() {
     //Start the Application
     initRedis(thisProcessObjects)
         .then(initUMRedis)
-        .then(addUserManager)
         .then(initSIOPubRedis)
         .then(initSIOSubRedis)
+        .then(addUserManager)
         .then(initSocket)
         .then(initExpress)
         .then(addAzAd)

@@ -10,6 +10,6 @@ $(document).ready(function () {
     var socket = io();
     socket.emit('client ready', 'Client is Ready')
     socket.on('server ready', function (data) {
-        $('#signalme').append('<br>' + data+'<br>')
+        $('#sio').text( data )
     });
 })
