@@ -11,6 +11,7 @@ let addSocketIOServices = (processObjects) => {
         let sioPub = processObjects.sioPubRedisClient
         let sioSub = processObjects.sioSubRedisClient
         let io = processObjects.io
+        let userMan = processObjects.userManager
 
         var sirAdapter = require('socket.io-redis')({ pubClient: sioPub, subClient: sioSub })
 
@@ -27,8 +28,14 @@ let addSocketIOServices = (processObjects) => {
             socket.on('lookup', (status) => { log('socketioCode.js\t: lookup Event -> ' + inspect(status)) })
 
             socket.on('client ready', (data) => {
-                let returnStuff = inspect({ socket: socket.handshake, time: Date() })
-                socket.emit('server ready', returnStuff)
+                userMan.getLoggedUsers((userList) => {
+                    let returnStuff = inspect({
+                        loggedUsers: userList,
+                        socket: socket.handshake,
+                        time: Date()
+                    })
+                    return socket.emit('server ready', returnStuff)
+                })
             })
 
             return next()
