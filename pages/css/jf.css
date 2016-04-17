@@ -1,0 +1,14 @@
+aside{
+    display: inline-block;
+    width:20%;
+border: 5px solid;
+border-color: black #444 #888 #ccc;
+overflow: auto;
+}
+article{
+    display: inline-block;
+    width:70%;
+    border: 5px solid;
+border-color: black #444 #888 #ccc;
+overflow: auto;
+}

@@ -20,25 +20,18 @@ let addSocketIOServices = (processObjects) => {
 
         //let server=processObjects.server //Just testing node socket directly
 
-        io.on('connection', function (socket) {
-            console.log('a user connected');
+        io.on('connection', (socket) => {
+            let thisUser = socket.handshake.headers.cookie
+            log('socketioCode.js\t: connection event -> ' + thisUser)
 
-            socket.on('disconnect', function () {
-                console.log('user disconnected');
+            socket.on('disconnect', () => { log('socketioCode.js\t: disconnect event ->' + thisUser) })
+
+            socket.on('lookup', (status) => { log('socketioCode.js\t: lookup Event -> ' + inspect(status)) })
+
+            socket.on('client ready', (data) => {
+                socket.emit('server ready', inspect(socket.handshake))
             })
-
-            socket.on('lookup', (status) => {
-                console.log(inspect(status))
-            })
-
-
-            io.on('connection', (socket) => {
-                socket.on('client ready', (data) => {
-                    socket.emit('server ready',  inspect(socket.handshake))
-                })
-            })
-
-        });
+        })
 
         process.nextTick(() => resolve(processObjects))
     })

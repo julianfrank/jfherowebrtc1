@@ -5,13 +5,14 @@
     <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="
         crossorigin="anonymous"></script>
         <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <script src="/js/secureApp.js"></script>
+    <script src="/js/rt.js"></script>
     <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="/css/jf.css">
 </head>
 
 <body>
     <h1>JF WebRTC - Main Page</h1>
-
+<aside>
     <a href="/">
         <h2>Home V0.0.14</h2></a>
     <a href='https://jfwrtc-60937.onmodulus.net/'>
@@ -24,9 +25,12 @@
         <h2>Page B</h2></a>
     <a href="/oauth2signin">
         <h2>Login using AzureAD</h2></a>
+</aside>
+<article>
     <br>
     <div id='signalme'>Signal Me Response :</div>
     <br><pre>
     <div id='sio'>SocketIO Response :</div>
     </pre><br>
+</article>
 </body>
