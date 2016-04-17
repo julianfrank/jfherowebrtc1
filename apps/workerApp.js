@@ -54,7 +54,7 @@ function workerApp() {
     const startServer = () => {
         log('workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit')
 
-        server.listen(port, () => {
+        server.listen(port,process.env.OPENSHIFT_NODEJS_IP, () => {
             log('workerApp.js\t: ' + app.locals.name + " " +
                 helpers.readPackageJSON(__dirname, "version") +
                 " Started & Listening on port: " + port)
