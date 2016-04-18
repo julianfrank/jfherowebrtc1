@@ -1,10 +1,10 @@
 'use strict'
 const helpers = require('../apps/helpers')
-const log = helpers.log
+const log = helpers.loggly
 const inspect = require('util').inspect
 
 let addAzAd = (processObjects) => {
-    log('expressAzAd.js\t:Initializing Passport AzAD Middleware')
+    log('info','expressAzAd.js\t:Initializing Passport AzAD Middleware')
     return new Promise((resolve, reject) => {
         const OIDCStrategy = require('passport-azure-ad').OIDCStrategy;
 
@@ -13,21 +13,21 @@ let addAzAd = (processObjects) => {
         let passport = processObjects.passport
 
         const findByEmail = (email, fn) => {
-            log('expressAzAd.js\t:Trying to find email: ' + email)
+            log('verbose','expressAzAd.js\t:Trying to find email: ' + email)
             userMan.findUserByEmail(email, fn)
         }
         passport.serializeUser((user, done) => {
-            log('expressAzAd.js\t:Serializing user.email=' + user.email)
+            log('verbose','expressAzAd.js\t:Serializing user.email=' + user.email)
             return done(null, user.email)
         });
         passport.deserializeUser((id, done) => {
-            log('expressAzAd.js\t:Deserializing id = ' + id)
+            log('verbose','expressAzAd.js\t:Deserializing id = ' + id)
             findByEmail(id, (err, user) => {
                 if (user != null) {
-                    log('expressAzAd.js\t:Deserializing user = ' + user.email + ' Error: ' + err)
+                    log('error','expressAzAd.js\t:Deserializing user = ' + user.email + ' Error: ' + err)
                     return done(err, user)
                 } else {
-                    log('expressAzAd.js\t:' + id + ' is not logged in')
+                    log('info','expressAzAd.js\t:' + id + ' is not logged in')
                     return done(err, null)
                 }
             })
@@ -50,18 +50,18 @@ let addAzAd = (processObjects) => {
             loggingLevel: 'warn' // valid are 'info', 'warn', 'error'. Error always goes to stderr in Unix.
         },
             (iss, sub, profile, accessToken, refreshToken, done) => {
-                log('expressAzAd.js\t:Received Profile-' + inspect(profile.email))
+                log('verbose','expressAzAd.js\t:Received Profile-' + inspect(profile.email))
                 if (!profile.email) {
                     return done(new Error("expressAzAd.js\t:Profile does not have Email"), null);
                 } else {
                     // asynchronous verification, for effect...
                     process.nextTick(() => {
-                        //log('expressAzAd.js\t:Trying to find email using profile: ' + inspect(profile))
+                        //log('verbose','expressAzAd.js\t:Trying to find email using profile: ' + inspect(profile))
                         findByEmail(profile.email, (err, user) => {
                             if (err) { return done(err) }
                             if (!user) {
                                 // "Auto-registration"
-                                log('expressAzAd.js\t:Profile being Added for email-' + profile.email)
+                                log('verbose','expressAzAd.js\t:Profile being Added for email-' + profile.email)
                                 //Adding access and Refresh Token to Profile
                                 profile.accessToken = accessToken
                                 profile.refreshToken = refreshToken
@@ -80,7 +80,7 @@ let addAzAd = (processObjects) => {
             }
         ))
 
-        log('expressAzAd.js\t:Adding Passport AzAD Middleware to Express')
+        log('verbose','expressAzAd.js\t:Adding Passport AzAD Middleware to Express')
 
         let app = processObjects.app
         // Initialize Passport!  Also use passport.session() middleware, to support

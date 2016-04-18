@@ -2,8 +2,9 @@ function workerApp() {
     'use strict'
     //Add-on Modules
     const helpers = require('../apps/helpers')
-    const port = process.env.PORT||process.env.OPENSHIFT_NODEJS_PORT || 80
-    const log = helpers.log
+    const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 80
+    const log = helpers.loggly()
+    const check = helpers.checkLog
 
     //Key Libraries
     const express = require('express')
@@ -52,18 +53,18 @@ function workerApp() {
 
     //Start Server
     const startServer = () => {
-        log('workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit')
+        log('info', 'workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit',check)
 
-        server.listen(port,process.env.OPENSHIFT_NODEJS_IP, () => {
-            log('workerApp.js\t: ' + app.locals.name + " " +
+        server.listen(port, process.env.OPENSHIFT_NODEJS_IP, () => {
+            log('info', 'workerApp.js\t: ' + app.locals.name + " " +
                 helpers.readPackageJSON(__dirname, "version") +
-                " Started & Listening on port: " + port)
+                " Started & Listening on port: " + port,check)
         })
     }
 
     //Stop PRocess
     const stopProcess = (reason) => {
-        log('workerApp.js\t:About to exit due to ' + reason)
+        log('warn', 'workerApp.js\t:About to exit due to ' + reason,check)
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
@@ -75,10 +76,10 @@ function workerApp() {
     // Process Shutdown Zone
     const exitProcess = () => {
         if (process.connected) {
-            log('workerApp.js\t:About to Disconnect this Process')
+            log('warn', 'workerApp.js\t:About to Disconnect this Process',check)
             process.disconnect()
         } else {
-            log('workerApp.js\t:About to Exit Process')
+            log('warn', 'workerApp.js\t:About to Exit Process',check)
             process.exit(0)
         }
     }

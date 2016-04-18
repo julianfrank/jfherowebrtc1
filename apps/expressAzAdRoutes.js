@@ -1,11 +1,11 @@
 'use strict'
 
 const helpers = require('../apps/helpers')
-const log = helpers.log
+const log = helpers.loggly
 const inspect = require('util').inspect
 
 let addAzAdRoutes = (processObjects) => {
-    log('expressAzAdRoutes.js\t:Adding AzAD Related Routes')
+    log('info','expressAzAdRoutes.js\t:Adding AzAD Related Routes')
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
@@ -14,10 +14,10 @@ let addAzAdRoutes = (processObjects) => {
 
         app.get('/oauth2signin', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('expressAzAdRoutes.js\t:Login was called in the Sample')
+                log('verbose','expressAzAdRoutes.js\t:Login was called in the Sample')
                 req.session.save((err) => {
                     if (err === null) {
-                        log('expressAzAdRoutes.js\t:Error while saving session in oauth2signin ' + err)
+                        log('error','expressAzAdRoutes.js\t:Error while saving session in oauth2signin ' + err)
                     } else {
                         res.redirect('/')
                     }
@@ -31,12 +31,10 @@ let addAzAdRoutes = (processObjects) => {
         //   which, in this example, will redirect the user to the home page.
         app.get('/oauth2return', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('expressAzAdRoutes.js\t:We received a GET return from AzureAD.')
-                req.session.save((err) => {
-                    //if (err === null) log('expressAzAdRoutes.js\t:Error while saving session GET->oauth2return ' + err) 
-                })
-                //res.location('https://lab4jf.in')
-                //res.render('secureApp')
+                log('verbose','expressAzAdRoutes.js\t:We received a GET return from AzureAD.')
+                //req.session.save((err) => {
+                    //if (err === null) log('verbose','expressAzAdRoutes.js\t:Error while saving session GET->oauth2return ' + err) 
+                //})
                 res.redirect('/')
             })
 
@@ -47,24 +45,22 @@ let addAzAdRoutes = (processObjects) => {
         //   which, in this example, will redirect the user to the home page.
         app.post('/oauth2return', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('expressAzAdRoutes.js\t:We received a POST return from AzureAD.')
-                req.session.save((err) => { if (err === null) log('expressAzAdRoutes.js\t:Error while saving session POST->oauth2return ' + err) })
-                //res.location('https://lab4jf.in')
-                //res.render('secureApp')
+                log('verbose','expressAzAdRoutes.js\t:We received a POST return from AzureAD.')
+                //req.session.save((err) => { if (err === null) log('verbose','expressAzAdRoutes.js\t:Error while saving session POST->oauth2return ' + err) })
                 res.redirect('/')
             })
 
         app.get('/logout', (req, res) => {
             if (typeof req.user != 'undefined') {
-                log('expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(req.user.email))
+                log('verbose','expressAzAdRoutes.js\t:Logout Initiated for user ->' + inspect(req.user.email))
                 userMan.removeUser(req.user.email)
                 req.logout()
                 let sid = req.session.id
                 req.session.destroy((err) => {
                     if (err) {
-                        log('expressAzAdRoutes.js\t: Session ' + sid + ' Destroy attempted with error-> ' + err)
+                        log('error','expressAzAdRoutes.js\t: Session ' + sid + ' Destroy attempted with error-> ' + err)
                     } else {
-                        log('expressAzAdRoutes.js\t: Session ' + sid + ' Destroyed')
+                        log('verbose','expressAzAdRoutes.js\t: Session ' + sid + ' Destroyed')
                     }
                 })
             }

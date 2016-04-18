@@ -1,8 +1,19 @@
+'use strict'
 // Import key Libraries
 var crypto = require('crypto')
 var fs = require('fs')
 var https = require('https')
 var os = require('os')
+
+var winston = require('winston');
+require('winston-loggly');
+winston.add(winston.transports.Loggly, {
+    token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
+    subdomain: "lab4jf",
+    tags: ['JF'],
+    json: true
+})
+//Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
 
 /* Change this to change the logging method of the app
 @logText    String  Text to be logged with a timestamp
@@ -15,23 +26,13 @@ function log(logText) {
 /* Change this to change the logging method of the app
 @jsFile    String  Name of the file from which this instance will work
 */
-function loggly(jsFile) {
-    var winston = require('winston');
-    require('winston-loggly');
-    winston.add(winston.transports.Loggly, {
-        token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
-        subdomain: "lab4jf",
-        tags: [].push(jsFile),
-        json: true
-    })
-    return winston.log
-}
+function loggly() { return winston.log }
 
 /* Supposed to be used in winstron-loggly command to confirm log status
 @err    String  Error
 @result String  Result sent by Loggly
 */
-function logStatus(err, result) {
+function checkLog(err, result) {
     if (err) {
         console.error('loggly\t:Logging resulted in err -> ' + err)
     } else {
@@ -141,10 +142,10 @@ function cleanArray(array, field) {
     return cleanA;
 }
 
-module.exports={
+module.exports = {
     log,
     loggly,
-    logStatus,
+    checkLog,
     getHostNetworkInterfaces,
     hourlyState,
     hourDiff,
