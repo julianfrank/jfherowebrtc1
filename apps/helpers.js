@@ -4,16 +4,40 @@ var fs = require('fs')
 var https = require('https')
 var os = require('os')
 
-// Initializing
-
 /* Change this to change the logging method of the app
 @logText    String  Text to be logged with a timestamp
 */
 function log(logText) {
-    var date = (typeof process.env.NODE_HOME === "undefined") ? Date().substring(16, 24) + '| ':'JF>'
+    var date = (typeof process.env.NODE_HOME === "undefined") ? Date().substring(16, 24) + '| ' : 'JF>'
     console.log(date + logText)
 }
-module.exports.log = exports.log = log
+
+/* Change this to change the logging method of the app
+@jsFile    String  Name of the file from which this instance will work
+*/
+function loggly(jsFile) {
+    var winston = require('winston');
+    require('winston-loggly');
+    winston.add(winston.transports.Loggly, {
+        token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
+        subdomain: "lab4jf",
+        tags: [].push(jsFile),
+        json: true
+    })
+    return winston.log
+}
+
+/* Supposed to be used in winstron-loggly command to confirm log status
+@err    String  Error
+@result String  Result sent by Loggly
+*/
+function logStatus(err, result) {
+    if (err) {
+        console.error('loggly\t:Logging resulted in err -> ' + err)
+    } else {
+        console.error('loggly\t:Logging Successful with result -> ' + result)
+    }
+}
 
 /*Pulls the details of the network interfaces connected to the Node-Server in an Array
 */
@@ -21,7 +45,6 @@ function getHostNetworkInterfaces() {
     var networkInterfaces = os.networkInterfaces()
     return networkInterfaces
 }
-module.exports.getHostNetworkInterfaces = exports.getHostNetworkInterfaces = getHostNetworkInterfaces
 
 /*Generate a Hashed String that stays the same only for one hour
 @mySecret 	String 	Any String that remains constant between creation and checking time/entity
@@ -32,7 +55,6 @@ function hourlyState(mySecret) {
     var hs = shasum.digest('hex').toString()
     return hs
 }
-module.exports.hourlyState = exports.hourlyState = hourlyState
 
 /*Return Hour Difference between two Dates
 @date1 	Date() 	First Date
@@ -43,20 +65,18 @@ function hourDiff(date1, date2) {
     diff = diff / 1000 / 60 / 60;//1000 milisecs->60 seconds ->60 mins
     return Math.floor(diff)
 }
-module.exports.hourDiff = exports.hourDiff = hourDiff
 
 /*Generic function to read file within express engine declaration...currently planned to be used only for HTML
 Add this into express using this statement =>	app.engine('html', helpers.readHTML);//This sample gets called when any '.html' file is rendered 
 Parameters are called directly by express, so no coding needed*/
 function readHTML(filePath, options, callback) {
-    fs.readFile(filePath, function(err, content) {
+    fs.readFile(filePath, function (err, content) {
         if (err) return callback(new Error(err.message))
         // this is an extremely simple template engine
         var rendered = content.toString()
         return callback(null, rendered)
     })
 }
-module.exports.readHTML = exports.readHTML = readHTML
 
 /*Generic function to reaquest from any https site
 @options 	JSON 						Use Standard NodeJS's HTTPS Options JSON Structure
@@ -77,11 +97,11 @@ module.exports.readHTML = exports.readHTML = readHTML
 */
 function requestHTTPS(options, body, callback) {
     var response = '';
-    var req = https.request(options, function(x) {
+    var req = https.request(options, function (x) {
         //log.info("helpers.requestHTTPS: \nstatusCode: ", x.statusCode, "\nheaders: ", x.headers);
         x.setEncoding('utf8');
-        x.on('data', function(d) { response += d; })
-        x.on('end', function() {
+        x.on('data', function (d) { response += d; })
+        x.on('end', function () {
             if ((response === null) || (response.length === 0)) {
                 options = JSON.stringify(options); body = JSON.stringify(body)
                 //		log.fatal("\nhelpers.requestHTTPS:=> Fatal Error while calling with \n Options: " + options + "\nBody: " + body + '\n');
@@ -96,12 +116,11 @@ function requestHTTPS(options, body, callback) {
     });
     if (body != undefined) req.write(body);
     req.end();
-    req.on('error', function(e) {
+    req.on('error', function (e) {
         //log.fatal("\nhelpers.requestHTTPS: Fatal Error while calling with \n Options:" + options + "\nBody:" + body + "\nError Details:" + e + '\n');
         callback(null, "helpers.requestHTTPS: Fatal Error while calling with \n Options:" + options + "\nBody:" + body + "\nError Details:" + e);
     });
 }
-module.exports.requestHTTPS = exports.requestHTTPS = requestHTTPS;
 
 /*Read Variables in package.json
 @variable 	String 	Top level string to be read from 'PAckage.JSON' file*/
@@ -109,8 +128,6 @@ function readPackageJSON(pkgDir, variable) {
     var packageJSON = require('../package.json')
     return packageJSON[variable];
 }
-module.exports.readPackageJSON = exports.readPackageJSON = readPackageJSON
-
 
 /*Return a clean array with only the specific JSON field you need
 This is specifically meant for Arrays of Jsons and requirement is for a new array with just one field from the entire jason object
@@ -118,9 +135,21 @@ This is specifically meant for Arrays of Jsons and requirement is for a new arra
 @field 	String 		Name of the Field that is required*/
 function cleanArray(array, field) {
     var cleanA = [];
-    array.forEach(function(value, index, array) {
+    array.forEach(function (value, index, array) {
         cleanA.push(value[field]);
     })
     return cleanA;
 }
-module.exports.cleanArray = exports.cleanArray = cleanArray;
+
+module.exports={
+    log,
+    loggly,
+    logStatus,
+    getHostNetworkInterfaces,
+    hourlyState,
+    hourDiff,
+    readHTML,
+    requestHTTPS,
+    readPackageJSON,
+    cleanArray
+}

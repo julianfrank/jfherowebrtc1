@@ -54,7 +54,7 @@ article{
     height:2em;
     width: 90%;
     background-color: black;
-    overflow: hidden;
+    overflow: visible;
     margin: 0em;
 padding: 0em;
 }
