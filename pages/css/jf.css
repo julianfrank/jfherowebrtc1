@@ -1,16 +1,67 @@
-header{
-    display: inline-block;
-    vertical-align: top;
-    width:20%;
-border: 5px solid;
-border-color: black #444 #888 #ccc;
-overflow: auto;
+ul,ol {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: #333;
 }
+
+li {
+    float: left;
+        margin:0;
+    padding: 0;
+}
+
+li a {
+    display: block;
+    color: white;
+    background-color: slategrey;
+    text-align: center;
+padding: 1.2em;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+li a:hover {
+    color: darkslategray;
+    background-color: #ccc;
+            margin:0;
+    padding: 1em;
+}
+
+header,h1{
+    vertical-align: top;
+    display: inline-flex;
+    max-height: 2em;
+    backface-visibility:  visible;
+}
+
+h1{
+    max-width: 30%;
+    margin: 0;
+    padding: 10px 10px;
+    font-size:  2em;
+    overflow: hidden;
+    background-color: slategrey;
+    color: white;  
+}
+
 article{
-    display: inline-block;
-    vertical-align: bottom;
-    width:70%;
-    border: 5px solid;
-border-color: black #444 #888 #ccc;
-overflow: auto;
+    font-size: 1em;
+}
+
+.supressed{
+    height:2em;
+    width: 90%;
+    background-color: black;
+    overflow: hidden;
+    margin: 0em;
+padding: 0em;
+}
+
+.supressed:hover{
+    height: 100%;
+    width:90%;
+    color: white;
+    overflow: auto;
 }

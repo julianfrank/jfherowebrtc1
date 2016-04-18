@@ -21,23 +21,25 @@
 <body>
     <h1>JF WebRTC - Main Page</h1>
     <header>
-        <h2><a href="/">Home V0.0.14</a></h2>
+
         <nav>
-            <ol>
+            <ul>
+                <li><a href='/'>Home V0.0.14</a></li>
                 <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
                 <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
                 <li><a href='/gretaa.html'>Page A</a></li>
                 <li><a href='/gretab.html'>Page B</a></li>
                 <li><a href='/oauth2signin'>Login using AzureAD</a></li>
-            </ol>
+            </ul>
         </nav>
     </header>
 
-    <article>
+    <article class='supressed'>
+        Debug View
+        <label id='signalme'>Signal Me Response :</label>
         <br>
-        <div id='signalme'>Signal Me Response :</div>
-        <br><pre>
-    <div id='sio'>SocketIO Response :</div>
-    </pre><br>
+        <pre>
+    <label id='sio'>SocketIO Response :</label>
+    </pre>
     </article>
 </body>
