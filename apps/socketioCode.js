@@ -19,7 +19,8 @@ let addSocketIOServices = (processObjects) => {
         sirAdapter.pubClient.on('error', function (err) { log('error','socketioCode.js\t:Error in Publisher Service->' + err) })
         sirAdapter.subClient.on('error', function (err) { log('error','socketioCode.js\t:Error in Subscriber Service->' + err) })
 
-        io.use((socket, next) => {
+        let testNSP=io.of('/test')
+        testNSP.use((socket, next) => {
             let thisUser = socket.handshake.headers.cookie
             log('verbose','socketioCode.js\t: connection event -> ' + thisUser)
 
@@ -31,14 +32,15 @@ let addSocketIOServices = (processObjects) => {
                 userMan.getLoggedUsers((userList) => {
                     let returnStuff = inspect({
                         loggedUsers: userList,
-                        socket: socket.handshake.headers,
+                        'handshake.headers': socket.handshake.headers,
+                        'request.headers': socket.request.headers,
+                        socketid:socket.request.headers.cookie,
                         time: Date()
                     })
                     return socket.emit('server ready', returnStuff)
                 })
             })
-
-            return next()
+            if (socket.request.headers.cookie) return next();
         })
 
         process.nextTick(() => resolve(processObjects))

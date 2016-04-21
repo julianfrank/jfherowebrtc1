@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    var socket = io();
+    var socket = io('/test');
     socket.emit('client ready', 'Client is Ready')
     socket.on('server ready', function (data) {
         $('#sio').text(data)

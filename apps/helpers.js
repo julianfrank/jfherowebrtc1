@@ -6,13 +6,21 @@ var https = require('https')
 var os = require('os')
 
 var winston = require('winston');
+//Loggly based Logging
 require('winston-loggly');
-winston.add(winston.transports.Loggly, {
+logglyOptions = {
     token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
     subdomain: "lab4jf",
-    tags: ['JF'],
+    tags: ['JF','wrtc'],
     json: true
-})
+}
+winston.add(winston.transports.Loggly, logglyOptions)
+//Logz based logging
+/*var logzioWinstonTransport = require('winston-logzio');
+var logzOptions = {
+    token: 'UhdEaEXjdilBzCAhiWKMUsrGQyPysMWU'
+};
+winston.add(logzioWinstonTransport, logzOptions);*/
 //Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
 
 /* Change this to change the logging method of the app
