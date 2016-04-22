@@ -6,21 +6,7 @@ const https = require('https')
 const os = require('os')
 
 const winston = require('winston')
-//Loggly based Logging
-/*require('winston-loggly');
-const logglyOptions = {
-    token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
-    subdomain: "lab4jf",
-    tags: ['JF','wrtc'],
-    json: true
-}
-winston.add(winston.transports.Loggly, logglyOptions)*/
-//Logz based logging
-/*const logzioWinstonTransport = require('winston-logzio');
-const logzOptions = {
-    token: 'UhdEaEXjdilBzCAhiWKMUsrGQyPysMWU'
-};
-winston.add(logzioWinstonTransport, logzOptions);*/
+
 //Papertrail based logging
 const Papertrail = require('winston-papertrail').Papertrail
 let logger = new winston.Logger({
@@ -29,6 +15,9 @@ let logger = new winston.Logger({
             host: 'logs4.papertrailapp.com',
             port: 17201, // your port here
             colorize: true
+        }),
+        new winston.transports.Console({
+            colorize:true
         })
     ]
 })
@@ -66,9 +55,9 @@ function remoteLog(type, message, meta) {
 @result String  Result sent by Loggly*/
 function checkLog(err, result) {
     if (err) {
-        console.error('RemoteLog\t:Logging resulted in err -> ' + err)
+        logger.error('RemoteLog\t:Logging resulted in err -> ' + err)
     } else {
-        console.error('RemoteLog\t:Logging Successful with result -> ' + result)
+        logger.silly('RemoteLog\t:Logging Successful with result -> ' + result)
     }
 }
 
