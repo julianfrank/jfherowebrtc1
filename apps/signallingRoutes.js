@@ -3,9 +3,10 @@
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
 const util = require('util')
+let sigmehit = 0
 
 let addSignalRoutes = (processObjects) => {
-    log('info','signallingRoutes.js\t:Adding Signalling Routers',['signallingroutes'])
+    log('info', 'signallingRoutes.js\t:Adding Signalling Routers', ['signallingroutes'])
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
@@ -15,6 +16,7 @@ let addSignalRoutes = (processObjects) => {
         app.all('/signal/me', (req, res) => {
             res.type('json')
             userMan.getLoggedUsers((userList) => {
+                log('info', 'signallingRoutes.js\t: Signalme hit count -> ' + (sigmehit++), ['signallingroutes'])
                 res.send(userList)
             })
         })
