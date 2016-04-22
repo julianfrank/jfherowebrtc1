@@ -1,10 +1,10 @@
 'use strict'
 const utils = require('util')
 const helpers = require('../apps/helpers')
-const log = helpers.loggly
+const log = helpers.remoteLog
 
 let initExpress = (processObjects) => {
-    log('info','expressCode.js\t:Initializing Express')
+    log('info','expressCode.js\t:Initializing Express',['expresscode'])
     return new Promise((resolve, reject) => {
 
         const bodyParser = require('body-parser') //Required to read the body
@@ -44,7 +44,7 @@ let initExpress = (processObjects) => {
 
         app.all('*', (err, req, res, next) => { if (err) return reject('expressCode.js\t:Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
         app.all('*', (req, res, next) => {//Default Route to log All Access
-            log('verbose','expressCode.js\t:req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated())
+            log('verbose','expressCode.js\t:req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated(),['expresscode'])
             if (typeof req.session === 'undefined') return reject('expressCode.js\t:Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             return next()
         })

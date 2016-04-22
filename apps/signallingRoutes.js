@@ -1,11 +1,11 @@
 'use strict'
 
 const helpers = require('../apps/helpers')
-const log = helpers.loggly
+const log = helpers.remoteLog
 const util = require('util')
 
 let addSignalRoutes = (processObjects) => {
-    log('info','signallingRoutes.js\t:Adding Signalling Routers')
+    log('info','signallingRoutes.js\t:Adding Signalling Routers',['signallingroutes'])
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app

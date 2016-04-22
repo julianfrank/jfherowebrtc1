@@ -1,10 +1,10 @@
 'use strict'
 
 const helpers = require('../apps/helpers')
-const log = helpers.loggly
+const log = helpers.remoteLog
 
 let addAppRoutes = (processObjects) => {
-    log('info','expressAppRoutes.js\t:Adding Standard Application Routers')
+    log('info','expressAppRoutes.js\t:Adding Standard Application Routers',['expressStdAppRoutes'])
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app

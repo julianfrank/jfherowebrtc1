@@ -1,57 +1,90 @@
 'use strict'
 // Import key Libraries
-var crypto = require('crypto')
-var fs = require('fs')
-var https = require('https')
-var os = require('os')
+const crypto = require('crypto')
+const fs = require('fs')
+const https = require('https')
+const os = require('os')
 
-var winston = require('winston');
+const winston = require('winston')
 //Loggly based Logging
-require('winston-loggly');
-logglyOptions = {
+/*require('winston-loggly');
+const logglyOptions = {
     token: "4beae9b4-3dd4-4bed-b730-be16fb624988",
     subdomain: "lab4jf",
     tags: ['JF','wrtc'],
     json: true
 }
-winston.add(winston.transports.Loggly, logglyOptions)
+winston.add(winston.transports.Loggly, logglyOptions)*/
 //Logz based logging
-/*var logzioWinstonTransport = require('winston-logzio');
-var logzOptions = {
+/*const logzioWinstonTransport = require('winston-logzio');
+const logzOptions = {
     token: 'UhdEaEXjdilBzCAhiWKMUsrGQyPysMWU'
 };
 winston.add(logzioWinstonTransport, logzOptions);*/
-//Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+//Papertrail based logging
+const Papertrail = require('winston-papertrail').Papertrail
+let logger = new winston.Logger({
+    transports: [
+        new Papertrail({
+            host: 'logs4.papertrailapp.com',
+            port: 17201, // your port here
+            colorize: true
+        })
+    ]
+})
+const consoleopts = ['error', 'warn', 'info', 'verbose', 'debug', 'silly']
+consoleopts.forEach((val) => {
+    remoteLog(val, 'Testing ' + val, [].push(val))
+})
 
-/* Change this to change the logging method of the app
+//Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
+/* Change this to change the logging method of the app*/
+function remoteLog(type, message, meta) {
+    switch (type) {
+        case 'info':
+            logger.info(message, meta, checkLog)
+            break;
+        case 'error':
+            logger.error(message, meta, checkLog)
+            break;
+        case 'warn':
+            logger.warn(message, meta, checkLog)
+            break;
+        case 'verbose':
+            logger.info(message, Array(meta).push('verbose'), checkLog)
+            break;
+        case 'debug':
+            logger.warn(message, Array(meta).push('debub'), checkLog)
+            break;
+        case 'silly':
+            logger.info(message, Array(meta).push('silly'), checkLog)
+            break;
+    }
+}
+/* Supposed to be used in winstron-loggly command to confirm log status
+@err    String  Error
+@result String  Result sent by Loggly*/
+function checkLog(err, result) {
+    if (err) {
+        console.error('RemoteLog\t:Logging resulted in err -> ' + err)
+    } else {
+        console.error('RemoteLog\t:Logging Successful with result -> ' + result)
+    }
+}
+
+
+/* Change this to change the console.log logging method of the app
 @logText    String  Text to be logged with a timestamp
 */
 function log(logText) {
-    var date = (typeof process.env.NODE_HOME === "undefined") ? Date().substring(16, 24) + '| ' : 'JF>'
+    let date = (typeof process.env.NODE_HOME === "undefined") ? Date().substring(16, 24) + '| ' : 'JF>'
     console.log(date + logText)
-}
-
-/* Change this to change the logging method of the app
-@jsFile    String  Name of the file from which this instance will work
-*/
-function loggly() { return winston.log }
-
-/* Supposed to be used in winstron-loggly command to confirm log status
-@err    String  Error
-@result String  Result sent by Loggly
-*/
-function checkLog(err, result) {
-    if (err) {
-        console.error('loggly\t:Logging resulted in err -> ' + err)
-    } else {
-        console.error('loggly\t:Logging Successful with result -> ' + result)
-    }
 }
 
 /*Pulls the details of the network interfaces connected to the Node-Server in an Array
 */
 function getHostNetworkInterfaces() {
-    var networkInterfaces = os.networkInterfaces()
+    let networkInterfaces = os.networkInterfaces()
     return networkInterfaces
 }
 
@@ -59,9 +92,9 @@ function getHostNetworkInterfaces() {
 @mySecret 	String 	Any String that remains constant between creation and checking time/entity
 */
 function hourlyState(mySecret) {
-    var shasum = crypto.createHash('sha1')
+    let shasum = crypto.createHash('sha1')
     shasum.update(mySecret + Date().substring(0, 19))
-    var hs = shasum.digest('hex').toString()
+    let hs = shasum.digest('hex').toString()
     return hs
 }
 
@@ -70,7 +103,7 @@ function hourlyState(mySecret) {
 @date2 	Date() 	Second Date - dates can be provided in any order but returned value will remain positive
 */
 function hourDiff(date1, date2) {
-    var diff = (diff < 0) ? (date1 - date2) : -(date1 - date2)
+    let diff = (diff < 0) ? (date1 - date2) : -(date1 - date2)
     diff = diff / 1000 / 60 / 60;//1000 milisecs->60 seconds ->60 mins
     return Math.floor(diff)
 }
@@ -82,7 +115,7 @@ function readHTML(filePath, options, callback) {
     fs.readFile(filePath, function (err, content) {
         if (err) return callback(new Error(err.message))
         // this is an extremely simple template engine
-        var rendered = content.toString()
+        let rendered = content.toString()
         return callback(null, rendered)
     })
 }
@@ -105,8 +138,8 @@ function readHTML(filePath, options, callback) {
 	@error 		Error 	Error if any  
 */
 function requestHTTPS(options, body, callback) {
-    var response = '';
-    var req = https.request(options, function (x) {
+    let response = '';
+    let req = https.request(options, function (x) {
         //log.info("helpers.requestHTTPS: \nstatusCode: ", x.statusCode, "\nheaders: ", x.headers);
         x.setEncoding('utf8');
         x.on('data', function (d) { response += d; })
@@ -131,11 +164,11 @@ function requestHTTPS(options, body, callback) {
     });
 }
 
-/*Read Variables in package.json
-@variable 	String 	Top level string to be read from 'PAckage.JSON' file*/
-function readPackageJSON(pkgDir, variable) {
-    var packageJSON = require('../package.json')
-    return packageJSON[variable];
+/*Read letiables in package.json
+@letiable 	String 	Top level string to be read from 'PAckage.JSON' file*/
+function readPackageJSON(pkgDir, letiable) {
+    let packageJSON = require('../package.json')
+    return packageJSON[letiable];
 }
 
 /*Return a clean array with only the specific JSON field you need
@@ -143,7 +176,7 @@ This is specifically meant for Arrays of Jsons and requirement is for a new arra
 @array 	Array/[] 	Source Array of JSONs
 @field 	String 		Name of the Field that is required*/
 function cleanArray(array, field) {
-    var cleanA = [];
+    let cleanA = [];
     array.forEach(function (value, index, array) {
         cleanA.push(value[field]);
     })
@@ -152,8 +185,8 @@ function cleanArray(array, field) {
 
 module.exports = {
     log,
-    loggly,
-    checkLog,
+    remoteLog,
+    //checkLog,
     getHostNetworkInterfaces,
     hourlyState,
     hourDiff,
