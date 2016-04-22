@@ -1,6 +1,6 @@
 {
   "name": "jfwrtc",
-  "version": "0.0.15",
+  "version": "0.0.16",
   "description": "WebRTC App",
   "main": "procMaster.js",
   "scripts": {
