@@ -4,7 +4,7 @@
   "description": "WebRTC App",
   "main": "procMaster.js",
   "scripts": {
-    "test": "node --optimize_for_size --max_old_space_size=180 --gc_interval=100 procMaster.js",
+    "test": "node --optimize_for_size --max_old_space_size=180 --gc_interval=100 test.js",
     "start": "node --optimize_for_size --max_old_space_size=180 --gc_interval=100 procMaster.js"
   },
   "repository": {
