@@ -8,7 +8,10 @@ deploy:
   api_key: "2caa3b9d-0b8b-4c3e-b9e5-f69e9ad99455"
   project_name: "jfwrtc"
   
-  
 notifications:
   webhooks:
-    urls: https://api.loader.io/v2/tests/091ea4a6bafe842b06518987f08cbecd/token/0b67c08103da5fade447f99241dc1e32/run
+    urls: 
+      - https://api.loader.io/v2/tests/091ea4a6bafe842b06518987f08cbecd/token/0b67c08103da5fade447f99241dc1e32/run
+    on_success:  always
+    on_failure:  never
+    on_start:    never
