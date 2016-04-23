@@ -9,38 +9,25 @@ const winston = require('winston')
 
 //Papertrail based logging
 const Papertrail = require('winston-papertrail').Papertrail
-let logger = new winston.Logger({
-    transports: [
-        new Papertrail({
-            host: 'logs4.papertrailapp.com', port: 17201, // your port here
-            colorize: true, inlineMeta: true, level: 'warn'
-        }),
-        new winston.transports.Console({ colorize: true, inlineMeta: true, level: 'warn' })
-    ]
+const consoleLogger = new winston.transports.Console({ colorize: true, inlineMeta: false, level: 'info' })
+const ptLogger = new Papertrail({
+    host: 'logs4.papertrailapp.com', port: 17201,
+    colorize: true, inlineMeta: true, level: 'debug'
 })
-const consoleopts = ['error', 'warn', 'info', 'verbose', 'debug', 'silly']
-consoleopts.forEach((val) => {
-    return remoteLog(val, 'Testing ' + val, { test: val })
-})
-
-//Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
-/* Change this to change the logging method of the app*/
+let logger = new winston.Logger({ transports: [consoleLogger, ptLogger] })
+const consoleopts = ['error', 'warn', 'info', 'debug']
+consoleopts.forEach((val) => { return remoteLog(val, 'Testing ' + val, { test: val }) })
+/* Change this to change the logging method of the app
+@type       String  Type of message. Accepted values are info,error, warn and debug
+@message    String  Message to be sent to Logger
+@meta       JSON    Meta data to be sent along with the message
+*/
 function remoteLog(type, message, meta) {
-    if (type === 'info') { return logger.info(message, meta, checkLog) }
     if (type === 'error') { return logger.error(message, meta, checkLog) }
     if (type === 'warn') { return logger.warn(message, meta, checkLog) }
-    if (type === 'verbose') {
-        meta['actualType'] = 'verbose'
-        return logger.info(message, meta, checkLog)
-    }
-    if (type === 'debug') {
-        meta['actualType'] = 'debug'
-        return logger.warn(message, meta, checkLog)
-    }
-    if (type === 'silly') {
-        meta['actualType'] = 'silly'
-        return logger.info(message, meta, checkLog)
-    }
+    if (type === 'debug') { return logger.debug(message, meta, checkLog) }
+    if (type === 'info') { return logger.info(message, meta, checkLog) }
+    logger.error('Unhandled log type ' + type + ' message ' + message + ' meta ' + JSON.stringify(meta))
 }
 /* Supposed to be used in winstron-loggly command to confirm log status
 @err    String  Error
@@ -49,10 +36,9 @@ function checkLog(err, result) {
     if (err) {
         logger.error('RemoteLog\t:Logging resulted in err -> ' + err)
     } else {
-        logger.silly('RemoteLog\t:Logging Successful with result -> ' + result)
+        //logger.debug('RemoteLog\t:Logging Successful with result -> ' + result)//Enable to test the logger
     }
 }
-
 
 /* Change this to change the console.log logging method of the app
 @logText    String  Text to be logged with a timestamp

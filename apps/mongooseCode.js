@@ -18,7 +18,7 @@ let initMongoose = (processObjects) => {
                     reject('Problem Connecting with ' + mdburl + 'due to ' + err + ' Going to exit')
                 } else {
 
-                    log('verbose','Connected to ' + mdburl,logMeta)
+                    log('debug','Connected to ' + mdburl,logMeta)
                     process.nextTick(() => resolve(processObjects))
                 }
             })
@@ -33,7 +33,7 @@ let closeMongoose = (processObjects) => {
             if ((err) || (processObjects.mongoConnection === null)) {
                 reject('Error While closing Mongoose Connection :' + err + '. Continuing Shutdown Anyway')
             } else {
-                log('verbose','Closed Mongoose Connection :' + mdburl,logMeta)
+                log('debug','Closed Mongoose Connection :' + mdburl,logMeta)
                 resolve(processObjects)
             }
         })

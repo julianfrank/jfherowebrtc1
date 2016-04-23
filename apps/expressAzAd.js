@@ -14,15 +14,15 @@ let addAzAd = (processObjects) => {
         let passport = processObjects.passport
 
         const findByEmail = (email, fn) => {
-            log('verbose', 'Trying to find email: ' + email, logMeta)
+            log('debug', 'Trying to find email: ' + email, logMeta)
             userMan.findUserByEmail(email, fn)
         }
         passport.serializeUser((user, done) => {
-            log('verbose', 'Serializing user.email=' + user.email, logMeta)
+            log('debug', 'Serializing user.email=' + user.email, logMeta)
             return done(null, user.email)
         });
         passport.deserializeUser((id, done) => {
-            log('verbose', 'Deserializing id = ' + id)
+            log('debug', 'Deserializing id = ' + id)
             findByEmail(id, (err, user) => {
                 if (err) {
                     log('error', ' Deserializer resulted in error ->' + err, logMeta)
@@ -56,18 +56,18 @@ let addAzAd = (processObjects) => {
             loggingLevel: 'warn' // valid are 'info', 'warn', 'error'. Error always goes to stderr in Unix.
         },
             (iss, sub, profile, accessToken, refreshToken, done) => {
-                log('verbose', 'Received Profile-' + inspect(profile.email), logMeta)
+                log('debug', 'Received Profile-' + inspect(profile.email), logMeta)
                 if (!profile.email) {
                     return done(new Error("Profile does not have Email"), null);
                 } else {
                     // asynchronous verification, for effect...
                     process.nextTick(() => {
-                        //log('verbose','Trying to find email using profile: ' + inspect(profile))
+                        //log('debug','Trying to find email using profile: ' + inspect(profile))
                         findByEmail(profile.email, (err, user) => {
                             if (err) { return done(err) }
                             if (!user) {
                                 // "Auto-registration"
-                                log('verbose', 'Profile being Added for email-' + profile.email, logMeta)
+                                log('debug', 'Profile being Added for email-' + profile.email, logMeta)
                                 //Adding access and Refresh Token to Profile
                                 profile.accessToken = accessToken
                                 profile.refreshToken = refreshToken
@@ -86,7 +86,7 @@ let addAzAd = (processObjects) => {
             }
         ))
 
-        log('verbose', 'Adding Passport AzAD Middleware to Express', logMeta)
+        log('debug', 'Adding Passport AzAD Middleware to Express', logMeta)
 
         let app = processObjects.app
         // Initialize Passport!  Also use passport.session() middleware, to support
