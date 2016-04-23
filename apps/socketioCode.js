@@ -23,11 +23,11 @@ let addSocketIOServices = (processObjects) => {
         let testNSP=io.of('/test')
         testNSP.use((socket, next) => {
             let thisUser = socket.handshake.headers.cookie
-            log('verbose',' connection event -> ' + thisUser,logMeta)
+            log('debug',' connection event -> ' + thisUser,logMeta)
 
-            socket.on('disconnect', () => { log('verbose',' disconnect event ->' + thisUser,logMeta) })
+            socket.on('disconnect', () => { log('debug',' disconnect event ->' + thisUser,logMeta) })
 
-            socket.on('lookup', (status) => { log('verbose',' lookup Event -> ' + inspect(status),logMeta) })
+            socket.on('lookup', (status) => { log('debug',' lookup Event -> ' + inspect(status),logMeta) })
 
             socket.on('client ready', (data) => {
                 userMan.getLoggedUsers((userList) => {

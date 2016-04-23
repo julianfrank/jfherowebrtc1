@@ -19,17 +19,17 @@ let addUserManager = (processObjects) => {
                     if (err) {
                         log('error',' Issue with set, returned ' + err,logMeta)
                     } else {
-                        log('verbose',' set Success, Reply ' + reply,logMeta)
+                        log('debug',' set Success, Reply ' + reply,logMeta)
                     }
                 })
                 umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
                     if (err) {
                         log('error',' Issue with expire, returned ' + err,logMeta)
                     } else {
-                        log('verbose',' expire Success, Reply ' + reply,logMeta)
+                        log('debug',' expire Success, Reply ' + reply,logMeta)
                     }
                 })
-                log('verbose','User ' + profile.email + ' added to userManager',logMeta)
+                log('debug','User ' + profile.email + ' added to userManager',logMeta)
             }
 
             processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
@@ -38,7 +38,7 @@ let addUserManager = (processObjects) => {
                         log('error',' get for ' + email + ' Failed with Error -> ' + err,logMeta)
                         return cb(null, null)
                     } else {
-                        //log('verbose',' get for ' + email + ' Succeeded with reply -> ' + reply,logMeta)
+                        //log('debug',' get for ' + email + ' Succeeded with reply -> ' + reply,logMeta)
                         return cb(null, JSON.parse(reply))
                     }
                 })
@@ -53,13 +53,13 @@ let addUserManager = (processObjects) => {
                             if (err) {
                                 log('error',' Problem in del -> ' + err,logMeta)
                             } else {
-                                log('verbose',' ' + email + ' deleted with reply -> ' + inspect(reply),logMeta)
+                                log('debug',' ' + email + ' deleted with reply -> ' + inspect(reply),logMeta)
                             }
                         })
                     }
                 })
 
-                log('verbose','User ' + email + ' Removed from userManager',logMeta)
+                log('debug','User ' + email + ' Removed from userManager',logMeta)
             }
 
             processObjects.userManager.getLoggedUsers = (returnUserList) => {
@@ -68,7 +68,7 @@ let addUserManager = (processObjects) => {
                         log('error',' getLoggedUsers resulted in error -> ' + err,logMeta)
                         return null
                     } else {
-                        log('verbose',' getLoggedUsers resulted in -> ' + reply,logMeta)
+                        log('debug',' getLoggedUsers resulted in -> ' + reply,logMeta)
                         let userList = reply.map((val) => { return val.slice(8) })
                         if (typeof returnUserList === 'function') {
                             return returnUserList(userList)

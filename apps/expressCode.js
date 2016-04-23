@@ -45,7 +45,7 @@ let initExpress = (processObjects) => {
 
         app.all('*', (err, req, res, next) => { if (err) return reject('Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
         app.all('*', (req, res, next) => {//Default Route to log All Access
-            log('verbose','req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated(),logMeta)
+            log('debug','req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated(),logMeta)
             if (typeof req.session === 'undefined') return reject('Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             return next()
         })
