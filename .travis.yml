@@ -11,6 +11,3 @@ deploy:
   
 notifications:
   webhooks:https://api.loader.io/v2/tests/091ea4a6bafe842b06518987f08cbecd/token/0b67c08103da5fade447f99241dc1e32/run
-    on_success: always
-    on_failure:  never
-    on_start:  never
