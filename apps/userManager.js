@@ -2,10 +2,11 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'userManager.js' }
 const inspect = require('util').inspect
 
 let addUserManager = (processObjects) => {
-    log('info','userManager.js\t:Adding User Management Module',['userManager'])
+    log('info','Adding User Management Module',logMeta)
     return new Promise((resolve, reject) => {
 
         let redis = processObjects.redis
@@ -16,28 +17,28 @@ let addUserManager = (processObjects) => {
             processObjects.userManager.addUser = (profile) => { //Add new Profile to userArray
                 umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
                     if (err) {
-                        log('error','userManager.js\t: Issue with set, returned ' + err,['userManager'])
+                        log('error',' Issue with set, returned ' + err,logMeta)
                     } else {
-                        log('verbose','userManager.js\t: set Success, Reply ' + reply,['userManager'])
+                        log('verbose',' set Success, Reply ' + reply,logMeta)
                     }
                 })
                 umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
                     if (err) {
-                        log('error','userManager.js\t: Issue with expire, returned ' + err,['userManager'])
+                        log('error',' Issue with expire, returned ' + err,logMeta)
                     } else {
-                        log('verbose','userManager.js\t: expire Success, Reply ' + reply,['userManager'])
+                        log('verbose',' expire Success, Reply ' + reply,logMeta)
                     }
                 })
-                log('verbose','userManager.js\t:User ' + profile.email + ' added to userManager',['userManager'])
+                log('verbose','User ' + profile.email + ' added to userManager',logMeta)
             }
 
             processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
                 umRedisClient.get(email, (err, reply) => {
                     if (err) {
-                        log('error','userManager.js\t: get for ' + email + ' Failed with Error -> ' + err,['userManager'])
+                        log('error',' get for ' + email + ' Failed with Error -> ' + err,logMeta)
                         return cb(null, null)
                     } else {
-                        //log('verbose','userManager.js\t: get for ' + email + ' Succeeded with reply -> ' + reply,['userManager'])
+                        //log('verbose',' get for ' + email + ' Succeeded with reply -> ' + reply,logMeta)
                         return cb(null, JSON.parse(reply))
                     }
                 })
@@ -46,28 +47,28 @@ let addUserManager = (processObjects) => {
             processObjects.userManager.removeUser = (email) => { //Add new Profile to userArray
                 umRedisClient.get(email, (err, obj) => {
                     if (err) {
-                        log('error','userManager.js\t: Problem in get -> ' + err,['userManager'])
+                        log('error',' Problem in get -> ' + err,logMeta)
                     } else {
                         umRedisClient.del(email, (err, reply) => {
                             if (err) {
-                                log('error','userManager.js\t: Problem in del -> ' + err,['userManager'])
+                                log('error',' Problem in del -> ' + err,logMeta)
                             } else {
-                                log('verbose','userManager.js\t: ' + email + ' deleted with reply -> ' + inspect(reply),['userManager'])
+                                log('verbose',' ' + email + ' deleted with reply -> ' + inspect(reply),logMeta)
                             }
                         })
                     }
                 })
 
-                log('verbose','userManager.js\t:User ' + email + ' Removed from userManager',['userManager'])
+                log('verbose','User ' + email + ' Removed from userManager',logMeta)
             }
 
             processObjects.userManager.getLoggedUsers = (returnUserList) => {
                 return umRedisClient.keys('userMan.*', (err, reply) => {
                     if (err) {
-                        log('error','userManager.js\t: getLoggedUsers resulted in error -> ' + err,['userManager'])
+                        log('error',' getLoggedUsers resulted in error -> ' + err,logMeta)
                         return null
                     } else {
-                        log('verbose','userManager.js\t: getLoggedUsers resulted in -> ' + reply,['userManager'])
+                        log('verbose',' getLoggedUsers resulted in -> ' + reply,logMeta)
                         let userList = reply.map((val) => { return val.slice(8) })
                         if (typeof returnUserList === 'function') {
                             return returnUserList(userList)

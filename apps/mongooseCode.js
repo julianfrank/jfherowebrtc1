@@ -2,22 +2,23 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'mongooseCode.js' }
 const util = require('util')
 
 const mdburl = process.env.MDBURL || require('../secrets.js').mongoDBurl
 const mdbcreds = process.env.MDBCREDS || require('../secrets.js').mongoDBcreds
 
 let initMongoose = (processObjects) => {
-    log('info','mongooseCode.js\t:Initializing MongoDB',['mongooseCode'])
+    log('info','Initializing MongoDB',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.mongoose.connect('mongodb://' + mdbcreds + mdburl, () => {
             //Start the server only if DB is Ready
             processObjects.mongoConnection.once('open', (err, db) => {
                 if (err) {
-                    reject('mongooseCode.js\t:Problem Connecting with ' + mdburl + 'due to ' + err + ' Going to exit')
+                    reject('Problem Connecting with ' + mdburl + 'due to ' + err + ' Going to exit')
                 } else {
 
-                    log('verbose','mongooseCode.js\t:Connected to ' + mdburl,['mongooseCode'])
+                    log('verbose','Connected to ' + mdburl,logMeta)
                     process.nextTick(() => resolve(processObjects))
                 }
             })
@@ -26,13 +27,13 @@ let initMongoose = (processObjects) => {
 }
 
 let closeMongoose = (processObjects) => {
-    log('info','mongooseCode.js\t:Closing MongoDB',['mongooseCode'])
+    log('info','Closing MongoDB',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.mongoConnection.close((err) => {//Centralising Process exit so that DB/Session is closed before exit...
             if ((err) || (processObjects.mongoConnection === null)) {
-                reject('mongooseCode.js\t:Error While closing Mongoose Connection :' + err + '. Continuing Shutdown Anyway')
+                reject('Error While closing Mongoose Connection :' + err + '. Continuing Shutdown Anyway')
             } else {
-                log('verbose','mongooseCode.js\t:Closed Mongoose Connection :' + mdburl,['mongooseCode'])
+                log('verbose','Closed Mongoose Connection :' + mdburl,logMeta)
                 resolve(processObjects)
             }
         })

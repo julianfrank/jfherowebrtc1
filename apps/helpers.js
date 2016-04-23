@@ -12,42 +12,34 @@ const Papertrail = require('winston-papertrail').Papertrail
 let logger = new winston.Logger({
     transports: [
         new Papertrail({
-            host: 'logs4.papertrailapp.com',
-            port: 17201, // your port here
-            colorize: true
+            host: 'logs4.papertrailapp.com', port: 17201, // your port here
+            colorize: true, inlineMeta: true, level: 'warn'
         }),
-        new winston.transports.Console({
-            colorize:true
-        })
+        new winston.transports.Console({ colorize: true, inlineMeta: true, level: 'warn' })
     ]
 })
 const consoleopts = ['error', 'warn', 'info', 'verbose', 'debug', 'silly']
 consoleopts.forEach((val) => {
-    remoteLog(val, 'Testing ' + val, [].push(val))
+    return remoteLog(val, 'Testing ' + val, { test: val })
 })
 
 //Winston logging levels { error: 0, warn: 1, info: 2, verbose: 3, debug: 4, silly: 5 }
 /* Change this to change the logging method of the app*/
 function remoteLog(type, message, meta) {
-    switch (type) {
-        case 'info':
-            logger.info(message, meta, checkLog)
-            break;
-        case 'error':
-            logger.error(message, meta, checkLog)
-            break;
-        case 'warn':
-            logger.warn(message, meta, checkLog)
-            break;
-        case 'verbose':
-            logger.info(message, Array(meta).push('verbose'), checkLog)
-            break;
-        case 'debug':
-            logger.warn(message, Array(meta).push('debub'), checkLog)
-            break;
-        case 'silly':
-            logger.info(message, Array(meta).push('silly'), checkLog)
-            break;
+    if (type === 'info') { return logger.info(message, meta, checkLog) }
+    if (type === 'error') { return logger.error(message, meta, checkLog) }
+    if (type === 'warn') { return logger.warn(message, meta, checkLog) }
+    if (type === 'verbose') {
+        meta['actualType'] = 'verbose'
+        return logger.info(message, meta, checkLog)
+    }
+    if (type === 'debug') {
+        meta['actualType'] = 'debug'
+        return logger.warn(message, meta, checkLog)
+    }
+    if (type === 'silly') {
+        meta['actualType'] = 'silly'
+        return logger.info(message, meta, checkLog)
     }
 }
 /* Supposed to be used in winstron-loggly command to confirm log status

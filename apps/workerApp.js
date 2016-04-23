@@ -4,6 +4,7 @@ function workerApp() {
     const helpers = require('../apps/helpers')
     const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 80
     const log = helpers.remoteLog
+    let logMeta = { js: 'workerApp.js' }
     const check = helpers.checkLog
 
     //Key Libraries
@@ -53,18 +54,18 @@ function workerApp() {
 
     //Start Server
     const startServer = () => {
-        log('info', 'workerApp.js\t: Going to start ' + app.locals.name + '. Press Control+C to Exit',['workerApp'])
+        log('info', 'Going to start ' + app.locals.name + '. Press Control+C to Exit', logMeta)
 
         server.listen(port, process.env.OPENSHIFT_NODEJS_IP, () => {
-            log('info', 'workerApp.js\t: ' + app.locals.name + " " +
+            log('info', app.locals.name + " " +
                 helpers.readPackageJSON(__dirname, "version") +
-                " Started & Listening on port: " + port,['workerApp'])
+                " Started & Listening on port: " + port, logMeta)
         })
     }
 
     //Stop PRocess
     const stopProcess = (reason) => {
-        log('warn', 'workerApp.js\t:About to exit due to ' + reason,['workerApp'])
+        log('warn', 'About to exit due to ' + reason, logMeta)
         closeMongoose(thisProcessObjects)
             .then(quitRedis)
             .then(quitUMRedis)
@@ -76,10 +77,10 @@ function workerApp() {
     // Process Shutdown Zone
     const exitProcess = () => {
         if (process.connected) {
-            log('warn', 'workerApp.js\t:About to Disconnect this Process',['workerApp'])
+            log('warn', 'About to Disconnect this Process', logMeta)
             process.disconnect()
         } else {
-            log('warn', 'workerApp.js\t:About to Exit Process',['workerApp'])
+            log('warn', 'About to Exit Process', logMeta)
             process.exit(0)
         }
     }

@@ -6,6 +6,7 @@ require('newrelic')
 let workerApp = require('./apps/workerApp').workerApp
 //const num_processes = require('os').cpus().length;
 const log = require('./apps/helpers').remoteLog
+let logMeta = { js: 'procMaster.js' }
 
 //Run mainApp only if not inside TRAVIS
 if (process.env.TRAVIS === 'YES') {
@@ -15,6 +16,6 @@ if (process.env.TRAVIS === 'YES') {
 }
 
 function mainApp() {
-    log('info', 'Going to start the WRTC app', ['procMaster.js'])
+    log('info', 'Going to start the WRTC app', logMeta)
     workerApp()
 }

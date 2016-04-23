@@ -2,10 +2,11 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'socketioCode.js' }
 const inspect = require('util').inspect
 
 let addSocketIOServices = (processObjects) => {
-    log('info','socketioCode.js\t:Adding SocketIO Services',['socketioCode'])
+    log('info','Adding SocketIO Services',logMeta)
     return new Promise((resolve, reject) => {
 
         let sioPub = processObjects.sioPubRedisClient
@@ -16,17 +17,17 @@ let addSocketIOServices = (processObjects) => {
         var sirAdapter = require('socket.io-redis')({ pubClient: sioPub, subClient: sioSub })
 
         io.adapter(sirAdapter)
-        sirAdapter.pubClient.on('error', function (err) { log('error','socketioCode.js\t:Error in Publisher Service->' + err,['socketioCode']) })
-        sirAdapter.subClient.on('error', function (err) { log('error','socketioCode.js\t:Error in Subscriber Service->' + err,['socketioCode']) })
+        sirAdapter.pubClient.on('error', function (err) { log('error','Error in Publisher Service->' + err,logMeta) })
+        sirAdapter.subClient.on('error', function (err) { log('error','Error in Subscriber Service->' + err,logMeta) })
 
         let testNSP=io.of('/test')
         testNSP.use((socket, next) => {
             let thisUser = socket.handshake.headers.cookie
-            log('verbose','socketioCode.js\t: connection event -> ' + thisUser,['socketioCode'])
+            log('verbose',' connection event -> ' + thisUser,logMeta)
 
-            socket.on('disconnect', () => { log('verbose','socketioCode.js\t: disconnect event ->' + thisUser,['socketioCode']) })
+            socket.on('disconnect', () => { log('verbose',' disconnect event ->' + thisUser,logMeta) })
 
-            socket.on('lookup', (status) => { log('verbose','socketioCode.js\t: lookup Event -> ' + inspect(status),['socketioCode']) })
+            socket.on('lookup', (status) => { log('verbose',' lookup Event -> ' + inspect(status),logMeta) })
 
             socket.on('client ready', (data) => {
                 userMan.getLoggedUsers((userList) => {

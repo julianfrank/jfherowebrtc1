@@ -2,15 +2,16 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'expressLastRoute.js' }
 
 let addLastRoute = (processObjects) => {
-    log('info', 'expressLastRoute.js\t:Adding Last Route',['expressLastRoute'])
+    log('info', 'Adding Last Route',logMeta)
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
 
         app.all('*', (req, res, next) => {//Capture Unhandled routes Here
-            log('verbose', 'expressLastRoute.js\t:No Route found for\t:' + req.path,['expressLastRoute'])
+            log('warn', 'No Route found for\t:' + req.path,logMeta)
             return next
         })
 

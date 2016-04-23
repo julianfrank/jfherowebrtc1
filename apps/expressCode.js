@@ -2,9 +2,10 @@
 const utils = require('util')
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'expressCode.js' }
 
 let initExpress = (processObjects) => {
-    log('info','expressCode.js\t:Initializing Express',['expresscode'])
+    log('info','Initializing Express',logMeta)
     return new Promise((resolve, reject) => {
 
         const bodyParser = require('body-parser') //Required to read the body
@@ -42,10 +43,10 @@ let initExpress = (processObjects) => {
         app.use('/js', processObjects.express.static('pages/js'))
         app.use('/css', processObjects.express.static('pages/css'))
 
-        app.all('*', (err, req, res, next) => { if (err) return reject('expressCode.js\t:Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
+        app.all('*', (err, req, res, next) => { if (err) return reject('Fatal Error: Error in Express Route ${err}. Going to exit Process.') })//Default Route to log All Access..Enters only if there is an error
         app.all('*', (req, res, next) => {//Default Route to log All Access
-            log('verbose','expressCode.js\t:req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated(),['expresscode'])
-            if (typeof req.session === 'undefined') return reject('expressCode.js\t:Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
+            log('verbose','req.path:' + req.path + '\treq.isAuthenticated:' + req.isAuthenticated(),logMeta)
+            if (typeof req.session === 'undefined') return reject('Fatal Error: Session Service Failed. Possible Redis Failure. Going to exit Process.')
             return next()
         })
 

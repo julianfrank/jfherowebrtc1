@@ -2,9 +2,10 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'expressLastRoute.js' }
 
 let addAppRoutes = (processObjects) => {
-    log('info','expressAppRoutes.js\t:Adding Standard Application Routers',['expressStdAppRoutes'])
+    log('info','Adding Standard Application Routers',logMeta)
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app

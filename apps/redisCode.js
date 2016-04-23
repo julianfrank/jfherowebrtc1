@@ -2,12 +2,13 @@
 const util = require('util')
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
+let logMeta = { js: 'redisCode.js' }
 
 const redisLabURL = process.env.REDISURL || require('../secrets.js').redisurl
 const redisLabPASS = process.env.REDISCREDS || require('../secrets.js').rediscreds
 
 const redisRetryStrategy = (options) => {
-    log('warn','redisCode.js\t:Redis Retry being Executed using options-> ' + util.inspect(options),['redisCode'])
+    log('warn','Redis Retry being Executed using options-> ' + util.inspect(options),logMeta)
     if (options.error.code === 'ECONNREFUSED') { return new Error('The RedisLab server refused the connection'); }// End reconnecting on a specific error and flush all commands with a individual error
     if (options.total_retry_time > 1000 * 60 * 60) { return new Error('RedisLab Retry time exhausted'); }// End reconnecting after a specific timeout and flush all commands with a individual error
     if (options.times_connected > 10) { return undefined; }// End reconnecting with built in error
@@ -15,10 +16,10 @@ const redisRetryStrategy = (options) => {
 }
 
 function initRedis(processObjects) {
-    log('info','redisCode.js\t:Initializing RedisSessionStore',['redisCode'])
+    log('info','Initializing RedisSessionStore',logMeta)
     return new Promise((resolve, reject) => {
 
-        log('verbose','redisCode.js\t:Creating redisClient for Session store',['redisCode'])
+        log('verbose','Creating redisClient for Session store',logMeta)
         processObjects.redisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
             retry_strategy: redisRetryStrategy,
@@ -27,9 +28,9 @@ function initRedis(processObjects) {
         processObjects.redisClient.auth(redisLabPASS, () => {
             processObjects.redisClient.info((err, reply) => {
                 if (err) {
-                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                    reject('Error Returned by Redis Server :' + err)
                 } else {
-                    log('verbose','redisCode.js\t:redisClient Connected to ' + redisLabURL,['redisCode'])
+                    log('verbose','redisClient Connected to ' + redisLabURL,logMeta)
                     processObjects.redisSessionStore = new processObjects.redisStore({// create new redis store for Session Management 
                         url: 'redis://' + redisLabURL,
                         client: processObjects.redisClient,
@@ -38,9 +39,9 @@ function initRedis(processObjects) {
                     })
                     processObjects.redisSessionStore.client.info((err, reply) => {
                         if (err) {
-                            reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                            reject('Error Returned by Redis Server :' + err)
                         } else {
-                            log('verbose','redisCode.js\t:Redis Session Store Created Successfully',['redisCode'])
+                            log('verbose','Redis Session Store Created Successfully',logMeta)
                             process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and RedisSessionstore is working
                         }
                     })
@@ -51,17 +52,17 @@ function initRedis(processObjects) {
 }
 
 function quitRedis(processObjects) {
-    log('info','redisCode.js\t:Quiting Redis',['redisCode'])
+    log('info','Quiting Redis',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.redisClient.quit((err, res) => {
             if (res === 'OK') {
-                log('verbose','redisCode.js\t:Quit Redis Connection: ' + redisLabURL,['redisCode'])
+                log('verbose','Quit Redis Connection: ' + redisLabURL,logMeta)
                 processObjects.redisSessionStore.client.quit((err, res) => {
-                    if (res === 'OK') log('error','redisCode.js\t:Alert! Redis Session Still seems Not Closed. Continuing to End Process Anyway',['redisCode'])
+                    if (res === 'OK') log('error','Alert! Redis Session Still seems Not Closed. Continuing to End Process Anyway',logMeta)
                     resolve(processObjects)
                 })
             } else {
-                log('error','redisCode.js\t:Error: Redis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',['redisCode'])
+                log('error','Redis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',logMeta)
                 reject(err)
             }
         })
@@ -69,10 +70,10 @@ function quitRedis(processObjects) {
 }
 
 function initUMRedisClient(processObjects) {
-    log('info','redisCode.js\t:Initializing Redis User Management Store',['redisCode'])
+    log('info','Initializing Redis User Management Store',logMeta)
     return new Promise((resolve, reject) => {
 
-        log('verbose','redisCode.js\t:Creating umRedisClient for User Management store',['redisCode'])
+        log('verbose','Creating umRedisClient for User Management store',logMeta)
 
         processObjects.umRedisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
@@ -81,16 +82,16 @@ function initUMRedisClient(processObjects) {
         })
 
         processObjects.umRedisClient.on("error", (err) => {
-            log('verbose',"redisCode.js\t: umRedisClient creation Error " + err,['redisCode'])
+            log('verbose',"umRedisClient creation Error " + err,logMeta)
             reject(err)
         })
 
         processObjects.umRedisClient.auth(redisLabPASS, () => {
             processObjects.umRedisClient.info((err, reply) => {
                 if (err) {
-                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                    reject('Error Returned by Redis Server :' + err)
                 } else {
-                    log('verbose','redisCode.js\t:umRedisClient Connected to ' + redisLabURL,['redisCode'])
+                    log('verbose','umRedisClient Connected to ' + redisLabURL,logMeta)
                     process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and umRedisClient is working
                 }
             })
@@ -99,14 +100,14 @@ function initUMRedisClient(processObjects) {
 }
 
 function quitUMRedis(processObjects) {
-    log('info','redisCode.js\t:Quiting UMRedisClient',['redisCode'])
+    log('info','Quiting UMRedisClient',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.umRedisClient.quit((err, res) => {
             if (res === 'OK') {
-                log('verbose','redisCode.js\t:Quit umRedis Connection: ' + redisLabURL,['redisCode'])
+                log('verbose','Quit umRedis Connection: ' + redisLabURL,logMeta)
                 resolve(processObjects)
             } else {
-                log('error','redisCode.js\t:Error: umRedis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',['redisCode'])
+                log('error','umRedis Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',logMeta)
                 reject(err)
             }
         })
@@ -114,10 +115,10 @@ function quitUMRedis(processObjects) {
 }
 
 function initSIOPubRedisClient(processObjects) {
-    log('info','redisCode.js\t:Initializing Socket.io Redis Publisher Client',['redisCode'])
+    log('info','Initializing Socket.io Redis Publisher Client',logMeta)
     return new Promise((resolve, reject) => {
 
-        log('verbose','redisCode.js\t:Creating sioPubRedisClient for SocketIO Services',['redisCode'])
+        log('verbose','Creating sioPubRedisClient for SocketIO Services',logMeta)
 
         processObjects.sioPubRedisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
@@ -126,16 +127,16 @@ function initSIOPubRedisClient(processObjects) {
         })
 
         processObjects.sioPubRedisClient.on("error", (err) => {
-            log('error',"redisCode.js\t: sioPubRedisClient creation Error " + err,['redisCode'])
+            log('error'," sioPubRedisClient creation Error " + err,logMeta)
             reject(err)
         })
 
         processObjects.sioPubRedisClient.auth(redisLabPASS, () => {
             processObjects.sioPubRedisClient.info((err, reply) => {
                 if (err) {
-                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                    reject('Error Returned by Redis Server :' + err)
                 } else {
-                    log('verbose','redisCode.js\t:sioPubRedisClient Connected to ' + redisLabURL,['redisCode'])
+                    log('verbose','sioPubRedisClient Connected to ' + redisLabURL,logMeta)
                     process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and sioPubRedisClient is working
                 }
             })
@@ -144,14 +145,14 @@ function initSIOPubRedisClient(processObjects) {
 }
 
 function quitSIOPubRedis(processObjects) {
-    log('info','redisCode.js\t:Quiting sioPubRedisClient',['redisCode'])
+    log('info','Quiting sioPubRedisClient',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.sioPubRedisClient.quit((err, res) => {
             if (res === 'OK') {
-                log('verbose','redisCode.js\t:Quit sioPubRedisClient Connection: ' + redisLabURL,['redisCode'])
+                log('verbose','Quit sioPubRedisClient Connection: ' + redisLabURL,logMeta)
                 resolve(processObjects)
             } else {
-                log('error','redisCode.js\t:Error: sioPubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',['redisCode'])
+                log('error','sioPubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',logMeta)
                 reject(err)
             }
         })
@@ -159,10 +160,10 @@ function quitSIOPubRedis(processObjects) {
 }
 
 function initSIOSubRedisClient(processObjects) {
-    log('info','redisCode.js\t:Initializing Socket.io Redis Subscriber Client',['redisCode'])
+    log('info','Initializing Socket.io Redis Subscriber Client',logMeta)
     return new Promise((resolve, reject) => {
 
-        log('verbose','redisCode.js\t:Creating sioSubRedisClient for SocketIO Services',['redisCode'])
+        log('verbose','Creating sioSubRedisClient for SocketIO Services',logMeta)
 
         processObjects.sioSubRedisClient = processObjects.redis.createClient({
             url: 'redis://' + redisLabURL,
@@ -172,16 +173,16 @@ function initSIOSubRedisClient(processObjects) {
         })
 
         processObjects.sioSubRedisClient.on("error", (err) => {
-            log('error',"redisCode.js\t: sioSubRedisClient creation Error " + err,['redisCode'])
+            log('error',"sioSubRedisClient creation Error " + err,logMeta)
             reject(err)
         })
 
         processObjects.sioSubRedisClient.auth(redisLabPASS, () => {
             processObjects.sioSubRedisClient.info((err, reply) => {
                 if (err) {
-                    reject('redisCode.js\t:Error Returned by Redis Server :' + err)
+                    reject('Error Returned by Redis Server :' + err)
                 } else {
-                    log('verbose','redisCode.js\t:sioSubRedisClient Connected to ' + redisLabURL,['redisCode'])
+                    log('verbose','sioSubRedisClient Connected to ' + redisLabURL,logMeta)
                     process.nextTick(() => resolve(processObjects))//Ensure we proceed only if Redis is connected and sioPubRedisClient is working
                 }
             })
@@ -190,14 +191,14 @@ function initSIOSubRedisClient(processObjects) {
 }
 
 function quitSIOSubRedis(processObjects) {
-    log('info','redisCode.js\t:Quiting sioSubRedisClient',['redisCode'])
+    log('info','Quiting sioSubRedisClient',logMeta)
     return new Promise((resolve, reject) => {
         processObjects.sioSubRedisClient.quit((err, res) => {
             if (res === 'OK') {
-                log('verbose','redisCode.js\t:Quit sioSubRedisClient Connection: ' + redisLabURL,['redisCode'])
+                log('verbose','Quit sioSubRedisClient Connection: ' + redisLabURL,logMeta)
                 resolve(processObjects)
             } else {
-                log('error','redisCode.js\t:Error: sioSubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + '\tError:' + err + ' Continuing to End Process Anyway',['redisCode'])
+                log('error','sioSubRedisClient Connection not Closed. Redis Server Says\tResult:' + res + ' Error:' + err + ' Continuing to End Process Anyway',logMeta)
                 reject(err)
             }
         })
