@@ -15,6 +15,7 @@ $(document).ready(function () {
     })
 
     var socketDemo = io('/demo');
+    socketDemo.join('demoRoom')
     socketDemo.emit('dclient ready', 'Client is Ready')
     socketDemo.on('dserver ready', function (data) { $('#o_chat').text(data) })
 

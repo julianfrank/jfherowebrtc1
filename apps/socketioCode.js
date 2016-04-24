@@ -47,6 +47,8 @@ let addSocketIOServices = (processObjects) => {
         //demo Namespace
         let demoNSP = io.of('/demo')
         demoNSP.on('connection', (socket) => {
+            socket.join('demoRoom')
+
             let thisUser = socket.handshake.headers.cookie
             log('debug', 'demo connection event -> ' + thisUser, logMeta)
 
@@ -56,11 +58,12 @@ let addSocketIOServices = (processObjects) => {
 
             socket.on('dclient ready', (data) => {
                 let returnStuff = { message: 'Server Ready' }
-                return socket.emit('dserver ready', JSON.stringify(returnStuff) + Date())
+                return socket.broadcast.to('demoRoom').emit('dserver ready', JSON.stringify(returnStuff) + Date())
             })
-            
-            socket.on('demoC2S', (data) => {
-                return socket.emit('dserver ready', Date()+data)
+
+            socket.on('demoC2S', (id, msg) => {
+                log('debug', id + msg, logMeta)
+                return socket.broadcast.to(id).emit('demoS2C', Date() + msg)
             })
         })
 
