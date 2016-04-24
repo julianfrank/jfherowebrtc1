@@ -9,10 +9,10 @@ const winston = require('winston')
 
 //Papertrail based logging
 const Papertrail = require('winston-papertrail').Papertrail
-const consoleLogger = new winston.transports.Console({ colorize: true, inlineMeta: false, level: 'info' })
+const consoleLogger = new winston.transports.Console({ colorize: true, inlineMeta: false, level: 'debug' })
 const ptLogger = new Papertrail({
     host: 'logs4.papertrailapp.com', port: 17201,
-    colorize: true, inlineMeta: true, level: 'debug'
+    colorize: true, inlineMeta: true, level: 'warn'
 })
 let logger = new winston.Logger({ transports: [consoleLogger, ptLogger] })
 const consoleopts = ['error', 'warn', 'info', 'debug']
@@ -20,8 +20,7 @@ consoleopts.forEach((val) => { return remoteLog(val, 'Testing ' + val, { test: v
 /* Change this to change the logging method of the app
 @type       String  Type of message. Accepted values are info,error, warn and debug
 @message    String  Message to be sent to Logger
-@meta       JSON    Meta data to be sent along with the message
-*/
+@meta       JSON    Meta data to be sent along with the message*/
 function remoteLog(type, message, meta) {
     if (type === 'error') { return logger.error(message, meta, checkLog) }
     if (type === 'warn') { return logger.warn(message, meta, checkLog) }
