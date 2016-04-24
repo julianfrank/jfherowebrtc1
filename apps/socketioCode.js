@@ -58,6 +58,10 @@ let addSocketIOServices = (processObjects) => {
                 let returnStuff = { message: 'Server Ready' }
                 return socket.emit('dserver ready', JSON.stringify(returnStuff) + Date())
             })
+            
+            socket.on('demoC2S', (data) => {
+                return socket.emit('dserver ready', Date()+data)
+            })
         })
 
         process.nextTick(() => resolve(processObjects))
