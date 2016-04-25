@@ -61,9 +61,9 @@ let addSocketIOServices = (processObjects) => {
                 return socket.broadcast.to('demoRoom').emit('dserver ready', JSON.stringify(returnStuff) + Date())
             })
 
-            socket.on('demoC2S', (id, msg) => {
-                log('debug', id + msg, logMeta)
-                return socket.broadcast.to(id).emit('demoS2C', Date() + msg)
+            socket.on('demoC2S', ( msg) => {
+                log('debug',  'demoC2S sent '+msg, logMeta)
+                return socket.emit('demoS2C', Date() + msg)
             })
         })
 
