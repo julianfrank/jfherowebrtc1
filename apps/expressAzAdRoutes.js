@@ -15,7 +15,7 @@ let addAzAdRoutes = (processObjects) => {
 
         app.get('/oauth2signin', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('debug','Login was called in the Sample',logMeta)
+                //log('debug','Login was called in the Sample',logMeta)
                 req.session.save((err) => {
                     if (err === null) {
                         log('error','Error while saving session in oauth2signin ' + err,logMeta)
@@ -32,7 +32,7 @@ let addAzAdRoutes = (processObjects) => {
         //   which, in this example, will redirect the user to the home page.
         app.get('/oauth2return', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('debug','We received a GET return from AzureAD.',logMeta)
+                //log('debug','We received a GET return from AzureAD.',logMeta)
                 //req.session.save((err) => {
                     //if (err === null) log('debug','Error while saving session GET->oauth2return ' + err,logMeta) 
                 //})
@@ -46,14 +46,14 @@ let addAzAdRoutes = (processObjects) => {
         //   which, in this example, will redirect the user to the home page.
         app.post('/oauth2return', passport.authenticate('azuread-openidconnect', { failureRedirect: '/oauth2signin', failureFlash: true }),
             (req, res) => {
-                log('debug','We received a POST return from AzureAD.',logMeta)
+                //log('debug','We received a POST return from AzureAD.',logMeta)
                 //req.session.save((err) => { if (err === null) log('debug','Error while saving session POST->oauth2return ' + err,logMeta) })
                 res.redirect('/')
             })
 
         app.get('/logout', (req, res) => {
             if (typeof req.user != 'undefined') {
-                log('debug','Logout Initiated for user ->' + inspect(req.user.email),logMeta)
+                //log('debug','Logout Initiated for user ->' + inspect(req.user.email),logMeta)
                 userMan.removeUser(req.user.email)
                 req.logout()
                 let sid = req.session.id

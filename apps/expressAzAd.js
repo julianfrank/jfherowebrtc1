@@ -14,25 +14,25 @@ let addAzAd = (processObjects) => {
         let passport = processObjects.passport
 
         const findByEmail = (email, fn) => {
-            log('debug', 'Trying to find email: ' + email, logMeta)
+            //log('debug', 'Trying to find email: ' + email, logMeta)
             userMan.findUserByEmail(email, fn)
         }
         passport.serializeUser((user, done) => {
-            log('debug', 'Serializing user.email=' + user.email, logMeta)
+            //log('debug', 'Serializing user.email=' + user.email, logMeta)
             return done(null, user.email)
         });
         passport.deserializeUser((id, done) => {
-            log('debug', 'Deserializing id = ' + id)
+            //log('debug', 'Deserializing id = ' + id)
             findByEmail(id, (err, user) => {
                 if (err) {
                     log('error', ' Deserializer resulted in error ->' + err, logMeta)
                     return done(err, null)
                 } else {
                     if (user != null) {
-                        log('info', 'Deserializing user = ' + user.email, logMeta)
+                        //log('info', 'Deserializing user = ' + user.email, logMeta)
                         return done(err, user)
                     } else {
-                        log('info', '' + id + ' is not logged in', logMeta)
+                        log('warn', '' + id + ' is not logged in', logMeta)
                         return done(err, null)
                     }
                 }
@@ -56,7 +56,7 @@ let addAzAd = (processObjects) => {
             loggingLevel: 'warn' // valid are 'info', 'warn', 'error'. Error always goes to stderr in Unix.
         },
             (iss, sub, profile, accessToken, refreshToken, done) => {
-                log('debug', 'Received Profile-' + inspect(profile.email), logMeta)
+                //log('debug', 'Received Profile-' + inspect(profile.email), logMeta)
                 if (!profile.email) {
                     return done(new Error("Profile does not have Email"), null);
                 } else {
@@ -89,8 +89,7 @@ let addAzAd = (processObjects) => {
         log('debug', 'Adding Passport AzAD Middleware to Express', logMeta)
 
         let app = processObjects.app
-        // Initialize Passport!  Also use passport.session() middleware, to support
-        // persistent login sessions (recommended).
+        // Initialize Passport!  Also use passport.session() middleware, to support persistent login sessions (recommended).
         app.use(passport.initialize());
         app.use(passport.session());
         //Simple Middleware to add authentication into routes added after this module available with processObjects
