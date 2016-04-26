@@ -28,18 +28,22 @@ let addSocketIOServices = (processObjects) => {
 
             socket.on('disconnect', () => { log('debug', ' disconnect event ->' + thisUser, logMeta) })
 
-            socket.on('lookup', (status) => { log('debug', ' lookup Event -> ' + inspect(status), logMeta) })
-
             socket.on('client ready', (data) => {
                 userMan.getLoggedUsers((userList) => {
-                    let returnStuff = inspect({
-                        loggedUsers: userList,
-                        'handshake.headers': socket.handshake.headers,
-                        'request.headers': socket.request.headers,
-                        socketid: socket.request.headers.cookie,
-                        time: Date()
+
+                    io.of('/demo').in('demoRoom').clients((err, clients) => {
+                        log('debug', clients, logMeta)
+                        let returnStuff = inspect({
+                            loggedUsers: userList,
+                            rooms: socket.rooms,
+                            demoRoomClients: clients,
+                            id: socket.id,
+                            namespace: testNSP.name,
+                            'socket.request.headers.cookie': socket.request.headers.cookie,
+                            time: Date()
+                        })
+                        return socket.emit('server ready', returnStuff)
                     })
-                    return socket.emit('server ready', returnStuff)
                 })
             })
             if (socket.request.headers.cookie) return next();
@@ -47,23 +51,21 @@ let addSocketIOServices = (processObjects) => {
         //demo Namespace
         let demoNSP = io.of('/demo')
         demoNSP.on('connection', (socket) => {
-            socket.join('demoRoom')
+            socket.join('demoRoom', (err) => { if (err) { log('debug', 'err:' + err, ' msg:' + msg, logMeta) } })
 
             let thisUser = socket.handshake.headers.cookie
             log('debug', 'demo connection event -> ' + thisUser, logMeta)
 
-            socket.on('disconnect', () => { log('debug', 'demo disconnect event ->' + thisUser, logMeta) })
-
-            socket.on('lookup', (status) => { log('debug', 'demo lookup Event -> ' + inspect(status), logMeta) })
+            socket.on('disctonnect', () => { log('debug', 'demo disconnect event ->' + thisUser, logMeta) })
 
             socket.on('dclient ready', (data) => {
                 let returnStuff = { message: 'Server Ready' }
-                return socket.broadcast.to('demoRoom').emit('dserver ready', JSON.stringify(returnStuff) + Date())
+                return socket.emit('dserver ready', JSON.stringify(returnStuff) + Date())
             })
 
-            socket.on('demoC2S', ( msg) => {
-                log('debug',  'demoC2S sent '+msg, logMeta)
-                return socket.emit('demoS2C', Date() + msg)
+            socket.on('demoC2S', (msg) => {
+                log('debug', 'demoC2S sent ' + msg, logMeta)
+                return socket.in('demoRoom').emit('demoS2C', Date() + msg)
             })
         })
 
