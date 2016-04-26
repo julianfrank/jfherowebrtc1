@@ -1,6 +1,6 @@
 $(document).ready( ()=> {
 
-    var socket = io('/test');
+    var socket = io('/test',{transports:['websocket']});
     socket.emit('client ready', 'Client is Ready')
     socket.on('server ready', function (data) { $('#sio').text(data) })
 
