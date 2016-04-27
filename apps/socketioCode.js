@@ -39,7 +39,7 @@ let addSocketIOServices = (processObjects) => {
                             demoRoomClients: clients,
                             id: socket.id,
                             namespace: testNSP.name,
-                            'socket.request.headers.cookie': socket.request.headers.cookie,
+                            'socket.request.headers': socket.request.headers,
                             time: Date()
                         })
                         return socket.emit('server ready', returnStuff)

@@ -52,16 +52,15 @@ article{
 
 .supressed{
     height:2em;
-    width: 90%;
-    overflow: visible;
     margin: 0em;
 padding: 0em;
-}
-
-.supressed:hover{
     height: 100%;
     width:90%;
     color: white;
     background-color: black;
     overflow: auto;
+}
+
+.supressed:hover{
+    background-color: blue;
 }
