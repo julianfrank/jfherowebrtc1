@@ -22,7 +22,7 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
-        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl') })
+        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl',{testvar1:"testVar1",testvar2:"Testvar2"}) })
 
         app.all('/gret*', (req, res) => {
             res.type('html')

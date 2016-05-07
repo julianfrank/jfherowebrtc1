@@ -13,7 +13,7 @@ let initExpress = (processObjects) => {
 
         let app = processObjects.app
 
-        app.locals.name = 'Julian Frank\'s WebRTC Application'
+        app.locals.name = "WebRTC Application by Julian Frank"
 
         app.engine('html', helpers.readHTML);// define the template engine [(filePath, options, callback)]
         app.engine('jffl', jffl)
