@@ -22,6 +22,8 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
+        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl') })
+
         app.all('/gret*', (req, res) => {
             res.type('html')
             res.render(String(req.path).slice(1, -5))

@@ -1,0 +1,18 @@
+{
+    "html": {
+        "std": "teststd.html",
+        "title":"Test Title",
+        "head": [
+            "testhead1.html","testhead2.html"
+        ],
+        "body": [
+            "testbody1.html","testbody2.html"
+        ]
+    },
+    "js": [
+        "testjs1.js","testjs2.js"
+    ],
+    "css":[
+        "testcss1.css","testcss2.css"
+    ]
+}

@@ -8,7 +8,7 @@ let workerApp = require('./apps/workerApp').workerApp
 const log = require('./apps/helpers').remoteLog
 let logMeta = { js: 'procMaster.js' }
 
-require("applicationinsights").setup("fbft0kqhe4726o4xxpsp3z1etx8yj8t4pjbib62s").start()
+//require("applicationinsights").setup("fbft0kqhe4726o4xxpsp3z1etx8yj8t4pjbib62s").start()
 
 //Run mainApp only if not inside TRAVIS
 if (process.env.TRAVIS === 'YES') {

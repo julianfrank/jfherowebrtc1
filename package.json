@@ -1,6 +1,6 @@
 {
   "name": "jfwrtc",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "description": "WebRTC App",
   "main": "procMaster.js",
   "scripts": {
@@ -30,6 +30,7 @@
     "cookie-parser": "^1.4.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "jffl4express": "0.0.12",
     "mongoose": "^4.4.13",
     "newrelic": "^1.26.2",
     "passport": "^0.3.2",
