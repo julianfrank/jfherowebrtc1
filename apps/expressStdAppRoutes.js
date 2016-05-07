@@ -12,7 +12,7 @@ let addAppRoutes = (processObjects) => {
 
         app.all('/loaderio-25e297b4d9d2c6ecdb00afc5a49519f4', (req, res) => {// Need this to load test using loader.io
             res.contentType('text/html')
-            res.render('loaderio-25e297b4d9d2c6ecdb00afc5a49519f4')
+            res.render('loaderio-25e297b4d9d2c6ecdb00afc5a49519f4.html')
         })
 
         app.all('/favicon.ico', (req, res) => {// Show my Pretty Face ;) on the favicon area
