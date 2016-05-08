@@ -25,7 +25,7 @@ let addAppRoutes = (processObjects) => {
             if (req.isAuthenticated()) {
                 res.render('secureApp.html');
             } else {
-                res.render('jfmain.html')
+                res.render('jfmain.jffl')
             }
         })
 

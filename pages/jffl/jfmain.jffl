@@ -1,0 +1,12 @@
+{
+    "html": {
+        "std": "std.html",
+        "title":"JF WebRTC App - Main Page",
+        "head": [
+            "headMeta.html","headLazyLoaders.html","headScripts.html"
+        ],
+        "body": [
+            "bodyTitleJFMain.html","bodyHeader.html","bodyJFMain.html"
+        ]
+    }
+}
