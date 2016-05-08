@@ -3,7 +3,7 @@
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
 let logMeta = { js: 'signallingRoutes.js' }
-const util = require('util')
+const inspect = require('util').inspect
 let sigmehit = 0
 
 let addSignalRoutes = (processObjects) => {
@@ -11,7 +11,7 @@ let addSignalRoutes = (processObjects) => {
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
-        //let authCheck = processObjects.ensureAuthenticated
+        let authCheck = processObjects.ensureAuthenticated
         let userMan = processObjects.userManager
 
         app.all('/signal/me', (req, res) => {
@@ -22,7 +22,11 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
-        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl',{testvar1:"testVar1",testvar2:"Testvar2"}) })
+        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl', { testvar1: "testVar1", testvar2: "Testvar2" }) })
+
+        app.all('/pubnub', authCheck, (req, res) => { res.render('pubnubApp.html') })
+
+        app.get('/whoami', authCheck, (req, res) => { res.send((req.session.passport.user) ? (inspect(req.session.passport.user)) : ('Guest')) })
 
         app.all('/gret*', (req, res) => {
             res.type('html')
