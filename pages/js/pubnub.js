@@ -1,72 +1,57 @@
-$(document).ready(() => {
+let pnShared, pnUser, privChannel
 
+$(document).ready(() => {
+    //Declare all the functions
     function whoami(next) {
         $.ajax({ url: '/whoami', dataType: 'text' })
             .done((data) => { return next(data) })
     }
 
-    function initPubNub() {
+    function initPubNub(uuid) {
         return PUBNUB.init({
             publish_key: 'pub-c-d2da6931-2a1d-4fb9-a9e9-d7f4b19e08b4',
             subscribe_key: 'sub-c-4336477c-e46f-11e5-b584-02ee2ddab7fe',
+            ssl: true,
+            uuid: uuid,
             error: function (error) {
-                console.error('PubNub Error:', error);
+                log(uuid + ' PubNub Error:', error);
             }
         })
     }
 
-    let pubnub = initPubNub()
-    let privChannel = ''
-    pubnub.time((message) => {
-        whoami((userEmail) => {
+    //Start the Application Code Here
+    whoami((userEmail) => {
 
-            privChannel = 'wrtc' + userEmail
+        pnUser = initPubNub(userEmail)
 
-            pubnub.subscribe({
-                channel: 'wrtcCommon',
-                message: function (m) {
-                    log("Message from channel wrtcCommon->" + m)
-                },
-                error: function (error) { console.error("Error in wrtcCommon " + JSON.stringify(error)) }
-            })
-            setTimeout(function () {
-                pubnub.publish({
-                    channel: 'wrtcCommon',
-                    message: userEmail + ' Publishing on wrtcCommon',
-                    callback: function (m) {
-                        log("wrtcCommon Publish status -> " + m)
-                    }
-                })
-            }, 5000)
-
-
-            pubnub.subscribe({
-                channel: privChannel,
-                message: function (m) {
-                    log("Message from channel " + privChannel + " ->" + m)
-                },
-                error: function (error) { console.error("Error in " + privChannel + "-> " + JSON.stringify(error)) }
-            })
-            setTimeout(function () {
-                pubnub.publish({
-                    channel: privChannel,
-                    message: userEmail + ' Publishing on ' + privChannel,
-                    callback: function (m) {
-                        log(privChannel + " Publish status -> " + m)
-                        setTimeout(function () {
-                            pubnub.publish({
-                                channel: 'wrtcCommon',
-                                message: userEmail + ' Publishing on wrtcCommon',
-                                callback: function (m) {
-                                    log("wrtcCommon Publish status -> " + m)
-                                }
-                            })
-                        }, 100)
-                    }
-                })
-            }, 1000);
-
+        pnUser.subscribe({
+            channel: 'shared',
+            message: function (message, env, channel) {
+                // RECEIVED A MESSAGE.
+                log('Received:\t' + message + '\tenv:\t' + env + '\tchannel:\t' + channel)
+            },
+            connect: function () {
+                log("Connected")
+            },
+            disconnect: function () {
+                log("Disconnected")
+            },
+            reconnect: function () {
+                log("Reconnected")
+            },
+            error: function () {
+                log("Network Error")
+            },
         })
+
+        setInterval(function () {
+            pnUser.publish({
+                channel: 'shared',
+                message: 'Testing message from ' + userEmail,
+                callback: function (m) { log(m) }
+            })
+        }, Math.random()*100)
+
     })
 
 })
