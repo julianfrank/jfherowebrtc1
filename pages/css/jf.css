@@ -51,11 +51,9 @@ article{
 }
 
 .supressed{
-    height:2em;
     margin: 0em;
 padding: 0em;
-    height: 100%;
-    width:90%;
+    max-height:  50vh;
     color: white;
     background-color: black;
     overflow: auto;

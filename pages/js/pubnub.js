@@ -25,32 +25,47 @@ $(document).ready(() => {
             pubnub.subscribe({
                 channel: 'wrtcCommon',
                 message: function (m) {
-                    console.log("Message from channel wrtcCommon->" + m)
+                    log("Message from channel wrtcCommon->" + m)
                 },
                 error: function (error) { console.error("Error in wrtcCommon " + JSON.stringify(error)) }
             })
-            pubnub.publish({
-                channel: 'wrtcCommon',
-                message: userEmail,
-                callback: function (m) {
-                    console.log("wrtcCommon Publish status -> " + m)
-                }
-            })
+            setTimeout(function () {
+                pubnub.publish({
+                    channel: 'wrtcCommon',
+                    message: userEmail + ' Publishing on wrtcCommon',
+                    callback: function (m) {
+                        log("wrtcCommon Publish status -> " + m)
+                    }
+                })
+            }, 5000)
+
 
             pubnub.subscribe({
                 channel: privChannel,
                 message: function (m) {
-                    console.log("Message from channel " + privChannel + " ->" + m)
+                    log("Message from channel " + privChannel + " ->" + m)
                 },
                 error: function (error) { console.error("Error in " + privChannel + "-> " + JSON.stringify(error)) }
             })
-            pubnub.publish({
-                channel: privChannel,
-                message: userEmail,
-                callback: function (m) {
-                    console.log(privChannel + " Publish status -> " + m)
-                }
-            })
+            setTimeout(function () {
+                pubnub.publish({
+                    channel: privChannel,
+                    message: userEmail + ' Publishing on ' + privChannel,
+                    callback: function (m) {
+                        log(privChannel + " Publish status -> " + m)
+                        setTimeout(function () {
+                            pubnub.publish({
+                                channel: 'wrtcCommon',
+                                message: userEmail + ' Publishing on wrtcCommon',
+                                callback: function (m) {
+                                    log("wrtcCommon Publish status -> " + m)
+                                }
+                            })
+                        }, 100)
+                    }
+                })
+            }, 1000);
+
         })
     })
 
