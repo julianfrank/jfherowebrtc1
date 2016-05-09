@@ -9,6 +9,6 @@ function log(msg) {
         debugUpdateScreen = false
         setTimeout(function () {
             debugUpdateScreen = true
-        }, 2000);
+        }, Math.random()*1000);
     }
 }
