@@ -65,7 +65,7 @@ let addSocketIOServices = (processObjects) => {
 
             socket.on('demoC2S', (msg) => {
                 log('debug', 'demoC2S sent ' + msg, logMeta)
-                return socket.in('demoRoom').emit('demoS2C', Date() + msg)
+                return socket.emit('demoS2C', msg)
             })
         })
 

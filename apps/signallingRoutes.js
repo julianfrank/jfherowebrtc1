@@ -22,8 +22,6 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
-        app.all('/testjffl', (req, res) => { res.render('testjffl.jffl', { testvar1: "testVar1", testvar2: "Testvar2" }) })
-
         app.all('/pubnub', authCheck, (req, res) => { res.render('pubnubApp.html') })
 
         app.get('/whoami', authCheck, (req, res) => { res.send((req.session.passport.user) ? (inspect(req.session.passport.user)) : ('Guest')) })

@@ -7,6 +7,7 @@
     <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>-->
     <script src='/socket.io/socket.io.js'></script>
     <script src="/js/rt.js"></script>
+    <script src="/js/debugConsole.js"></script>
     <link rel="shortcut icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="/css/jf.css">
     <meta charset="utf-8">
@@ -28,7 +29,7 @@
                 <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
                 <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
                 <li><a href='/gretaa.html'>Page A</a></li>
-                <li><a href='/gretab.html'>Page B</a></li>
+                <li><a href='/pubnub'>PubNub</a></li>
                 <li><a href='/oauth2signin'>Login using AzureAD</a></li>
             </ul>
         </nav>
@@ -40,10 +41,8 @@
         <label>Chat Output</label>
         <div id='o_chat'></div><br>
     </article>
-    <article class='supressed'>> Debug View<br>
-        <label>Signal Me Response :</label>
-        <div id='signalme' class='supressed'></div><br>
-        <label>SocketIO Response :</label>
-        <pre><div id='sio' class='supressed'></div>    </pre>
+    <article class='supressed'>
+        Debug Console
+        <pre id="debugConsole"></pre>
     </article>
 </body>
