@@ -29,9 +29,23 @@ let addSocketIOServices = (processObjects) => {
                 socket.emit('s2c', "Connect Acknowledged by Server")//Acknowledge Connect
 
                 socket.on('c2s', (msg) => {
-                    log('info', 'shared Client says ' + msg, logMeta)
+                    log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
                     //socket.emit('s2c', 'shared client says ' + msg + ' using socket')
-                    socket.broadcast.emit('s2c', msg)
+                    switch (msg.event) {
+                        case 'userJoin':
+                            log('info', 'Going to update socketid ' + socket.id + ' to ' + msg.username, logMeta)
+                            userMan.updateUser(msg.username, 'socketid', socket.id, (status, err) => {
+                                if (status) {
+                                    socket.emit('s2c', socket.id + " Updated for" + msg.username)
+                                } else {
+                                    socket.emit('s2c', socket.id + " Could not be updated. Error received->" + err)
+                                }
+                            })
+                            break
+                        default:
+                            socket.broadcast.emit('s2c', msg)
+                            break
+                    }
                 })
 
                 socket.on('disconnect', () => { sharedio.emit('shared User Disconnected') })
