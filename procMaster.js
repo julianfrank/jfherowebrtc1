@@ -8,6 +8,7 @@ let workerApp = require('./apps/workerApp').workerApp
 const log = require('./apps/helpers').remoteLog
 let logMeta = { js: 'procMaster.js' }
 
+log('info', 'Going to start the WRTC app', logMeta)
 //require("applicationinsights").setup("fbft0kqhe4726o4xxpsp3z1etx8yj8t4pjbib62s").start()
 
 //Run mainApp only if not inside TRAVIS
@@ -18,6 +19,6 @@ if (process.env.TRAVIS === 'YES') {
 }
 
 function mainApp() {
-    log('info', 'Going to start the WRTC app', logMeta)
+    log('info', 'Going to start the WRTC Process', logMeta)
     workerApp()
 }

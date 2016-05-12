@@ -15,8 +15,8 @@ const ptLogger = new Papertrail({
     colorize: true, inlineMeta: true, level: 'warn'
 })
 let logger = new winston.Logger({ transports: [consoleLogger, ptLogger] })
-const consoleopts = ['error', 'warn', 'info', 'debug']
-consoleopts.forEach((val) => { return remoteLog(val, 'Testing ' + val, { test: val }) })
+//const consoleopts = ['error', 'warn', 'info', 'debug']
+//consoleopts.forEach((val) => { return remoteLog(val, 'Testing ' + val, { test: val }) })
 /* Change this to change the logging method of the app
 @type       String  Type of message. Accepted values are info,error, warn and debug
 @message    String  Message to be sent to Logger

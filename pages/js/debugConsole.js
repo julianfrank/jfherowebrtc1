@@ -1,16 +1,16 @@
 let debugText = "",
     debugUpdateScreen = true,
     debugBuffer = 4444,
-    debugRefreshDelay = 444
+    debugRefreshDelay = 44
 
 window.onload = function () {
     if (!document.getElementById('debugConsole')) {
         let debugView = document.createElement("article")
-        debugView.appendChild(document.createTextNode("Debug View"))
-        debugView.className = 'supressed'
         let debugPre = document.createElement("pre")
         debugPre.id = 'debugConsole'
         debugView.appendChild(debugPre)
+        debugView.appendChild(document.createTextNode("Debug View"))
+        debugView.className = 'supressed'
         let body = document.getElementsByTagName("body")[0].appendChild(debugView)
         log('Julian Frank says:\t Your Debug Console is now Ready')
     } else {

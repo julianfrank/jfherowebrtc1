@@ -38,14 +38,21 @@ $(document).ready(() => {
 
         pnUser = initPubNub(userEmail)
         subscribePubNub(pnUser, 'shared', stdMsgHandler)
+        pnUser.publish({
+            channel: 'shared',
+            message: 'Testing msg from ' + userEmail,
+            callback: function (m) { log('Publishing with status: ' + m) }
+        })
 
         setInterval(function () {
-            pnUser.publish({
+            pnUser.here_now({
                 channel: 'shared',
-                message: 'Testing msg from ' + userEmail,
-                callback: function (m) { log('Publishing with status: '+m) }
+                state: true,
+                callback: function (msg) {
+                    log("Here_Now ->" + JSON.stringify(msg))
+                }
             })
-        }, 1000 + (Math.random() * 10000))
+        }, 60000)
 
     })
 

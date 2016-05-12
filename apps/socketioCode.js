@@ -21,53 +21,22 @@ let addSocketIOServices = (processObjects) => {
         sirAdapter.subClient.on('error', function (err) { log('error', 'Error in Subscriber Service->' + err, logMeta) })
 
         //Test Namespace
-        let testNSP = io.of('/test')
-        testNSP.use((socket, next) => {
-            let thisUser = socket.handshake.headers.cookie
-            log('debug', ' connection event -> ' + thisUser, logMeta)
+        let sharedio = io
+            .of('/shared')
+            .on('connection', (socket) => {
 
-            socket.on('disconnect', () => { log('debug', ' disconnect event ->' + thisUser, logMeta) })
+                log('info', 'connect happened on sharedio', logMeta)
+                socket.emit('s2c', "Message from Server to Client on Shared via socket")
+                sharedio.emit('s2c', "Message from Server to Client on Shared via sharedio")
 
-            socket.on('client ready', (data) => {
-                userMan.getLoggedUsers((userList) => {
-
-                    io.of('/demo').in('demoRoom').clients((err, clients) => {
-                        log('debug', clients, logMeta)
-                        let returnStuff = inspect({
-                            loggedUsers: userList,
-                            rooms: socket.rooms,
-                            demoRoomClients: clients,
-                            id: socket.id,
-                            namespace: testNSP.name,
-                            'socket.request.headers': socket.request.headers,
-                            time: Date()
-                        })
-                        return socket.emit('server ready', returnStuff)
-                    })
+                socket.on('message', (msg) => {
+                    log('info', 'Client says ' + msg, logMeta)
+                    socket.emit('s2c', 'client says ' + msg + ' using socket')
+                    sharedio.emit('s2c', 'Client says ' + msg + ' using sharedio')
                 })
+
+                socket.on('disconnect', () => { sharedio.emit('User Disconnected') })
             })
-            if (socket.request.headers.cookie) return next();
-        })
-        //demo Namespace
-        let demoNSP = io.of('/demo')
-        demoNSP.on('connection', (socket) => {
-            socket.join('demoRoom', (err) => { if (err) { log('debug', 'err:' + err, ' msg:' + msg, logMeta) } })
-
-            let thisUser = socket.handshake.headers.cookie
-            log('debug', 'demo connection event -> ' + thisUser, logMeta)
-
-            socket.on('disctonnect', () => { log('debug', 'demo disconnect event ->' + thisUser, logMeta) })
-
-            socket.on('dclient ready', (data) => {
-                let returnStuff = { message: 'Server Ready' }
-                return socket.emit('dserver ready', JSON.stringify(returnStuff) + Date())
-            })
-
-            socket.on('demoC2S', (msg) => {
-                log('debug', 'demoC2S sent ' + msg, logMeta)
-                return socket.emit('demoS2C', msg)
-            })
-        })
 
         process.nextTick(() => resolve(processObjects))
     })
