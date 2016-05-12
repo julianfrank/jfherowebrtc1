@@ -20,22 +20,22 @@ let addSocketIOServices = (processObjects) => {
         sirAdapter.pubClient.on('error', function (err) { log('error', 'Error in Publisher Service->' + err, logMeta) })
         sirAdapter.subClient.on('error', function (err) { log('error', 'Error in Subscriber Service->' + err, logMeta) })
 
-        //Test Namespace
+        //Shared Namespace
         let sharedio = io
-            .of('/shared')
-            .on('connection', (socket) => {
+            .of('/shared')//Namespace by the name shared
+            .on('connection', (socket) => {//Handle Connect event
 
                 log('info', 'connect happened on sharedio', logMeta)
-                socket.emit('s2c', "Message from Server to Client on Shared via socket")
-                sharedio.emit('s2c', "Message from Server to Client on Shared via sharedio")
+                socket.emit('s2c', "Connect Acknowledged by Server")//Acknowledge Connect
 
-                socket.on('message', (msg) => {
-                    log('info', 'Client says ' + msg, logMeta)
-                    socket.emit('s2c', 'client says ' + msg + ' using socket')
-                    sharedio.emit('s2c', 'Client says ' + msg + ' using sharedio')
+                socket.on('c2s', (msg) => {
+                    log('info', 'shared Client says ' + msg, logMeta)
+                    //socket.emit('s2c', 'shared client says ' + msg + ' using socket')
+                    socket.broadcast.emit('s2c', msg)
                 })
 
-                socket.on('disconnect', () => { sharedio.emit('User Disconnected') })
+                socket.on('disconnect', () => { sharedio.emit('shared User Disconnected') })
+                socket.on('error', (err) => { log('error', 'Error in sharedio Socket Service->' + err, logMeta) })
             })
 
         process.nextTick(() => resolve(processObjects))

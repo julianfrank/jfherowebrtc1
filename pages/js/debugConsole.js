@@ -7,11 +7,10 @@ window.onload = function () {
     if (!document.getElementById('debugConsole')) {
         let debugView = document.createElement("article")
         let debugPre = document.createElement("pre")
-        debugPre.id = 'debugConsole'
         debugView.appendChild(debugPre)
-        debugView.appendChild(document.createTextNode("Debug View"))
         debugView.className = 'supressed'
         let body = document.getElementsByTagName("body")[0].appendChild(debugView)
+        debugPre.id = 'debugConsole'
         log('Julian Frank says:\t Your Debug Console is now Ready')
     } else {
         log('Julian Frank says:\t Your Debug Console was Ready')
