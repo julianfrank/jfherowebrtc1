@@ -14,6 +14,7 @@ let addUserManager = (processObjects) => {
 
         processObjects.userManager = () => {
 
+            // Add new User on successful Login
             processObjects.userManager.addUser = (profile) => { //Add new Profile to userArray
                 umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
                     if (err) {
@@ -33,6 +34,7 @@ let addUserManager = (processObjects) => {
 
             }
 
+            //Update Property related to user if user exists
             processObjects.userManager.updateUser = (emailID, key, value, next) => { //Update User Properties
                 if (emailID === 'Guest') {
                     let profile = { email: emailID + value }
@@ -43,7 +45,7 @@ let addUserManager = (processObjects) => {
                             return next(false, err)
                         } else {
                             //log('debug', ' set Success, Reply ' + reply, logMeta)
-                            umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
+                            umRedisClient.expire(profile.email, 1 * 60 * 60, (err, reply) => {//Set to Expire after 1 hours
                                 if (err) {
                                     log('error', ' Issue with expire, returned ' + err, logMeta)
                                     return next(false, err)

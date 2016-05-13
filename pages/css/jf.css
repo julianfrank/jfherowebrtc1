@@ -49,16 +49,3 @@ h1{
 article{
     font-size: 1em;
 }
-
-.supressed{
-    margin: 0em;
-padding: 0em;
-    max-height:  50vh;
-    color: white;
-    background-color: black;
-    overflow: auto;
-}
-
-.supressed:hover{
-    background-color: blue;
-}
