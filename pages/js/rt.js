@@ -37,10 +37,10 @@ $(document).ready(() => {
                 .done((me) => {
                     sharedio.emit('c2s', {
                         event: 'userJoin',
-                        username: me.slice(1, -1)
+                        username: (me==='Guest')?me:me.slice(1, -1)
                     })
-                    log("This User: " + me.slice(1, -1))
-                    thisUser = me.slice(1, -1)
+                    log("This User: " + me)
+                    thisUser = (me==='Guest')?me:me.slice(1, -1)
                 })
         }
         whoami()//RunOnce anyway
