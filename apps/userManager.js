@@ -34,34 +34,56 @@ let addUserManager = (processObjects) => {
             }
 
             processObjects.userManager.updateUser = (emailID, key, value, next) => { //Update User Properties
-                umRedisClient.get(emailID, (err, reply) => {
-                    if (err) {
-                        log('error', ' get for ' + emailID + ' Failed with Error -> ' + err, logMeta)
-                        return next(false, err)
-                    } else {
-                        //log('debug', ' get for ' + emailID + ' Succeeded with reply -> ' + reply, logMeta)
-                        if (reply === null) { return next(false, emailID + " not found in Redis") }
-                        let profile = JSON.parse(reply)
-                        profile[key] = value
-                        umRedisClient.set(emailID, JSON.stringify(profile), (err, reply) => {
-                            if (err) {
-                                log('error', ' Issue with set, returned ' + err, logMeta)
-                                return next(false, err)
-                            } else {
-                                //log('debug', ' set Success, Reply ' + reply, logMeta)
-                                umRedisClient.expire(emailID, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
-                                    if (err) {
-                                        log('error', ' Issue with expire, returned ' + err, logMeta)
-                                        return next(false, err)
-                                    } else {
-                                        log('debug', ' Update Successful for user ' + emailID + ' Key:' + key + ' Value:' + value, logMeta)
-                                        return next(true, null)
-                                    }
-                                })
-                            }
-                        })
-                    }
-                })
+                if (emailID === 'Guest') {
+                    let profile = { email: emailID + value }
+                    profile[key] = value
+                    umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
+                        if (err) {
+                            log('error', ' Issue with set, returned ' + err, logMeta)
+                            return next(false, err)
+                        } else {
+                            //log('debug', ' set Success, Reply ' + reply, logMeta)
+                            umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
+                                if (err) {
+                                    log('error', ' Issue with expire, returned ' + err, logMeta)
+                                    return next(false, err)
+                                } else {
+                                    log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
+                                    return next(true, null)
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    umRedisClient.get(emailID, (err, reply) => {
+                        if (err) {
+                            log('error', ' get for ' + emailID + ' Failed with Error -> ' + err, logMeta)
+                            return next(false, err)
+                        } else {
+                            //log('debug', ' get for ' + emailID + ' Succeeded with reply -> ' + reply, logMeta)
+                            if (reply === null) { return next(false, emailID + " not found in Redis") }
+                            let profile = JSON.parse(reply)
+                            profile[key] = value
+                            umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
+                                if (err) {
+                                    log('error', ' Issue with set, returned ' + err, logMeta)
+                                    return next(false, err)
+                                } else {
+                                    //log('debug', ' set Success, Reply ' + reply, logMeta)
+                                    umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
+                                        if (err) {
+                                            log('error', ' Issue with expire, returned ' + err, logMeta)
+                                            return next(false, err)
+                                        } else {
+                                            log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
+                                            return next(true, null)
+                                        }
+                                    })
+                                }
+                            })
+                        }
+                    })
+                }
             }
 
             processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 

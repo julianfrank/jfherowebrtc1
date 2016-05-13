@@ -36,7 +36,7 @@ let addSocketIOServices = (processObjects) => {
                             log('info', 'Going to update socketid ' + socket.id + ' to ' + msg.username, logMeta)
                             userMan.updateUser(msg.username, 'socketid', socket.id, (status, err) => {
                                 if (status) {
-                                    socket.emit('s2c', socket.id + " Updated for" + msg.username)
+                                    socket.emit('s2c', socket.id + " Updated for " + msg.username)
                                 } else {
                                     socket.emit('s2c', socket.id + " Could not be updated. Error received->" + err)
                                 }
