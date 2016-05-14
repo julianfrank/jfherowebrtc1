@@ -45,7 +45,7 @@ let addUserManager = (processObjects) => {
                             return next(false, err)
                         } else {
                             //log('debug', ' set Success, Reply ' + reply, logMeta)
-                            umRedisClient.expire(profile.email, 1 * 60 * 60, (err, reply) => {//Set to Expire after 1 hours
+                            umRedisClient.expire(profile.email, 1 * 10 * 60, (err, reply) => {//Set to Expire after 10 minutes
                                 if (err) {
                                     log('error', ' Issue with expire, returned ' + err, logMeta)
                                     return next(false, err)
