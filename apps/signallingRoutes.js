@@ -22,7 +22,12 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
-        app.get('/whoami', (req, res) => { res.send((req.session.passport) ? (inspect(req.session.passport.user)) : ('Guest')) })
+        app.get('/whoami', (req, res) => {
+            res.send({
+                user: (req.session.passport) ? (inspect(req.session.passport.user)) : ('Guest'),
+                appVer: helpers.readPackageJSON(__dirname, "version")
+            })
+        })
 
         app.all('/gret*', (req, res) => {
             res.type('html')

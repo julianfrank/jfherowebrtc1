@@ -40,11 +40,11 @@ window.onload = function () {
 
             let body = document.getElementsByTagName("body")[0].appendChild(debugView)
 
-            log('Julian Frank says:\t Your Debug Console is now Ready')
+            log('Julian Frank says: Your Debug Console is now Ready')
 
         } else {
 
-            log('Julian Frank says:\t Your Debug Console was Ready')
+            log('Julian Frank says: Your Debug Console was Ready')
 
         }
     }

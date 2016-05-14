@@ -88,6 +88,27 @@ let addUserManager = (processObjects) => {
                 }
             }
 
+            //Update socket.id -> emailid mappings
+            processObjects.userManager.addSocket = (socketID, emailID, next) => {
+                umRedisClient.set(socketID, emailID, (err, reply) => {
+                    if (err) {
+                        log('error', 'processObjects.userManager.addSocket Issue with set, returned ' + err, logMeta)
+                        return next(false, err)
+                    } else {
+                        //log('debug', ' set Success, Reply ' + reply, logMeta)
+                        umRedisClient.expire(socketID, 1 * 10 * 60, (err, reply) => {//Set to Expire after 10 minutes
+                            if (err) {
+                                log('error', 'processObjects.userManager.addSocket Issue with expire, returned ' + err, logMeta)
+                                return next(false, err)
+                            } else {
+                                log('debug', ' Update Successful for user ' + emailID + ' SocketID:' + socketID, logMeta)
+                                return next(true, null)
+                            }
+                        })
+                    }
+                })
+            }
+
             processObjects.userManager.findUserByEmail = (email, cb) => {//Function used by Passport Deserializer to find email in userArray 
                 umRedisClient.get(email, (err, reply) => {
                     if (err) {

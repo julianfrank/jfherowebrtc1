@@ -24,7 +24,7 @@
 
         <nav>
             <ul>
-                <li><a href='/'>Home V0.0.23</a></li>
+                <li><a href='/' id='o_appVer'>Home Version:</a></li>
                 <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
                 <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
                 <li><a href='/gretaa.html'>Page A</a></li>
@@ -38,6 +38,10 @@
         <ul id='o_LoggedUserList'></ul>
     </article>
     <article>
-        <label>Chat Input<input id='i_chat'></label>
+        <label id='o_thisUser'><input id='i_chat'><button id='b_Send'>Send</button></label>
+    </article>
+    <article>
+        <label>Message Received</label>
+        <output id='o_chat'></output>
     </article>
 </body>
