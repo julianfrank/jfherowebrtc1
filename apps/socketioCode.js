@@ -48,8 +48,8 @@ let addSocketIOServices = (processObjects) => {
                     }
                 })
 
-                socket.on('disconnect', () => { sharedio.emit('shared User Disconnected') })
-                socket.on('error', (err) => { log('error', 'Error in sharedio Socket Service->' + err, logMeta) })
+                socket.on('disconnect', () => { sharedio.emit(socket.id + ' has Disconnected') })
+                socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
             })
 
         process.nextTick(() => resolve(processObjects))

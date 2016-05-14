@@ -22,8 +22,6 @@ let addSignalRoutes = (processObjects) => {
             })
         })
 
-        app.all('/pubnub', authCheck, (req, res) => { res.render('pubnubApp.html') })
-
         app.get('/whoami', (req, res) => { res.send((req.session.passport) ? (inspect(req.session.passport.user)) : ('Guest')) })
 
         app.all('/gret*', (req, res) => {
