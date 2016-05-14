@@ -4,7 +4,6 @@
     <title>JF WebRTC - Main Page</title>
     <script src="https://code.jquery.com/jquery-2.2.2.min.js" integrity="sha256-36cp2Co+/62rEAAYHLmRCPIych47CvdM+uTBJwSzWjI="
         crossorigin="anonymous"></script>
-    <!--<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>-->
     <script src='/socket.io/socket.io.js'></script>
     <script src="/js/rt.js"></script>
     <script src="/js/debugConsole.js"></script>
@@ -25,7 +24,7 @@
 
         <nav>
             <ul>
-                <li><a href='/'>Home V0.0.22</a></li>
+                <li><a href='/'>Home V0.0.23</a></li>
                 <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
                 <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
                 <li><a href='/gretaa.html'>Page A</a></li>
@@ -35,7 +34,10 @@
     </header>
 
     <article>
-        <label>Web Page</label>
+        <label>Logged in Users</label>
+        <ul id='o_LoggedUserList'></ul>
+    </article>
+    <article>
         <label>Chat Input<input id='i_chat'></label>
     </article>
 </body>

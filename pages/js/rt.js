@@ -32,25 +32,31 @@ $(document).ready(() => {
             }
         })
 
-        function whoami() {
-            $.ajax({ url: '/whoami', dataType: 'text' })
-                .done((me) => {
-                    sharedio.emit('c2s', {
-                        event: 'userJoin',
-                        username: (me==='Guest')?me:me.slice(1, -1)
-                    })
-                    log("This User: " + me)
-                    thisUser = (me==='Guest')?me:me.slice(1, -1)
-                })
+        //Get which emailid associated with this session. Unsecured connect will return 'Guest'
+        function whoami(next) { $.ajax({ url: '/whoami', dataType: 'text' }).done(next) }
+        function userJoinAnnouce(me) {
+            sharedio.emit('c2s', {
+                event: 'userJoin',
+                username: (me === 'Guest') ? me : me.slice(1, -1)
+            })
+            log("This User: " + me)
+            thisUser = (me === 'Guest') ? me : me.slice(1, -1)
         }
-        whoami()//RunOnce anyway
+        whoami(userJoinAnnouce)//RunOnce anyway
 
-        function updateLoggedUserList() {
-            //check for list of logged users (Need not be active on socket)
-            $.ajax({ url: '/signal/me', dataType: 'text' })
-                .done((loggedUsers) => { log('Logged Users are -> ' + loggedUsers) })
+        //check for list of logged users (Need not be active on socket)
+        function getLoggedUserList(next) { $.ajax({ url: '/signal/me', dataType: 'text' }).done(next) }
+        function updateLoggedUserListView(loggedUsers) {
+            log(loggedUsers)
+            let userArray = loggedUsers.slice(1, -1).split(',')//Convert the string into array
+            userArray.map((val) => {
+                let cleanStr = val.slice(1, -1)//remove the "" 
+                $('#o_LoggedUserList').append('<li>' + cleanStr + '</li>')
+                return cleanStr
+            })
+            log('Logged Users are -> ' + userArray.length)
         }
-        updateLoggedUserList()//RunOnce anyway
+        getLoggedUserList(updateLoggedUserListView)//RunOnce anyway
 
     })
 })

@@ -1,4 +1,4 @@
-ul,ol {
+nav ul,ol {
     list-style-type: none;
     margin: 0;
     padding: 0;
@@ -6,13 +6,13 @@ ul,ol {
     background-color: #333;
 }
 
-li {
+nav li {
     float: left;
         margin:0;
     padding: 0;
 }
 
-li a {
+nav li a {
     display: block;
     color: white;
     background-color: slategrey;
@@ -22,7 +22,7 @@ padding: 1.2em;
 }
 
 /* Change the link color to #111 (black) on hover */
-li a:hover {
+nav li a:hover {
     color: darkslategray;
     background-color: #ccc;
             margin:0;
@@ -41,6 +41,7 @@ h1{
     margin: 0;
     padding: 10px 10px;
     font-size:  2em;
+    font-weight: bold;
     overflow: hidden;
     background-color: slategrey;
     color: white;  
@@ -48,4 +49,8 @@ h1{
 
 article{
     font-size: 1em;
+}
+
+body{
+    overflow:hidden;
 }
