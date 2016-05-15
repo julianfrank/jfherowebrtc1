@@ -4,7 +4,7 @@ const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
 let logMeta = { js: 'signallingRoutes.js' }
 const inspect = require('util').inspect
-let sigmehit = 0
+let sigmehit = 0, socketID = 0
 
 let addSignalRoutes = (processObjects) => {
     log('info', 'Adding Signalling Routers', logMeta)
@@ -19,6 +19,14 @@ let addSignalRoutes = (processObjects) => {
             userMan.getLoggedUsers((userList) => {
                 log('info', ' Signalme hit count -> ' + (sigmehit++), logMeta)
                 res.send(userList)
+            })
+        })
+
+        app.get('/socketID/all', (req, res) => {
+            res.type('json')
+            userMan.getLoggedSocketID((SocketIDList) => {
+                log('info', ' /socketID/all hit count -> ' + (socketID++), logMeta)
+                res.send(SocketIDList)
             })
         })
 

@@ -28,15 +28,14 @@ let addSocketIOServices = (processObjects) => {
 
                 socket.on('c2s', (msg) => {
                     log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
-                    //socket.emit('s2c', 'shared client says ' + msg + ' using socket')
                     switch (msg.event) {
                         case 'userJoin':
                             log('info', 'Going to update socketid ' + socket.id + ' to ' + msg.username, logMeta)
                             userMan.addSocket(socket.id, msg.username, (status, err) => {
                                 if (status) {
-                                    socket.emit('s2c', socket.id + " Updated for " + msg.username)
+                                    socket.emit('s2c', { event: 'socketCacheSuccess', socketID: socket.id, user: msg.username })
                                 } else {
-                                    socket.emit('s2c', socket.id + " Could not be updated. Error received->" + err)
+                                    socket.emit('s2c', { event: 'socketCacheFail', socketID: socket.id, error: err })
                                 }
                             })
                             processObjects.sendReady(msg.username)
@@ -51,11 +50,22 @@ let addSocketIOServices = (processObjects) => {
                     socket.emit('s2c', {
                         event: 'ready',
                         socketID: socket.id,
-                        sessionID: retreiveSID(socket.handshake.headers.cookie),
+                        sessionID: retreiveSID(socket.handshake.cookie),
                         userID: user
                     })
                 }
-                socket.on('disconnect', () => { log('info', socket.id + ' has Disconnected', logMeta) })
+                socket.on('disconnect', () => {
+                    log('info', socket.id + ' has Disconnected', logMeta)
+                    log('info', 'Going to remove socketid ' + socket.id, logMeta)
+                    userMan.removeSocket(socket.id, (status, err) => {
+                        if (status) {
+                            socket.emit('s2c', log('info', socket.id + ' Removed', logMeta))
+                        } else {
+                            socket.emit('s2c', log('error', socket.id + ' Remove Failed with error -> ' + err, logMeta))
+                        }
+                    })
+//                    processObjects.sendReady(msg.username)
+                })
                 socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
             })
 
@@ -65,10 +75,15 @@ let addSocketIOServices = (processObjects) => {
 module.exports = { addSocketIOServices }
 
 function retreiveSID(cookie) {
-    let x = cookie.split(';'), sid = null
-    x.map((val) => {
-        let y = val.split('=')
-        if (y[0] === ' connect.sid') { sid = y[1] }
-    })
-    return sid
+    let sid = null
+    if (typeof (cookie) === 'undefined') {
+        return sid
+    } else {
+        let x = cookie.split(';')
+            .map((val) => {
+                let y = val.split('=')
+                if (y[0] === ' connect.sid') { sid = y[1] }
+            })
+        return sid
+    }
 }
