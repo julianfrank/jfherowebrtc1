@@ -13,9 +13,9 @@ $(document).ready(() => {
             switch (msg.event) {
                 case 'ready':
                     thisSocketID = msg.socketID
-                    thisSessionID = msg.sessionID
                     thisUser = msg.userID
-                    log('Ready -> Socket ID:' + thisSocketID + ' Session ID:' + thisSessionID + ' User ID:' + thisUser)
+                    //thisSessionID = msg.sessionID//log('Ready -> Socket ID:' + thisSocketID + ' Session ID:' + thisSessionID + ' User ID:' + thisUser)
+                    log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
                 case 'chatMsg':
                     log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
@@ -63,14 +63,13 @@ $(document).ready(() => {
     function getSocketIDList(next) { $.ajax({ url: '/socketID/all', dataType: 'json' }).done(next) }
     function updateSocketIDListView(SocketIDList) {
         $('#o_LoggedSocketIDList').empty()
-        log('Logged SocketID Array:' + SocketIDList)
-        let SocketIDArray = SocketIDList.slice(1, -1).split(',')//Convert the string into array
+        let SocketIDArray = SocketIDList//.slice(1, -1).split(',')//Convert the string into array
         SocketIDArray.map((val) => {
             let cleanStr = val.slice(1, -1)//remove the "" 
-            $('#o_LoggedSocketIDList').append('<li>' + cleanStr + '</li>')
+            $('#o_LoggedSocketIDList').append('<li>' + val + '</li>')
             return cleanStr
         })
-        log('Number of SocketIDs are -> ' + SocketIDArray.length)
+        log('Logged SocketID Array:' + SocketIDArray)
     }
 
     //handle any entry in the chat box...send it to server

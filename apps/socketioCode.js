@@ -30,7 +30,7 @@ let addSocketIOServices = (processObjects) => {
                     log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
                     switch (msg.event) {
                         case 'userJoin':
-                            log('info', 'Going to update socketid ' + socket.id + ' to ' + msg.username, logMeta)
+                            log('info', 'Going to update username ' + msg.username + ' to ' + socket.id, logMeta)
                             userMan.addSocket(socket.id, msg.username, (status, err) => {
                                 if (status) {
                                     socket.emit('s2c', { event: 'socketCacheSuccess', socketID: socket.id, user: msg.username })
@@ -50,7 +50,7 @@ let addSocketIOServices = (processObjects) => {
                     socket.emit('s2c', {
                         event: 'ready',
                         socketID: socket.id,
-                        sessionID: retreiveSID(socket.handshake.cookie),
+                        //sessionID: retreiveSID(socket.handshake.cookie),//Not used anywhere as of now- SessionID remain constant even if socket ID changes with each refresh
                         userID: user
                     })
                 }
@@ -64,7 +64,7 @@ let addSocketIOServices = (processObjects) => {
                             socket.emit('s2c', log('error', socket.id + ' Remove Failed with error -> ' + err, logMeta))
                         }
                     })
-//                    processObjects.sendReady(msg.username)
+                    //                    processObjects.sendReady(msg.username)
                 })
                 socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
             })
