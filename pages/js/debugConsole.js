@@ -7,23 +7,20 @@ window.onload = function () {
         debugBuffer = 4444,//Number of Characters you want in to be visible Including scrolled text
         debugRefreshDelay = 44,//How quickly you want the console to be refreshed. Use higher values if too much Logs are flowing and nothing difficult to read
         DISPLAYDEBUGLOG = true,// use false to NOT show and use debuglog in your app
-        STREAMTOCONSOLE=false//Make this true if you want to log to console.log as well 
+        STREAMTOCONSOLE = false//Make this true if you want to log to console.log as well 
 
     //Do NOT Change this
     var debugUpdateScreen = true
 
     //Core Log Update Function
     log = function (msg) {
-        if(STREAMTOCONSOLE){console.log(msg)}//Kept to debug debugconsole app
+        if (STREAMTOCONSOLE) { console.log(msg) }//Kept to debug debugconsole app
         if (DISPLAYDEBUGLOG) {
             debugText = msg.concat('\n', debugText).slice(0, debugBuffer)
             if (debugUpdateScreen) {
                 document.getElementById('debugConsole').textContent = debugText
-                //$('#debugConsole').text(debugText)
-                debugUpdateScreen = false
-                setTimeout(function () {
-                    debugUpdateScreen = true
-                }, debugRefreshDelay);
+                debugUpdateScreen = false//Delay refresh of console till debugRefreshDelay have passed
+                setTimeout(function () { debugUpdateScreen = true }, debugRefreshDelay)
             }
         }
     }
