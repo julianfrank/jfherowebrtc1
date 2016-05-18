@@ -26,37 +26,40 @@ $(document).ready(() => {
             }
         })
 
-        whoami(userJoinAnnouce)//Retreive the 
-        getLoggedUserList(updateLoggedUserListView)
+        whoami.then(userJoinAnnouce)
+        getLoggedUserList.then(updateLoggedUserListView)
         getSocketIDList(updateSocketIDListView)
     })
 
     //Get which emailid associated with this session. Unsecured connect will return 'Guest'
-    function whoami(next) { $.ajax({ url: '/whoami', dataType: 'text' }).done(next) }
-    function userJoinAnnouce(data) {
-        log('/whoami -> ' + data)
-        thisUser = (JSON.parse(data).user === 'Guest') ? JSON.parse(data).user : JSON.parse(data).user.slice(1, -1)
-        sharedio.emit('c2s', {
-            event: 'userJoin',
-            username: thisUser
+    let whoami = $.ajax({ url: '/whoami', dataType: 'text' })
+    let userJoinAnnouce = (data, textStatus, jqXHR) => {
+        return new Promise((resolve, reject) => {
+            log('/whoami -> ' + data)
+            thisUser = (JSON.parse(data).user === 'Guest') ? JSON.parse(data).user : JSON.parse(data).user
+            sharedio.emit('c2s', { event: 'userJoin', username: thisUser })
+            $('#o_appVer').append(JSON.parse(data).appVer)
+            $('#o_thisUser').append(thisUser)
+            return resolve
         })
-        $('#o_appVer').append(JSON.parse(data).appVer)
-        $('#o_thisUser').append(thisUser)
     }
 
     //check for list of logged users (Need not be active on socket)
-    function getLoggedUserList(next) { $.ajax({ url: '/signal/me', dataType: 'text' }).done(next) }
-    function updateLoggedUserListView(loggedUsers) {
-        $('#o_LoggedUserList').empty()
-        log('Logged Users Array:' + loggedUsers)
-        let userArray = loggedUsers.slice(1, -1).split(',')//Convert the string into array
-        userArray.map((val) => {
-            let cleanStr = val.slice(1, -1)//remove the "" 
-            $('#o_LoggedUserList').append('<li>' + cleanStr + '</li>')
-            return cleanStr
+    let getLoggedUserList = $.ajax({ url: '/signal/me', dataType: 'text' })
+    let updateLoggedUserListView = (data, textStatus, jqXHR) => {
+        return new Promise((resolve, reject) => {
+            let loggedListStr = data.slice(1, -1).split(',')
+            log('Logged Users Array:' + loggedListStr)
+            $('#o_LoggedUserList').empty()
+            loggedListStr.map((val) => {
+                if (thisUser.slice(0, -24) != val.slice(1, -1)) {
+                    $('#o_LoggedUserList').append('<li>' + val.slice(1, -1) + '</li>')
+                }
+            })
+            return resolve
         })
-        log('Number of Logged Users are -> ' + userArray.length)
     }
+
 
     //check for list of logged SocketIDs
     function getSocketIDList(next) { $.ajax({ url: '/socketID/all', dataType: 'json' }).done(next) }
