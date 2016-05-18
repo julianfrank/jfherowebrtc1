@@ -81,7 +81,33 @@ function readHTML(filePath, options, callback) {
     fs.readFile(filePath, function (err, content) {
         if (err) return callback(new Error(err.message))
         // this is an extremely simple template engine
-        let rendered = content.toString()
+        let source = content.toString()
+
+        //Obtain new variables to be injected
+        let parsedOptions = {}
+        Object.keys(options).map((val) => {
+            switch (val) {
+                case 'settings': break
+                case '_locals': break
+                case 'cache': break
+                default: parsedOptions[val] = options[val]
+            }
+        })
+        //Inject Parsed Options into HTML Document
+        let runParams = ""//Holder for Text to be injected into the HTML File
+        Object.keys(parsedOptions).map((val) => {
+            switch (typeof parsedOptions[val]) {
+                case 'string': runParams += "<script>var " + val + "='" + parsedOptions[val] + "'</Script>"; break
+                case 'number': runParams += "<script>var " + val + "=" + parsedOptions[val] + "</Script>"; break
+                case 'boolean': runParams += "<script>var " + val + "=" + parsedOptions[val] + "</Script>"; break
+                default: runParams += "<script>var " + val + "='" + typeof parsedOptions[val] + "'</Script>"
+            }
+        })
+
+        let endOfHead = source.search(/<head>/i)
+
+        let rendered = source.substring(0, endOfHead + 6) + runParams + source.substring(endOfHead + 6)
+
         return callback(null, rendered)
     })
 }

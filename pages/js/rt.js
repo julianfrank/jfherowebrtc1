@@ -5,7 +5,6 @@ $(document).ready(() => {
     let sharedio = io('/shared')  //open Connected on shared namespace
     sharedio.on('connect', () => {//Check for connect
         sharedio.on('disconnect', () => { log('sharedio.disconnect event fired') })
-        log('sharedio.connect event fired for ' + document.cookie)
 
         //log any data received from server
         sharedio.on('s2c', (msg) => {

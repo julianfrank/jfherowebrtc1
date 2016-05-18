@@ -1,8 +1,9 @@
 'use strict'
 
 const helpers = require('../apps/helpers')
+const inspect = require('util').inspect
 const log = helpers.remoteLog
-let logMeta = { js: 'expressLastRoute.js' }
+const logMeta = { js: 'expressLastRoute.js' }
 
 let addAppRoutes = (processObjects) => {
     log('info','Adding Standard Application Routers',logMeta)
@@ -22,10 +23,14 @@ let addAppRoutes = (processObjects) => {
 
         app.all('/', (req, res) => {// Main page
             res.contentType('text/html')
+            let userInfo={
+                user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),
+                appVer: helpers.readPackageJSON(__dirname, "version")
+            }
             if (req.isAuthenticated()) {
-                res.render('secureApp.html')
+                res.render('secureApp.html',userInfo)
             } else {
-                res.render('jfmain.html')
+                res.render('jfmain.html',userInfo)
             }
         })
 
