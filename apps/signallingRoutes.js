@@ -25,7 +25,7 @@ let addSignalRoutes = (processObjects) => {
         app.get('/socketID/all', (req, res) => {
             res.type('json')
             userMan.getLoggedSocketID((SocketIDList) => {
-                log('info', ' /socketID/all Current Array -> ' + SocketIDList, logMeta)
+                //log('info', ' /socketID/all Current Array -> ' + SocketIDList, logMeta)
                 res.send(SocketIDList)
             })
         })

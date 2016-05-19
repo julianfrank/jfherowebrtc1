@@ -29,9 +29,9 @@ $(document).ready(() => {
                     $('#o_thisUserSoID').append(thisSocketID)
                     log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
-                case 'chatMsg':
+                case 'groupChatMsg':
                     log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
-                    $('#o_chat').append('<li>' + msg.from + ':\t' + msg.message + '</li>')
+                    $('#o_Groupchat').append('<br><span>' + msg.from + ':\t' + msg.message + '</span>')
                     break
                 default:
                     log("unhandled message: sio says -> " + JSON.stringify(msg))
@@ -43,7 +43,7 @@ $(document).ready(() => {
         //getLoggedUserList.then(updateLoggedUserListView)
         getSocketIDList(updateSocketIDListView)
     })
-
+/*
     //Get which emailid associated with this session. Unsecured connect will return 'Guest'
     let whoami = $.ajax({ url: '/whoami', dataType: 'text' })
     let userJoinAnnouce = (data, textStatus, jqXHR) => {
@@ -71,7 +71,7 @@ $(document).ready(() => {
             return resolve
         })
     }
-
+*/
 
     //check for list of logged SocketIDs
     function getSocketIDList(next) { $.ajax({ url: '/socketID/all', dataType: 'json' }).done(next) }
@@ -91,7 +91,7 @@ $(document).ready(() => {
     $('#i_chat').change(sendChatMsg)
     function sendChatMsg() {
         sharedio.emit('c2s', {
-            event: 'chatMsg',
+            event: 'groupChatMsg',
             from: thisUser,
             message: $('#i_chat').val()
         })

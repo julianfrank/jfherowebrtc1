@@ -40,6 +40,9 @@ let addSocketIOServices = (processObjects) => {
                             })
                             processObjects.sendReady(msg.username)
                             break
+                        case 'groupChatMsg':
+                            socket.broadcast.emit('s2c', msg)
+                            break
                         default:
                             socket.broadcast.emit('s2c', msg)
                             break
