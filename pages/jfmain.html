@@ -5,8 +5,8 @@
     <script src="https://cdn.jsdelivr.net/jquery/2.2.3/jquery.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
         crossorigin="anonymous"></script>
     <script src='/socket.io/socket.io.js'></script>
-    <script src="/js/rt.js"></script>
     <script src="/js/debugConsole.js"></script>
+    <script src="/js/rt.js"></script>
     <link rel="shortcut icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="/css/jf.css">
     <meta charset="utf-8">
@@ -34,6 +34,11 @@
     </header>
 
     <article>
+        <label>This User: </label><output id='o_thisUser'></output><br>
+        <label>This User Socket ID: </label><output id='o_thisUserSoID'></output><br> Currently useable IDs => jfmobile -
+        officechrome - officeff - pc - user[1-4]
+    </article>
+    <article>
         <label>Logged in Users</label>
         <ul id='o_LoggedUserList'></ul>
     </article>
@@ -42,13 +47,14 @@
         <ul id='o_LoggedSocketIDList'></ul>
     </article>
     <article>
-        <label id='o_thisUser'><input id='i_chat'><button id='b_Send'>Send</button></label>
+        <label><input id='i_chat'><button id='b_Send'>Send</button></label>
     </article>
     <article>
-        <label>Message Received</label>
-        <output id='o_chat'></output>
+        <label>Group Message Received</label>
+        <output id='o_Groupchat'></output>
     </article>
-    jfmobile@jfkalab.onmicrosoft.com officechrome@jfkalab.onmicrosoft.com officeff@jfkalab.onmicrosoft.com pc@jfkalab.onmicrosoft.com
-    user[1-4]@jfkalab.onmicrosoft.com
-
+    <article>
+        <label>Personal Message Received</label>
+        <output id='o_personalChat'></output>
+    </article>
 </body>

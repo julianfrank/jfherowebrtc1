@@ -1,10 +1,23 @@
 $(document).ready(() => {
 
-    let thisUser = 'Guest', thisSocketID = null, thisSessionID = null
+    let thisUser = serverSentVars.user || 'Guest',
+        thisSocketID = null
 
+
+    $('#o_appVer').text(serverSentVars.appVer)
+    $('#o_thisUser').text(serverSentVars.user)
+    $('#o_LoggedUserList').empty()
+    serverSentVars.loggedUserList.map((val) => {
+        //log(thisUser.slice(0, -24) + '--' + val)
+        if (thisUser.slice(0, -24) != val) {
+            $('#o_LoggedUserList').append('<li>' + val + '</li>')
+        }
+    })
     let sharedio = io('/shared')  //open Connected on shared namespace
     sharedio.on('connect', () => {//Check for connect
         sharedio.on('disconnect', () => { log('sharedio.disconnect event fired') })
+
+        sharedio.emit('c2s', { event: 'userJoin', username: thisUser })
 
         //log any data received from server
         sharedio.on('s2c', (msg) => {
@@ -12,8 +25,8 @@ $(document).ready(() => {
             switch (msg.event) {
                 case 'ready':
                     thisSocketID = msg.socketID
-                    thisUser = msg.userID
-                    //thisSessionID = msg.sessionID//log('Ready -> Socket ID:' + thisSocketID + ' Session ID:' + thisSessionID + ' User ID:' + thisUser)
+                    if (thisUser != msg.userID) { log('Something wrong - UserID mispatch - thisUser:' + thisUser + ' msg.userID:' + msg.userID) }
+                    $('#o_thisUserSoID').append(thisSocketID)
                     log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
                 case 'chatMsg':
@@ -26,8 +39,8 @@ $(document).ready(() => {
             }
         })
 
-        whoami.then(userJoinAnnouce)
-        getLoggedUserList.then(updateLoggedUserListView)
+        //whoami.then(userJoinAnnouce)
+        //getLoggedUserList.then(updateLoggedUserListView)
         getSocketIDList(updateSocketIDListView)
     })
 
@@ -37,7 +50,6 @@ $(document).ready(() => {
         return new Promise((resolve, reject) => {
             log('/whoami -> ' + data)
             thisUser = (JSON.parse(data).user === 'Guest') ? JSON.parse(data).user : JSON.parse(data).user
-            sharedio.emit('c2s', { event: 'userJoin', username: thisUser })
             $('#o_appVer').append(JSON.parse(data).appVer)
             $('#o_thisUser').append(thisUser)
             return resolve
@@ -75,13 +87,14 @@ $(document).ready(() => {
     }
 
     //handle any entry in the chat box...send it to server
-    $("#b_Send")
-        .click(() => {
-            sharedio.emit('c2s', {
-                event: 'chatMsg',
-                from: thisUser,
-                message: $('#i_chat').val()
-            })
-            log('sharedio.emit->' + $('#i_chat').val())
+    $("#b_Send").click(sendChatMsg)
+    $('#i_chat').change(sendChatMsg)
+    function sendChatMsg() {
+        sharedio.emit('c2s', {
+            event: 'chatMsg',
+            from: thisUser,
+            message: $('#i_chat').val()
         })
+        log('sharedio.emit->' + $('#i_chat').val())
+    }
 })

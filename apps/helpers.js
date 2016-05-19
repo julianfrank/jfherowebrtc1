@@ -84,25 +84,29 @@ function readHTML(filePath, options, callback) {
         let source = content.toString()
 
         //Obtain new variables to be injected
-        let parsedOptions = {}
-        Object.keys(options).map((val) => {
+        let parsedOptions = options
+        delete options.settings
+        delete options._locals
+        delete options.cache
+        /*Object.keys(options).map((val) => {
             switch (val) {
                 case 'settings': break
                 case '_locals': break
                 case 'cache': break
                 default: parsedOptions[val] = options[val]
             }
-        })
+        })*/
+
         //Inject Parsed Options into HTML Document
-        let runParams = ""//Holder for Text to be injected into the HTML File
-        Object.keys(parsedOptions).map((val) => {
+        let runParams = "<script>var serverSentVars=" + JSON.stringify(parsedOptions) + "</Script>"//Holder for Text to be injected into the HTML File
+        /*Object.keys(parsedOptions).map((val) => {
             switch (typeof parsedOptions[val]) {
                 case 'string': runParams += "<script>var " + val + "='" + parsedOptions[val] + "'</Script>"; break
                 case 'number': runParams += "<script>var " + val + "=" + parsedOptions[val] + "</Script>"; break
                 case 'boolean': runParams += "<script>var " + val + "=" + parsedOptions[val] + "</Script>"; break
                 default: runParams += "<script>var " + val + "='" + typeof parsedOptions[val] + "'</Script>"
             }
-        })
+        })*/
 
         let endOfHead = source.search(/<head>/i)
 

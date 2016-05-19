@@ -1,17 +1,16 @@
-var log
+var log = function (text) { console.log(text) }//Basic service in case the rest of the function has not yet loaded
+
+//Update this as per need
+var debugText = '',//Default Text in hte debug Console...Replace with you app Intro/copyright etc
+    debugBuffer = 4444,//Number of Characters you want in to be visible Including scrolled text
+    debugRefreshDelay = 44,//How quickly you want the console to be refreshed. Use higher values if too much Logs are flowing and nothing difficult to read
+    DISPLAYDEBUGLOG = true,// use false to NOT show and use debuglog in your app
+    STREAMTOCONSOLE = false//Make this true if you want to log to console.log as well 
+
+//Do NOT Change this
+var debugUpdateScreen = true
 
 window.onload = function () {
-
-    //Update this as per need
-    var debugText = '',//Default Text in hte debug Console...Replace with you app Intro/copyright etc
-        debugBuffer = 4444,//Number of Characters you want in to be visible Including scrolled text
-        debugRefreshDelay = 44,//How quickly you want the console to be refreshed. Use higher values if too much Logs are flowing and nothing difficult to read
-        DISPLAYDEBUGLOG = true,// use false to NOT show and use debuglog in your app
-        STREAMTOCONSOLE = false//Make this true if you want to log to console.log as well 
-
-    //Do NOT Change this
-    var debugUpdateScreen = true
-
     //Core Log Update Function
     log = function (msg) {
         if (STREAMTOCONSOLE) { console.log(msg) }//Kept to debug debugconsole app
@@ -24,7 +23,6 @@ window.onload = function () {
             }
         }
     }
-
     //This inserts the log into the body
     if (DISPLAYDEBUGLOG) {
         if (!document.getElementById('debugConsole')) {

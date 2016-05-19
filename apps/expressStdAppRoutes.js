@@ -6,10 +6,11 @@ const log = helpers.remoteLog
 const logMeta = { js: 'expressLastRoute.js' }
 
 let addAppRoutes = (processObjects) => {
-    log('info','Adding Standard Application Routers',logMeta)
+    log('info', 'Adding Standard Application Routers', logMeta)
     return new Promise((resolve, reject) => {
 
         let app = processObjects.app
+        let userMan = processObjects.userManager
 
         app.all('/loaderio-25e297b4d9d2c6ecdb00afc5a49519f4', (req, res) => {// Need this to load test using loader.io
             res.contentType('text/html')
@@ -23,15 +24,18 @@ let addAppRoutes = (processObjects) => {
 
         app.all('/', (req, res) => {// Main page
             res.contentType('text/html')
-            let userInfo={
-                user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),
-                appVer: helpers.readPackageJSON(__dirname, "version")
-            }
-            if (req.isAuthenticated()) {
-                res.render('secureApp.html',userInfo)
-            } else {
-                res.render('jfmain.html',userInfo)
-            }
+            userMan.getLoggedUsers().then((userList) => {
+                let userInfo = {
+                    user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),
+                    appVer: helpers.readPackageJSON(__dirname, "version"),
+                    loggedUserList: userList
+                }
+                if (req.isAuthenticated()) {
+                    res.render('secureApp.html', userInfo)
+                } else {
+                    res.render('jfmain.html', userInfo)
+                }
+            })
         })
 
         process.nextTick(() => resolve(processObjects))

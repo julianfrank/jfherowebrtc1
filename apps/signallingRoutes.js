@@ -16,7 +16,7 @@ let addSignalRoutes = (processObjects) => {
 
         app.all('/signal/me', (req, res) => {
             res.type('json')
-            userMan.getLoggedUsers((userList) => {
+            userMan.getLoggedUsers().then((userList) => {
                 log('info', ' Signalme hit count -> ' + (sigmehit++), logMeta)
                 res.send(userList)
             })

@@ -28,7 +28,7 @@ let addUserManager = (processObjects) => {
                                 return next(false, err)
                             } else {
                                 log('debug', ' Update Successful for user ' + emailID + ' SocketID:' + socketID, logMeta)
-                                return next(true, null)
+                                processObjects.userManager.updateUser(emailID, 'SocketID', socketID, next)
                             }
                         })
                     }
@@ -36,17 +36,54 @@ let addUserManager = (processObjects) => {
             }
             //remove socketid->emaidid mapping
             processObjects.userManager.removeSocket = (socketID, next) => {
-                umRedisClient.del('socketID.' + socketID, (err, reply) => {
+                umRedisClient.get('socketID.' + socketID, (err, reply) => {
                     if (err) {
-                        log('error', 'processObjects.userManager.removeSocket Problem in del -> ' + err, logMeta)
+                        log('error', 'processObjects.userManager.removeSocket Problem in get socketid. -> ' + err, logMeta)
                         return next(false, err)
                     } else {
-                        log('debug', ' ' + socketID + ' deleted with reply -> ' + inspect(reply), logMeta)
-                        return next(true, null)
+                        log('debug', ' ' + socketID + ' going to be deleted -> related user' + inspect(reply), logMeta)
+
+                        let userToBeDeleted = reply
+
+                        umRedisClient.del('socketID.' + socketID, (err, reply) => {
+                            if (err) {
+                                log('error', 'processObjects.userManager.removeSocket Problem in del -> ' + err, logMeta)
+                                return next(false, err)
+                            } else {
+                                log('debug', 'socketID.' + socketID + ' deleted with reply -> ' + inspect(reply), logMeta)
+                                if (userToBeDeleted === 'Guest') {//For now remove 'Guest' only. If logged email is removed then cache is destroyed
+                                    umRedisClient.del('user.' + userToBeDeleted, (err, reply) => {
+                                        if (err) {
+                                            log('error', 'processObjects.userManager.removeSocket Problem in del user.socketID-> ' + err, logMeta)
+                                            return next(false, err)
+                                        } else {
+                                            log('debug', 'user.socketID.' + userToBeDeleted + ' deleted with reply -> ' + inspect(reply), logMeta)
+                                            return next(true, null)
+                                        }
+                                    })
+                                } else {
+                                    return next(true, null)
+                                }
+                            }
+                        })
+
                     }
                 })
             }
 
+            //Get SocketID from email
+            processObjects.userManager.getSocketIDFromemail = (emailID) => {
+                return new Promise((resolve, reject) => {
+                    umRedisClient.get('user.' + emailID, (err, reply) => {
+                        if (err) {
+                            reject('processObjects.userManager.getSocketIDFromemail->umRedisClient.get for user.' + emailID + 'resulted in error:' + err)
+                        } else {
+                            log('debug', 'Search for ' + emailID + ' resulted in -> ' + inspect(reply), logMeta)
+                            resolve(reply)
+                        }
+                    })
+                })
+            }
             //SocketID List LAtest
             processObjects.userManager.getLoggedSocketID = (returnSocketIDList) => {
                 return umRedisClient.keys('userMan.socketID.*', (err, reply) => {
@@ -66,17 +103,17 @@ let addUserManager = (processObjects) => {
             }
 
             //Update Property related to user if user exists
-            /*processObjects.userManager.updateUser = (emailID, key, value, next) => { //Update User Properties
+            processObjects.userManager.updateUser = (emailID, key, value, next) => { //Update User Properties
                 if (emailID === 'Guest') {
-                    let profile = { email: emailID + value }
+                    let profile = { email: emailID }
                     profile[key] = value
-                    umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
+                    umRedisClient.set('user.' + profile.email, JSON.stringify(profile), (err, reply) => {
                         if (err) {
                             log('error', ' Issue with set, returned ' + err, logMeta)
                             return next(false, err)
                         } else {
                             //log('debug', ' set Success, Reply ' + reply, logMeta)
-                            umRedisClient.expire(profile.email, 1 * 10 * 60, (err, reply) => {//Set to Expire after 10 minutes
+                            umRedisClient.expire('user.' + profile.email, 1 * 10 * 60, (err, reply) => {//Set to Expire after 10 minutes
                                 if (err) {
                                     log('error', ' Issue with expire, returned ' + err, logMeta)
                                     return next(false, err)
@@ -88,7 +125,7 @@ let addUserManager = (processObjects) => {
                         }
                     })
                 } else {
-                    umRedisClient.get(emailID, (err, reply) => {
+                    umRedisClient.get('user.' + emailID, (err, reply) => {
                         if (err) {
                             log('error', ' get for ' + emailID + ' Failed with Error -> ' + err, logMeta)
                             return next(false, err)
@@ -97,13 +134,13 @@ let addUserManager = (processObjects) => {
                             if (reply === null) { return next(false, emailID + " not found in Redis") }
                             let profile = JSON.parse(reply)
                             profile[key] = value
-                            umRedisClient.set(profile.email, JSON.stringify(profile), (err, reply) => {
+                            umRedisClient.set('user.' + profile.email, JSON.stringify(profile), (err, reply) => {
                                 if (err) {
                                     log('error', ' Issue with set, returned ' + err, logMeta)
                                     return next(false, err)
                                 } else {
                                     //log('debug', ' set Success, Reply ' + reply, logMeta)
-                                    umRedisClient.expire(profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
+                                    umRedisClient.expire('user.' + profile.email, 8 * 60 * 60, (err, reply) => {//Set to Expire after 8 hours
                                         if (err) {
                                             log('error', ' Issue with expire, returned ' + err, logMeta)
                                             return next(false, err)
@@ -117,7 +154,7 @@ let addUserManager = (processObjects) => {
                         }
                     })
                 }
-            }*/
+            }
 
             //All Below functions are for User Authentication with AzureAD
 
@@ -169,26 +206,23 @@ let addUserManager = (processObjects) => {
                 })
             }
 
-            processObjects.userManager.getLoggedUsers = (returnUserList) => {
-                return umRedisClient.keys('userMan.user.*', (err, reply) => {
-                    if (err) {
-                        log('error', 'processObjects.userManager.getLoggedUserss resulted in error -> ' + err, logMeta)
-                        return null
-                    } else {
-                        //log('debug', ' getLoggedUsers resulted in -> ' + reply, logMeta)
-                        let userList = reply.map((val) => { return val.slice(13, -24) })
-                        if (typeof returnUserList === 'function') {
-                            return returnUserList(userList)
+            processObjects.userManager.getLoggedUsers = () => {
+                return new Promise((resolve, reject) => {
+                    umRedisClient.keys('userMan.user.*', (err, reply) => {
+                        if (err) {
+                            log('error', 'processObjects.userManager.getLoggedUserss resulted in error -> ' + err, logMeta)
+                            return reject('processObjects.userManager.getLoggedUserss resulted in error -> ' + err)
                         } else {
-                            return JSON.stringify(userList)//[TODO]Not intended to be used as of now...may need to remove
+                            //log('debug', 'getLoggedUsers resulted in -> ' + reply, logMeta)
+                            return resolve(reply.map((val) => { return val.slice(13, -24) }))
                         }
-                    }
+                    })
                 })
             }
         }
-            processObjects.userManager()
+        processObjects.userManager()
 
-            return process.nextTick(() => resolve(processObjects))
+        return process.nextTick(() => resolve(processObjects))
     })
 }
 module.exports = { addUserManager }

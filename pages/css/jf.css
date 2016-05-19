@@ -54,3 +54,8 @@ article{
 body{
     overflow:hidden;
 }
+
+output{
+    background: darkslategrey;
+    color: yellow;
+}

@@ -50,7 +50,6 @@ let addSocketIOServices = (processObjects) => {
                     socket.emit('s2c', {
                         event: 'ready',
                         socketID: socket.id,
-                        //sessionID: retreiveSID(socket.handshake.cookie),//Not used anywhere as of now- SessionID remain constant even if socket ID changes with each refresh
                         userID: user
                     })
                 }
