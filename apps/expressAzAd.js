@@ -69,8 +69,8 @@ let addAzAd = (processObjects) => {
                                 // "Auto-registration"
                                 log('debug', 'Profile being Added for email-' + profile.email, logMeta)
                                 //Adding access and Refresh Token to Profile
-                                profile.accessToken = accessToken
-                                profile.refreshToken = refreshToken
+                                //profile.accessToken = accessToken
+                                //profile.refreshToken = refreshToken
                                 //Removing all keys with nested JSON for Redis Compatibility
                                 delete profile._raw
                                 delete profile._json

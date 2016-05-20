@@ -29,6 +29,7 @@ let addSocketIOServices = (processObjects) => {
                 socket.on('c2s', (msg) => {
                     log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
                     switch (msg.event) {
+
                         case 'userJoin':
                             log('info', 'Going to update username ' + msg.username + ' to ' + socket.id, logMeta)
                             userMan.addSocket(socket.id, msg.username, (status, err) => {
@@ -40,12 +41,34 @@ let addSocketIOServices = (processObjects) => {
                             })
                             processObjects.sendReady(msg.username)
                             break
+
                         case 'groupChatMsg':
                             socket.broadcast.emit('s2c', msg)
                             break
+
+                        case 'socketID4email':
+                            userMan.getValueFromemail(msg.email, 'SocketID')
+                                .then((socketID) => {
+                                    log('info', 'Going to send response for socketID4email ->' + inspect(socketID), logMeta)
+                                    socket.emit('s2c', {
+                                        event: 'socketID4email',
+                                        email: msg.email,
+                                        socketID: socketID
+                                    })
+                                })
+                                .catch((err) => {
+                                    log('error', 'Error in socketID4email -> ' + err, logMeta)
+                                })
+                            break
+
+                        case 'directChatMsg':
+                            socket.to(msg.to).emit('s2c', msg)
+                            break
+
                         default:
                             socket.broadcast.emit('s2c', msg)
                             break
+
                     }
                 })
 
@@ -76,16 +99,3 @@ let addSocketIOServices = (processObjects) => {
 }
 module.exports = { addSocketIOServices }
 
-function retreiveSID(cookie) {
-    let sid = null
-    if (typeof (cookie) === 'undefined') {
-        return sid
-    } else {
-        let x = cookie.split(';')
-            .map((val) => {
-                let y = val.split('=')
-                if (y[0] === ' connect.sid') { sid = y[1] }
-            })
-        return sid
-    }
-}

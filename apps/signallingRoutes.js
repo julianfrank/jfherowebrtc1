@@ -29,7 +29,7 @@ let addSignalRoutes = (processObjects) => {
                 res.send(SocketIDList)
             })
         })
-
+        
         app.get('/whoami', (req, res) => {
             res.send({
                 user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),

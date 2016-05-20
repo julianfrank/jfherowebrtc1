@@ -72,14 +72,18 @@ let addUserManager = (processObjects) => {
             }
 
             //Get SocketID from email
-            processObjects.userManager.getSocketIDFromemail = (emailID) => {
+            processObjects.userManager.getValueFromemail = (emailID, key) => {
                 return new Promise((resolve, reject) => {
                     umRedisClient.get('user.' + emailID, (err, reply) => {
                         if (err) {
                             reject('processObjects.userManager.getSocketIDFromemail->umRedisClient.get for user.' + emailID + 'resulted in error:' + err)
                         } else {
-                            log('debug', 'Search for ' + emailID + ' resulted in -> ' + inspect(reply), logMeta)
-                            resolve(reply)
+                            log('debug', 'Search for key:' + key + ' for ' + emailID + ' resulted in -> ' + reply, logMeta)
+                            if (reply != null) {
+                                resolve(JSON.parse(reply)[key])
+                            } else {
+                                reject('processObjects.userManager.getSocketIDFromemail->umRedisClient.get for user.' + emailID + 'resulted in NULL response')
+                            }
                         }
                     })
                 })
@@ -118,7 +122,7 @@ let addUserManager = (processObjects) => {
                                     log('error', ' Issue with expire, returned ' + err, logMeta)
                                     return next(false, err)
                                 } else {
-                                    log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
+                                    //log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
                                     return next(true, null)
                                 }
                             })
@@ -145,7 +149,7 @@ let addUserManager = (processObjects) => {
                                             log('error', ' Issue with expire, returned ' + err, logMeta)
                                             return next(false, err)
                                         } else {
-                                            log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
+                                            //log('debug', ' Update Successful for user ' + profile.email + ' Key:' + key + ' Value:' + value, logMeta)
                                             return next(true, null)
                                         }
                                     })
