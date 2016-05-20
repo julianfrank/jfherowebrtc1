@@ -5,17 +5,13 @@
     <script src="https://cdn.jsdelivr.net/jquery/2.2.3/jquery.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
         crossorigin="anonymous"></script>
     <script src='/socket.io/socket.io.js'></script>
-    <script src="/js/debugconsole.js"></script>
+    <script src="/js/debugconsole@0.1.0.js"></script>
     <script src="/js/sio1.js"></script>
     <link rel="shortcut icon" href="/static/favicon.ico" />
     <link rel="stylesheet" href="/css/wrtc1.css">
     <meta charset="utf-8">
     <meta name="author" content="Julian Frank" />
     <meta name="description" content="Blah Blah" />
-    <!--<link rel="stylesheet" href="assets/css/style.css" />-->
-    <!--[if lt IE 9]>
-  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
 </head>
 
 <body>
@@ -24,10 +20,9 @@
 
         <nav>
             <ul>
-                <li><a href='/' id='o_appVer'>Home Version:</a></li>
+                <li><a href='/' id='o_appVer'>App Version:</a></li>
                 <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
                 <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
-                <li><a href='/gretaa.html'>Page A</a></li>
                 <li><a href='/oauth2signin'>Login using AzureAD</a></li>
             </ul>
         </nav>
@@ -35,8 +30,8 @@
 
     <article>
         <label>This User: </label><output id='o_thisUser'></output><br>
-        <label>This User Socket ID: </label><output id='o_thisUserSoID'></output><br> Currently useable IDs => jfmobile -
-        officechrome - officeff - pc - user[1-4]
+        <label>This User Socket ID: </label><output id='o_thisUserSoID'></output><br> Currently useable IDs => jfmobile,
+        officechrome, officeff, pc & user[1-4]
     </article>
     <article>
         <label>Logged in Users</label>
