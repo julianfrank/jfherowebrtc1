@@ -40,16 +40,22 @@ let addSocketIOServices = (processObjects) => {
                                 }
                             })
                             processObjects.sendReady(msg.username)
+                            userMan.getLoggedUsers().then((newDir) => { socket.broadcast.emit('s2c', { event: 'dirUpdated', newDir: newDir }) })
+
                             break
 
                         case 'groupChatMsg':
                             socket.broadcast.emit('s2c', msg)
                             break
 
+                        case 'directChatMsg':
+                            socket.to(msg.to).emit('s2c', msg)
+                            break
+
                         case 'socketID4email':
                             userMan.getValueFromemail(msg.email, 'SocketID')
                                 .then((socketID) => {
-                                    log('info', 'Going to send response for socketID4email ->' + inspect(socketID), logMeta)
+                                    //log('info', 'Going to send response for socketID4email ->' + inspect(socketID), logMeta)
                                     socket.emit('s2c', {
                                         event: 'socketID4email',
                                         email: msg.email,
@@ -61,8 +67,14 @@ let addSocketIOServices = (processObjects) => {
                                 })
                             break
 
-                        case 'directChatMsg':
-                            socket.to(msg.to).emit('s2c', msg)
+                        case 'msgToEmail':
+                            userMan.getValueFromemail(msg.toEmail, 'SocketID')
+                                .then((socketID) => {
+                                    socket.to(socketID).emit('s2c', msg)
+                                })
+                                .catch((err) => {
+                                    log('error', 'Error in socketID4email -> ' + err, logMeta)
+                                })
                             break
 
                         default:
@@ -89,7 +101,7 @@ let addSocketIOServices = (processObjects) => {
                             socket.emit('s2c', log('error', socket.id + ' Remove Failed with error -> ' + err, logMeta))
                         }
                     })
-                    //                    processObjects.sendReady(msg.username)
+                    userMan.getLoggedUsers().then((newDir) => { socket.broadcast.emit('s2c', { event: 'dirUpdated', newDir: newDir }) })
                 })
                 socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
             })

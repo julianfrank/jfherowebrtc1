@@ -2,7 +2,8 @@ $(document).ready(() => {
 
     let thisUser = serverSentVars.user || 'Guest',
         thisSocketID = null,
-        targetSocketID = ''
+        targetSocketID = '',
+        targetEmailID = ''
 
     $('#o_appVer').text(serverSentVars.appVer)
     $('#o_thisUser').text(serverSentVars.user)
@@ -27,6 +28,10 @@ $(document).ready(() => {
                     log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
 
+                case 'dirUpdated':
+                    updateListView('#o_LoggedUserList', msg.newDir, thisUser.slice(0, -24))
+                    break
+
                 case 'groupChatMsg':
                     log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
                     $('#o_Groupchat').append('<br><span>' + msg.from + ':\t' + msg.message + '</span>')
@@ -43,18 +48,14 @@ $(document).ready(() => {
                     targetSocketID = msg.socketID
                     break
 
+                case 'msgToEmail':
+                    $('#o_personalChat').append('<br><span>' + msg.from + ':\t' + msg.message + '</span>')
+                    break
+
                 default:
                     log("Unhandled message: sio says -> " + JSON.stringify(msg))
                     break
             }
-        })
-
-        //Update Logged SocketID View - [TODO] Remove later
-        $.ajax({ url: '/socketID/all', dataType: 'json' }).then((data) => { updateListView('#o_LoggedSocketIDList', data) })
-
-        $('#o_LoggedUserList').click((event) => {
-            log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
-            sharedio.emit('c2s', { event: 'socketID4email', email: event.target.id + '@jfkalab.onmicrosoft.com' })
         })
     })
 
@@ -84,13 +85,23 @@ $(document).ready(() => {
     //handle any entry in the direct chat box...send it to server
     $("#b_directSend").click(sendDirectChatMsg)
     $('#i_directChat').change(sendDirectChatMsg)
-    function sendDirectChatMsg() {
+    function sendDirectChatMsg() { sendMessageToEmail(targetEmailID, $('#i_directChat').val()) }
+    //Shared function to send message to emailid...Email has to be full email id
+    function sendMessageToEmail(emailID, message) {
+        log('Sending ->' + message + ' to ' + emailID)
         sharedio.emit('c2s', {
-            event: 'directChatMsg',
+            event: 'msgToEmail',
             from: thisUser,
-            to: targetSocketID,
-            message: $('#i_directChat').val()
+            toEmail: emailID,
+            message: message
         })
-        log('Group sharedio.emit->' + $('#i_directChat').val() + ' to ' + targetSocketID)
     }
+
+    //Select Target to send message
+    $('#o_LoggedUserList')
+        .click((event) => {
+            log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
+            targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
+            $('#o_targetUser').text(targetEmailID)
+        })
 })
