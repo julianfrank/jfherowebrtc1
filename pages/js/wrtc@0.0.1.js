@@ -5,6 +5,25 @@
     var localVideo
 
     // Functions
+    //Device Enumerator
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        log("enumerateDevices() not supported.");
+        return;
+    }
+
+    // List cameras and microphones.
+    navigator.mediaDevices.enumerateDevices()
+        .then(function (devices) {
+            devices.forEach(function (device) {
+                log(device.kind + ": " + device.label +
+                    " id = " + device.deviceId);
+            });
+        })
+        .catch(function (err) {
+            log(err.name + ": " + err.message);
+        });
+
+    //Promise based GUM
     var promisifiedOldGUM = function (constraints) {
 
         // First get ahold of getUserMedia, if present
