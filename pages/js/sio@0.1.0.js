@@ -25,7 +25,7 @@ $(document).ready(() => {
                     thisSocketID = msg.socketID
                     if (thisUser != msg.userID) { log('Something wrong - UserID mispatch - thisUser:' + thisUser + ' msg.userID:' + msg.userID) }
                     $('#o_thisUserSoID').append(thisSocketID)
-                    log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
+                    //log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
 
                 case 'dirUpdated':
@@ -100,7 +100,7 @@ $(document).ready(() => {
     //Select Target to send message
     $('#o_LoggedUserList')
         .click((event) => {
-            log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
+            //log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
             targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
             $('#o_targetUser').text(targetEmailID)
         })

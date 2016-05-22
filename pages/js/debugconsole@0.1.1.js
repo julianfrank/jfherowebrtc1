@@ -15,7 +15,7 @@ window.onload = function () {
     log = function (msg) {
         if (STREAMTOCONSOLE) { console.log(msg) }//Kept to debug debugconsole app
         if (DISPLAYDEBUGLOG) {
-            debugText = msg.concat('\n', debugText).slice(0, debugBuffer)
+            debugText = (msg + '\n' + debugText).slice(0, debugBuffer)
             if (debugUpdateScreen) {
                 document.getElementById('debugConsole').textContent = debugText
                 debugUpdateScreen = false//Delay refresh of console till debugRefreshDelay have passed
