@@ -103,5 +103,6 @@ $(document).ready(() => {
             //log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
             targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
             $('#o_targetUser').text(targetEmailID)
+            signallingChannel(thisUser, targetEmailID, sharedio, signalHandler)//Initiate signalling for webrtc
         })
 })

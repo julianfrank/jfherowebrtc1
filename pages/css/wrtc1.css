@@ -59,3 +59,7 @@ output{
     background: darkslategrey;
     color: yellow;
 }
+
+video{
+    max-width: 40%;
+}

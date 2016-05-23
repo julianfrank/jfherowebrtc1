@@ -26,6 +26,16 @@ let addSocketIOServices = (processObjects) => {
             .on('connection', (socket) => {//Handle Connect event
                 log('info', 'connect happened on sharedio', logMeta)
 
+                socket.on('c2sWRTC', (msg) => {
+                    userMan.getValueFromemail(msg.to, 'SocketID')
+                        .then((socketID) => {
+                            socket.to(socketID).emit('s2cWRTC', msg)
+                        })
+                        .catch((err) => {
+                            log('error', 's2cWRTC->Error in socketID4email -> ' + err, logMeta)
+                        })
+                })
+
                 socket.on('c2s', (msg) => {
                     log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
                     switch (msg.event) {
