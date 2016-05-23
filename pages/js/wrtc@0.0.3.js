@@ -7,33 +7,35 @@ var signallingChannel, signalHandler
 
 
     //Get local camera and audio in/out and connect them to localvideo
-    function initAV() {
+    var initAV = new Promise(function (resolve, reject) {
         constraints = window.constraints = { audio: false, video: true }
 
         var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia)
-        getUserMedia(constraints, function (stream) {
-            var video = document.querySelector('#localVideo')
-            var videoTracks = stream.getVideoTracks()
-            log('Got stream with constraints:', constraints)
-            log('Using video device: ' + videoTracks[0].label)
-            stream.active = function () { log('Stream Active') }
-            stream.onended = function () { log(stream); log('Stream ended') }
-            window.stream = stream; // make variable available to browser console 
-            var url = window.URL || window.webkitURL
-            video.src = url ? url.createObjectURL(stream) : stream
-            video.onloadedmetadata = function (event) { video.play() }
-        }, function (error) {
-            log(error.name + ": " + error.message)
-            if (error.name === 'ConstraintNotSatisfiedError') {
-                log('The resolution ' + constraints.video.width.exact + 'x' +
-                    constraints.video.width.exact + ' px is not supported by your device.');
-            } else if (error.name === 'PermissionDeniedError') {
-                log('Permissions have not been granted to use your camera and microphone, you need to allow the page access to your devices in order for the demo to work.')
-            }
-            log('getUserMedia error: ' + error.name, error);
-
-        })
-    }
+        getUserMedia(constraints,
+            function (stream) {
+                var video = document.querySelector('#localVideo')
+                var videoTracks = stream.getVideoTracks()
+                log('Got stream with constraints:' + constraints + '\nUsing video device: ' + videoTracks[0].label)
+                //stream.active = function () { log('Stream Active') };            stream.onended = function () { log(stream); log('Stream ended') }
+                window.stream = stream; // make variable available to browser console 
+                var url = window.URL || window.webkitURL
+                video.src = url ? url.createObjectURL(stream) : stream
+                video.onloadedmetadata = function (event) {
+                    video.play()
+                    resolve()
+                }
+            },
+            function (error) {
+                var logtext = error.name + ": " + error.message
+                if (error.name === 'ConstraintNotSatisfiedError') {
+                    logtext += '\nThe resolution ' + constraints.video.width.exact + 'x' + constraints.video.width.exact + ' px is not supported by your device.'
+                } else if (error.name === 'PermissionDeniedError') {
+                    logtext += '\nPermissions have not been granted to use your camera and microphone, you need to allow the page access to your devices in order for the demo to work.'
+                }
+                logtext += '\ngetUserMedia error: ' + error.name + '->' + error
+                reject(logtext)
+            })
+    })
 
     function connectPeers() {
         var pc_config = { "iceServers": [{ "url": "stun:stun.l.google.com:19302" }] }
@@ -110,7 +112,9 @@ var signallingChannel, signalHandler
         localVideo = document.getElementById('localVideo')
         remoteVideo = document.getElementById('remoteVideo')
 
-        initAV()
+        initAV
+            .then(() => { log('Init AV Initialized') })
+            .catch((err) => { log(err) })
         // Set event listeners for user interface widgets
 
         //connectButton.addEventListener('click', connectPeers, false)
