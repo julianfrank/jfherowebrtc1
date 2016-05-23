@@ -4,8 +4,11 @@ var signallingChannel, signalHandler, pc
     // Define "global" variables
     var connectButton, disconnectButton, sendButton, messageInputBox, receivebox, localVideo
     var getUserMedia = (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mediaDevices.getUserMedia || navigator.msGetUserMedia)
-    var constraints = window.constraints = { audio: false, video: true }
-    var pc_config = {}// "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }
+    var constraints = window.constraints = { audio: true, video: false }
+    var pc_config = { "iceServers": [{ "urls": "stun:stun.l.google.com:19302" }] }
+    var RTCPeerConnection = window.RTCPeerConnection || window.mozRTCPeerConnection || window.webkitRTCPeerConnection;
+    var RTCSessionDescription = window.RTCSessionDescription || window.mozRTCSessionDescription;
+
 
     //Get local camera and audio in/out and connect them to localvideo
     var initAV = function () {
@@ -51,13 +54,6 @@ var signallingChannel, signalHandler, pc
                 return
             }
 
-            try {
-                pc.ontrack = function (evt) {
-                    remoteView.src = URL.createObjectURL(evt.stream);
-                }
-            } catch (error) {
-                reject('Error in pc.ontrack -> ' + error)
-            }
             /*pc.onconnecting = onSessionConnecting
             pc.onopen = onSessionOpened
             pc.onremovestream = onRemoteStreamRemoved*/
@@ -95,14 +91,13 @@ var signallingChannel, signalHandler, pc
             .then(initAV)
             .then((stream) => {
                 log('Init AV Initialized')
-                var videoTracks = stream.getVideoTracks()
-                log('Using video device: ' + videoTracks[0].label)
+                var mediaTracks = stream.getTracks()
+                log('Current Media Tracks :-> ' + mediaTracks.length + '\t' + mediaTracks[0].label)
+                pc.addStream(stream)
             })
-            .catch((err) => { log(err) })
+            .catch((err) => { log('Error in connectPeers -> ' + err) })
     }
 
-    // Set up an event listener which will run the startup
-    // function once the page is done loading.
-
+    // Set up an event listener which will run the startup function once the page is done loading.
     window.addEventListener('load', startup, false)
 })();
