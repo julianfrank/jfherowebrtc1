@@ -30,6 +30,7 @@ let addSocketIOServices = (processObjects) => {
                     userMan.getValueFromemail(msg.to, 'SocketID')
                         .then((socketID) => {
                             socket.to(socketID).emit('s2cWRTC', msg)
+                            log('debug', 's2cWRTC-> ' + JSON.stringify(msg), logMeta)
                         })
                         .catch((err) => {
                             log('error', 's2cWRTC->Error in socketID4email -> ' + err, logMeta)

@@ -1,9 +1,9 @@
-$(document).ready(() => {
+let thisUser = serverSentVars.user || 'Guest',
+    thisSocketID = null,
+    targetSocketID = '',
+    targetEmailID = ''
 
-    let thisUser = serverSentVars.user || 'Guest',
-        thisSocketID = null,
-        targetSocketID = '',
-        targetEmailID = ''
+$(document).ready(() => {
 
     $('#o_appVer').text(serverSentVars.appVer)
     $('#o_thisUser').text(serverSentVars.user)
@@ -13,8 +13,10 @@ $(document).ready(() => {
     let sharedio = io('/shared')  //open Connected on shared namespace
     sharedio.on('connect', () => {//Check for connect
         sharedio.on('disconnect', () => { log('sharedio.disconnect event fired') })
-
         sharedio.emit('c2s', { event: 'userJoin', username: thisUser })
+
+        //Initiate signalling for webrtc
+        signallingChannel.init(thisUser, sharedio)
 
         //log any data received from server
         sharedio.on('s2c', (msg) => {
@@ -63,7 +65,6 @@ $(document).ready(() => {
     function updateListView(target, dataArray, filter) {
         $(target).empty()
         dataArray.map((val) => {
-            //log(val+'--'+filter)
             if ((val != filter) && (val != null)) {
                 $(target).append("<li id='" + val + "'>" + val + "</li>")
             }
@@ -100,43 +101,10 @@ $(document).ready(() => {
     //Select Target to send message
     $('#o_LoggedUserList')
         .click((event) => {
-            //log('Going to send via c2s->' + "{ event: 'socketID4email', email: '" + event.target.id + "@jfkalab.onmicrosoft.com' })")
             targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
             $('#o_targetUser').text(targetEmailID)
-            signallingChannel(thisUser, targetEmailID, sharedio, signalHandler)//Initiate signalling for webrtc
+
+            signallingChannel.setTarget(targetEmailID)
         })
 
-    signalHandler = function (msg) {
-        log('Signal Handler got a message ->' + JSON.stringify(msg))
-    }
-
-    signallingChannel = function (local, remote, channel, msgHandler) {
-        this.localUser = local, this.remoteUser = remote, this.connected = false
-        log('Signalling Between ' + this.localUser + ' & ' + this.remoteUser + 'is Ready')
-        connectButton.disabled = false
-        connectButton.innerText = 'Connect ' + remote.slice(0, -24)
-
-        channel.emit('c2sWRTC', { event: 'wrtcSignalTest', from: this.localUser, to: this.remoteUser })
-
-        channel.on('s2cWRTC', function (msg) {
-            if (msg.event = 'wrtcSignalTest') {
-                disconnectButton.disabled = false
-                disconnectButton.innerText = 'Disconnect ' + msg.from.slice(0, -24)
-                if (!this.connected) {
-                    this.connected = true
-                    channel.emit('c2sWRTC', { event: 'wrtcSignalTest', from: this.localUser, to: this.remoteUser })
-                }
-            } else {
-                msgHandler(msg)
-            }
-        })
-
-        this.send = function (msg) {
-            channel.emit('c2sWRTC', {
-                event: 'wrtcSignal',
-                from: this.localUser, to: this.remoteUser,
-                message: msg
-            })
-        }
-    }
 })
