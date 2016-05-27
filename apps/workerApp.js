@@ -97,7 +97,8 @@ function workerApp() {
     }
 
     //Start the Application
-    initRedis(thisProcessObjects)
+    initMongoose(thisProcessObjects)
+        .then(initRedis)
         .then(initUMRedis)
         .then(initSIOPubRedis)
         .then(initSIOSubRedis)
@@ -107,7 +108,6 @@ function workerApp() {
         .then(addAzAd)
         .then(addAzAdRoutes)
         .then(addSignalRoutes)
-        //.then(initMongoose)
         .then(addAppRoutes)
         .then(addLastRoute)
         .then(startServer)

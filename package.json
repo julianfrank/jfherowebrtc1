@@ -1,6 +1,6 @@
 {
   "name": "jfwrtc",
-  "version": "0.0.37",
+  "version": "0.0.39",
   "description": "WebRTC App",
   "main": "procMaster.js",
   "scripts": {
@@ -26,11 +26,11 @@
   "dependencies": {
     "body-parser": "^1.15.1",
     "connect-redis": "^3.0.2",
-    "cookie-parser": "^1.4.1",
+    "cookie-parser": "^1.4.3",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
-    "mongoose": "^4.4.17",
-    "newrelic": "^1.27.2",
+    "mongoose": "^4.4.19",
+    "newrelic": "^1.28.0",
     "passport": "^0.3.2",
     "passport-azure-ad": "^1.4.5",
     "redis": "^2.5.3",

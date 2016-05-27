@@ -11,11 +11,14 @@ var debugText = '',//Default Text in hte debug Console...Replace with you app In
 var debugUpdateScreen = true
 
 window.onload = function () {
+
+    'use strict'
+
     //Core Log Update Function
     log = function (msg) {
         if (STREAMTOCONSOLE) { console.log(msg) }//Kept to debug debugconsole app
         if (DISPLAYDEBUGLOG) {
-            debugText = (msg + '\n' + debugText).slice(0, debugBuffer)
+            debugText = (((typeof msg) === 'string' ? msg : JSON.stringify(msg)) + '\n' + debugText).slice(0, debugBuffer)
             if (debugUpdateScreen) {
                 document.getElementById('debugConsole').textContent = debugText
                 debugUpdateScreen = false//Delay refresh of console till debugRefreshDelay have passed
@@ -31,8 +34,8 @@ window.onload = function () {
 
             var debugViewStyle = document.createElement('style')
             debugView.className = 'debugConsole'
-            debugViewStyle.innerHTML = ".debugConsole{width:25em;height:7em;position:absolute;bottom:1%;left:1%;z-index:111;max-height:44vh;color: white;opacity:0.16;background-color: black;overflow: visible;border-radius:7px;border-width:2px;border-color:black;border-style:solid;box-sizing:border-box}\n"
-            debugViewStyle.innerHTML += ".debugConsole:hover{width:100%;height:100%;max-width:78%;overflow: auto;opacity:1;animation: mymove 1s infinite;animation-direction: alternate;}\n"
+            debugViewStyle.innerHTML = ".debugConsole{width:25em;height:7em;position:absolute;bottom:1%;right:1%;z-index:111;max-height:44vh;color: white;opacity:0.16;background-color: black;overflow: visible;border-radius:7px;border-width:2px;border-color:black;border-style:solid;box-sizing:border-box}\n"
+            debugViewStyle.innerHTML += ".debugConsole:hover{width:100%;height:100%;max-width:99%;overflow: auto;opacity:1;animation: mymove 1s infinite;animation-direction: alternate;}\n"
             debugViewStyle.innerHTML += "@keyframes mymove {100% {box-shadow: 0px 0px 7px 7px darkgrey;}}"//Comment this if need to use in low performance clients
             debugView.appendChild(debugViewStyle)
 

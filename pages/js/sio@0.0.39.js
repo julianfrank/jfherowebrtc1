@@ -1,7 +1,83 @@
+'use strict'
+
 let thisUser = serverSentVars.user || 'Guest',
     thisSocketID = null,
     targetSocketID = '',
     targetEmailID = ''
+
+var signallingChannel = {
+    localUser: null,
+    remoteUser: 'Guest@jfkalab.onmicrosoft.com',
+    channel: null,
+    signalHandler: null,
+
+    init: function (local, channel) {
+        signallingChannel.localUser = local
+        signallingChannel.channel = channel
+        signallingChannel.channel.on('s2cWRTC', function (msg) {
+            let cleanmsg = JSON.parse(String(JSON.stringify(msg)))
+            switch (cleanmsg.event) {
+                case 'wrtcSignal':
+                    //log('going to handle signal->' + JSON.stringify(cleanmsg))
+                    signallingChannel.signalHandler(cleanmsg)
+                    break;
+                case 'req':
+                    signallingChannel.remoteUser = cleanmsg.from
+                    disconnectButton.disabled = false
+                    disconnectButton.innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
+                    var ack = { event: 'ack', from: signallingChannel.localUser, to: signallingChannel.remoteUser }
+                    debugstr = ack
+                    signallingChannel.emit('c2sWRTC', ack)
+                    break
+                case 'ack':
+                    log('Acknowledgement received from ' + cleanmsg.from)
+                    signallingChannel.remoteUser = cleanmsg.from
+                    disconnectButton.disabled = false
+                    disconnectButton.innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
+                    break
+                default:
+                    log('s2cRTC got unhandled message->' + cleanmsg)
+                    break
+            }
+        })
+    },
+    setTarget: function (target) {
+        signallingChannel.remoteUser = target
+        connectButton.disabled = false
+        connectButton.innerText = 'Connect ' + signallingChannel.remoteUser.slice(0, -24)
+    },
+    connect: function () {
+        connectButton.disabled = true
+        disconnectButton.disabled = false
+        var req = { event: 'req', to: signallingChannel.remoteUser, from: signallingChannel.localUser }
+        signallingChannel.channel.emit('c2sWRTC', req)
+    },
+    send: function (msg) {
+        signallingChannel.channel.emit('c2sWRTC', {
+            event: 'wrtcSignal',
+            from: signallingChannel.localUser, to: signallingChannel.remoteUser,
+            message: msg
+        })
+    }
+}
+//[TODO]Old code ...Remove if not needed
+/*var signalResponder = function (msg) {
+    var signal = (typeof msg.message === 'string') ? (JSON.parse(msg.message)) : (msg.message)
+
+    if (signal.sdp) {
+        log('SDP received->')
+        log(signal.sdp)
+        pc.setRemoteDescription(new RTCSessionDescription(signal.sdp), function () {
+            pc.createAnswer(gotDescription, (e) => { log('pc.setRemoteDescription error->' + e) })
+        }, function (error) {
+            log('pc.setRemoteDecription error->' + error)
+        })
+    } else if (signal.ice) {
+        log('ICE received->')
+        log(signal.ice)
+        pc.addIceCandidate(new RTCIceCandidate(signal.ice));
+    }
+}*/
 
 $(document).ready(() => {
 
@@ -105,6 +181,8 @@ $(document).ready(() => {
             $('#o_targetUser').text(targetEmailID)
 
             signallingChannel.setTarget(targetEmailID)
+
+            $('#connectButton').click((ev) => { start(true) })
         })
 
 })
