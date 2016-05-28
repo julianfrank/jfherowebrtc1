@@ -31,8 +31,9 @@ function getUserMediaSuccess(stream) {
     localStream = stream;
     //localVideo.src = window.URL.createObjectURL(stream)
     //--
-    window.stream = localStream // make variable available to browser console 
-    localVideo.src = window.URL ? window.URL.createObjectURL(localStream) : localStream
+    //window.stream = localStream // make variable available to browser console 
+    var url = window.URL || window.webkitURL
+    localVideo.src = url ? url.createObjectURL(stream) : stream
     localVideo.onloadedmetadata = function () { localVideo.play() }
     //--
 }
@@ -63,7 +64,11 @@ function gotMessageFromServer(message) {
         peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
             .then(function () {
                 // Only create answers in response to offers
-                if (signal.sdp.type == 'offer') { peerConnection.createAnswer().then(createdDescription).catch(errorHandler) }
+                if (signal.sdp.type == 'offer') {
+                    peerConnection.createAnswer()
+                        .then(createdDescription)
+                        .catch(errorHandler)
+                }
             })
             .catch(errorHandler)
     } else if (signal.ice) {
@@ -90,12 +95,10 @@ function gotRemoteStream(event) {
     log(event)
     //remoteVideo.src = window.URL.createObjectURL(event.streams)
     //---
-    window.stream = event.stream // make variable available to browser console 
-    //remoteVideo.src = window.URL ? window.URL.createObjectURL(event.stream) : event.stream
-    remoteVideo.src = event.stream
-    //remoteVideo.onloadedmetadata = function () { 
-        remoteVideo.play()
-    // }
+    //window.stream = event.stream // make variable available to browser console 
+    var url = window.URL || window.webkitURL
+    remoteVideo.src = url ? url.createObjectURL(event.stream) : event.stream
+    remoteVideo.onloadedmetadata = function () { remoteVideo.play() }
     //---
 }
 
