@@ -60,24 +60,6 @@ var signallingChannel = {
         })
     }
 }
-//[TODO]Old code ...Remove if not needed
-/*var signalResponder = function (msg) {
-    var signal = (typeof msg.message === 'string') ? (JSON.parse(msg.message)) : (msg.message)
-
-    if (signal.sdp) {
-        log('SDP received->')
-        log(signal.sdp)
-        pc.setRemoteDescription(new RTCSessionDescription(signal.sdp), function () {
-            pc.createAnswer(gotDescription, (e) => { log('pc.setRemoteDescription error->' + e) })
-        }, function (error) {
-            log('pc.setRemoteDecription error->' + error)
-        })
-    } else if (signal.ice) {
-        log('ICE received->')
-        log(signal.ice)
-        pc.addIceCandidate(new RTCIceCandidate(signal.ice));
-    }
-}*/
 
 $(document).ready(() => {
 
@@ -124,6 +106,10 @@ $(document).ready(() => {
                     log('socketID4email Returned SocketID:' + msg.socketID)
                     $('#o_targetUser').text(msg.email + ' -> ' + msg.socketID)
                     targetSocketID = msg.socketID
+                    break
+                    
+                    case 'socketCacheSuccess':
+                    log('Socket details for '+msg.user+' updated as '+msg.socketID)
                     break
 
                 case 'msgToEmail':

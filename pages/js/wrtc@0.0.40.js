@@ -3,9 +3,10 @@
 let localVideo, remoteVideo, peerConnection, localStream
 let connectButton, disconnectButton
 
-var url = window.URL || window.webkitURL
 var peerConnectionConfig = { 'iceServers': [{ 'urls': 'stun:stun.services.mozilla.com' }, { 'urls': 'stun:stun.l.google.com:19302' },] }
 var constraints = { video: true, audio: true, }
+
+window.URL = window.URL || window.webkitURL
 
 function pageReady() {
     uuid = uuid()
@@ -31,11 +32,8 @@ function getUserMediaSuccess(stream) {
     //localVideo.src = window.URL.createObjectURL(stream)
     //--
     window.stream = localStream // make variable available to browser console 
-    localVideo.src = url ? url.createObjectURL(localStream) : localStream
-    localVideo.onloadedmetadata = function (event) {
-        localVideo.play()
-        //localVideo.muted = true
-    }
+    localVideo.src = window.URL ? window.URL.createObjectURL(localStream) : localStream
+    localVideo.onloadedmetadata = function () { localVideo.play() }
     //--
 }
 
@@ -44,10 +42,9 @@ function start(isCaller) {
     peerConnection.onicecandidate = gotIceCandidate
     //peerConnection.onaddstream = gotRemoteStream
     peerConnection.ontrack = gotRemoteStream
-    //peerConnection.addStream(localStream)
-    peerConnection.addstream(localStream)
 
     if (isCaller) {
+        peerConnection.addStream(localStream)
         peerConnection.createOffer()
             .then(createdDescription)
             .catch(errorHandler)
@@ -90,14 +87,15 @@ function createdDescription(description) {
 
 function gotRemoteStream(event) {
     log('got remote stream')
-    //remoteVideo.src = window.URL.createObjectURL(event.stream)
+    log(event)
+    //remoteVideo.src = window.URL.createObjectURL(event.streams)
     //---
     window.stream = event.stream // make variable available to browser console 
-    remoteVideo.src = url ? url.createObjectURL(event.stream) : event.stream
-    remoteVideo.onloadedmetadata = function (event) {
+    //remoteVideo.src = window.URL ? window.URL.createObjectURL(event.stream) : event.stream
+    remoteVideo.src = event.stream
+    //remoteVideo.onloadedmetadata = function () { 
         remoteVideo.play()
-        //remoteVideo.muted = true
-    }
+    // }
     //---
 }
 
