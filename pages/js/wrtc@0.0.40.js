@@ -1,10 +1,14 @@
 'use strict'
 
+adapter.disableLog(false)
+
 let localVideo, remoteVideo, peerConnection, localStream
 let connectButton, disconnectButton
 
 var peerConnectionConfig = { 'iceServers': [{ 'urls': 'stun:stun.services.mozilla.com' }, { 'urls': 'stun:stun.l.google.com:19302' },] }
-var constraints = { video: true, audio: true, }
+var constraints = { video: true, audio: true }
+
+var debugSTR = 'Nothing to debug'
 
 window.URL = window.URL || window.webkitURL
 
@@ -91,13 +95,15 @@ function createdDescription(description) {
 }
 
 function gotRemoteStream(event) {
-    log('got remote stream')
-    log(event)
+    log('got remote stream of type ' + event.type)
+    log(event.streams[0])
+    debugSTR = event
     //remoteVideo.src = window.URL.createObjectURL(event.streams)
     //---
     //window.stream = event.stream // make variable available to browser console 
     var url = window.URL || window.webkitURL
-    remoteVideo.src = url ? url.createObjectURL(event.stream) : event.stream
+    remoteVideo.srcObject = url ? url.createObjectURL(event.streams[0]) : event.streams[0]
+    //remoteVideo.src = event.streams[0]
     remoteVideo.onloadedmetadata = function () { remoteVideo.play() }
     //---
 }
