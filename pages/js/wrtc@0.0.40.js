@@ -33,19 +33,22 @@ function pageReady() {
 
 function getUserMediaSuccess(stream) {
     localStream = stream;
-    //localVideo.src = window.URL.createObjectURL(stream)
     //--
-    //window.stream = localStream // make variable available to browser console 
+    window.localStream = localStream // make variable available to browser console 
     var url = window.URL || window.webkitURL
     localVideo.src = url ? url.createObjectURL(stream) : stream
-    localVideo.onloadedmetadata = function () { localVideo.play() }
+    
+    localVideo.onloadedmetadata = function () {
+        localVideo.play()
+        log('Local Video has dimension ' + localVideo.videoWidth + ' x ' + localVideo.videoHeight)
+    }
     //--
 }
 
 function start(isCaller) {
     peerConnection = new RTCPeerConnection(peerConnectionConfig)
     peerConnection.onicecandidate = gotIceCandidate
-    //peerConnection.onaddstream = gotRemoteStream
+    //peerConnection.onaddstream = gotRemoteStream//Replaced by ontrack
     peerConnection.ontrack = gotRemoteStream
 
     if (isCaller) {
@@ -96,15 +99,37 @@ function createdDescription(description) {
 
 function gotRemoteStream(event) {
     log('got remote stream of type ' + event.type)
-    log(event.streams[0])
-    debugSTR = event
-    //remoteVideo.src = window.URL.createObjectURL(event.streams)
-    //---
-    //window.stream = event.stream // make variable available to browser console 
+
     var url = window.URL || window.webkitURL
-    remoteVideo.srcObject = url ? url.createObjectURL(event.streams[0]) : event.streams[0]
-    //remoteVideo.src = event.streams[0]
-    remoteVideo.onloadedmetadata = function () { remoteVideo.play() }
+    log(url.createObjectURL(event.streams[0]))
+    //remoteVideo.srcObject = url ? url.createObjectURL(event.streams[0]) : event.streams[0]
+    remoteVideo.srcObject = event.streams[0]
+
+    //remoteVideo.oncanplay = function (e) {
+    log('Remote Video Ready State ->' + remoteVideo.readyState)
+    log('Remote Video Network State ->' + remoteVideo.networkState)
+    //}
+    remoteVideo.onloadedmetadata = function () {
+        log('Remote Video Ready State ->' + remoteVideo.readyState)
+        log('Remote Video Network State ->' + remoteVideo.networkState)
+    }
+
+    remoteVideo.onloadeddata = function () {
+        switch (adapter.browserDetails.browser) {
+
+            case 'chrome':
+                remoteVideo.play()
+                    .then((x) => {
+                        log('Received Video with dimension ' + remoteVideo.videoWidth + ' x ' + remoteVideo.videoHeight)
+                    })
+                break;
+
+            default:
+                remoteVideo.play()
+                log('Received Video with dimension ' + remoteVideo.videoWidth + ' x ' + remoteVideo.videoHeight)
+                break;
+        }
+    }
     //---
 }
 
