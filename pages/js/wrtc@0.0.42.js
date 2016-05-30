@@ -14,6 +14,7 @@ var peerConnectionConfig = {
     ]
 }
 var constraints = { video: true, audio: true }
+var offerOptions = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
 
 var debugSTR = 'Nothing to debug'
 
@@ -55,18 +56,49 @@ function getUserMediaSuccess(stream) {
 
 function start(isCaller) {
     peerConnection = new RTCPeerConnection(peerConnectionConfig)
+    //peerConnection.onsignalingstatechange = signalChanged
+    peerConnection.oniceconnectionstatechange = signalChanged
     peerConnection.onicecandidate = gotIceCandidate
     peerConnection.onaddstream = gotRemoteStream//Replaced by ontrack
-    peerConnection.ontrack = gotRemoteStream
-    var offerOptions = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+    //peerConnection.ontrack = gotRemoteStream
+    peerConnection.addStream(localStream)
+
+    peerConnection.onnegotiationneeded = negoNeeded
+    createOffer(isCaller)
+}
+
+function createOffer(isCaller) {
     if (isCaller) {
-        peerConnection.addStream(localStream)
         peerConnection.createOffer(offerOptions)
             .then(createdDescription)
             .catch(errorHandler)
     }
 }
 
+function negoNeeded() {
+    log('Nego Needed Called - No code to handle this event')
+    peerConnection.createOffer(offerOptions)
+        .then(createdDescription)
+        .catch(errorHandler)
+}
+
+function signalChanged(state) {
+    log('state.currentTarget.iceConnectionState ->' + state.currentTarget.iceConnectionState)
+    let readyStateType = [
+        '0 = HAVE_NOTHING - no information whether or not the audio/video is ready',
+        '1 = HAVE_METADATA - metadata for the audio/video is ready',
+        '2 = HAVE_CURRENT_DATA - data for the current playback position is available, but not enough data to play next frame/millisecond',
+        '3 = HAVE_FUTURE_DATA - data for the current and at least the next frame is available',
+        '4 = HAVE_ENOUGH_DATA - enough data available to start playing'
+    ]
+    let networkStateType = [
+        '0 = NETWORK_EMPTY - audio/video has not yet been initialized',
+        '1 = NETWORK_IDLE - audio/video is active and has selected a resource, but is not using the network',
+        '2 = NETWORK_LOADING - browser is downloading data',
+        '3 = NETWORK_NO_SOURCE - no audio/video source found'
+    ]
+    log('remoteVideo.readyState ->' + readyStateType[remoteVideo.readyState] + '\t' + 'remoteVideo.networkState ->' + networkStateType[remoteVideo.networkState])
+}
 function gotMessageFromServer(message) {
     if (!peerConnection) start(false)
 
@@ -99,6 +131,9 @@ function gotIceCandidate(event) {
     if (event.candidate != null) {
         log('Sending ICE ->' + JSON.stringify(event.candidate.sdpMid))
         signallingChannel.send({ 'ice': event.candidate, 'uuid': uuid })
+    } else {//30May
+        log('Sending SDP in response to null candidate')//30May
+        signallingChannel.send({ 'sdp': peerConnection.localDescription })//30May
     }
 }
 
@@ -113,7 +148,7 @@ function createdDescription(description) {
 
 function gotRemoteStream(event) {
     log('got remote stream of type ->' + event.type)
-    log(event)
+
     if (typeof event.stream === 'object') {
         remoteStream = event.stream
     } else {
@@ -125,29 +160,7 @@ function gotRemoteStream(event) {
     remoteVideo.src = url ? url.createObjectURL(remoteStream) : remoteStream
     remoteVideo.srcObject = remoteStream
 
-    //remoteVideo.oncanplay = function (e) {
-    let readyStateType = [
-        '0 = HAVE_NOTHING - no information whether or not the audio/video is ready',
-        '1 = HAVE_METADATA - metadata for the audio/video is ready',
-        '2 = HAVE_CURRENT_DATA - data for the current playback position is available, but not enough data to play next frame/millisecond',
-        '3 = HAVE_FUTURE_DATA - data for the current and at least the next frame is available',
-        '4 = HAVE_ENOUGH_DATA - enough data available to start playing'
-    ]
-    let networkStateType = [
-        '0 = NETWORK_EMPTY - audio/video has not yet been initialized',
-        '1 = NETWORK_IDLE - audio/video is active and has selected a resource, but is not using the network',
-        '2 = NETWORK_LOADING - browser is downloading data',
-        '3 = NETWORK_NO_SOURCE - no audio/video source found'
-    ]
-    log('remoteVideo.readyState ->' + readyStateType[remoteVideo.readyState])
-    log('remoteVideo.networkState ->' + networkStateType[remoteVideo.networkState])
-    //}
     remoteVideo.onloadedmetadata = function () {
-        log('Remote Video Ready State ->' + remoteVideo.readyState)
-        log('Remote Video Network State ->' + remoteVideo.networkState)
-    }
-
-    remoteVideo.onloadeddata = function () {
         switch (adapter.browserDetails.browser) {
 
             case 'chrome':
