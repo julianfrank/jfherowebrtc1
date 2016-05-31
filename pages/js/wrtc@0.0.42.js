@@ -1,20 +1,24 @@
 'use strict'
 
-adapter.disableLog(false)
-
 let localVideo, remoteVideo, peerConnection, localStream, remoteStream
 let connectButton, disconnectButton
 
 var peerConnectionConfig = {
-    'rtcpMuxPolicy': 'require',
-    'bundlePolicy': 'max-bundle',
-    'iceServers': [
-        { 'urls': 'stun:stun.services.mozilla.com' },
-        { 'urls': 'stun:stun.l.google.com:19302' }
+    rtcpMuxPolicy: 'negotiate',
+    bundlePolicy: 'max-compat',
+    RTCIceTransportPolicy: 'all',
+    iceServers: [
+        { urls: 'stun:stun.services.mozilla.com' },
+        { urls: 'stun:stun.l.google.com:19302' }
     ]
 }
 var constraints = { video: true, audio: true }
-var offerOptions = { offerToReceiveAudio: 1, offerToReceiveVideo: 1 }
+var offerOptions = {
+    offerToReceiveAudio: true,
+    offerToReceiveVideo: true,
+    voiceActivityDetection: true,
+    iceRestart: false
+}
 
 var debugSTR = 'Nothing to debug'
 
@@ -52,6 +56,7 @@ function getUserMediaSuccess(stream) {
         log('Local Video has dimension ' + localVideo.videoWidth + ' x ' + localVideo.videoHeight)
     }
     //--
+
 }
 
 function start(isCaller) {
@@ -60,7 +65,13 @@ function start(isCaller) {
     peerConnection.oniceconnectionstatechange = signalChanged
     peerConnection.onicecandidate = gotIceCandidate
     peerConnection.onaddstream = gotRemoteStream//Replaced by ontrack
-    //peerConnection.ontrack = gotRemoteStream
+    peerConnection.ontrack = gotRemoteStream
+    /*
+    if (localStream.getAudioTracks().length > 0)
+        peerConnection.addTrack(localStream.getAudioTracks()[0], localStream)
+    if (localStream.getVideoTracks().length > 0)
+        peerConnection.addTrack(localStream.getVideoTracks()[0], localStream)
+    //---*/
     peerConnection.addStream(localStream)
 
     peerConnection.onnegotiationneeded = negoNeeded
@@ -77,8 +88,13 @@ function createOffer(isCaller) {
 
 function negoNeeded() {
     log('Nego Needed Called - No code to handle this event')
-    peerConnection.createOffer(offerOptions)
-        .then(createdDescription)
+    peerConnection.createOffer()
+        .then(function (offer) {
+            return peerConnection.setLocalDescription(offer)
+        })
+        .then(function () {
+            signallingChannel.send({ 'sdp': peerConnection.localDescription })
+        })
         .catch(errorHandler)
 }
 
@@ -109,20 +125,37 @@ function gotMessageFromServer(message) {
 
     if (signal.sdp) {
         log('Responding to SDP ->' + JSON.stringify(signal.sdp.type))
+        switch (signal.sdp.type) {
+            case 'offer':
+                log('createAnswer')
+                peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+                    .then(function () { return peerConnection.createAnswer() })
+                    .then(createdDescription)
+                    .catch(errorHandler)
+                break
+            case 'answer':
+                log('signal.sdp.type->answer\t CODE MAY NOT BE VALID')
+                peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
+                    .catch(errorHandler)
+                break
+
+            default:
+                log('Unhandled SDP ->' + JSON.stringify(signal.sdp))
+                break
+        }
+
+        /*Old Code
         peerConnection.setRemoteDescription(new RTCSessionDescription(signal.sdp))
             .then(function () {
                 // Only create answers in response to offers
-                if (signal.sdp.type == 'offer') {
-                    log('createAnswer')
-                    peerConnection.createAnswer()
-                        .then(createdDescription)
-                        .catch(errorHandler)
-                }
+
             })
-            .catch(errorHandler)
+            .catch(errorHandler)*/
     } else if (signal.ice) {
         log('Responding to ICE ->' + JSON.stringify(signal.ice.sdpMid))
+
         peerConnection.addIceCandidate(new RTCIceCandidate(signal.ice))
+            //peerConnection.addIceCandidate(signal.ice)
             .catch(errorHandler)
     }
 }
@@ -134,6 +167,7 @@ function gotIceCandidate(event) {
     } else {//30May
         log('Sending SDP in response to null candidate')//30May
         signallingChannel.send({ 'sdp': peerConnection.localDescription })//30May
+        attachRemoteStreamToSrc()//31May
     }
 }
 
@@ -154,10 +188,12 @@ function gotRemoteStream(event) {
     } else {
         remoteStream = event.streams[0]
     }
+}
 
+function attachRemoteStreamToSrc() {
     var url = window.URL || window.webkitURL
 
-    remoteVideo.src = url ? url.createObjectURL(remoteStream) : remoteStream
+    //remoteVideo.src = url ? url.createObjectURL(remoteStream) : remoteStream
     remoteVideo.srcObject = remoteStream
 
     remoteVideo.onloadedmetadata = function () {
@@ -180,7 +216,7 @@ function gotRemoteStream(event) {
 }
 
 function errorHandler(error) {
-    log('Error->' + error)
+    log(error)
 }
 
 function uuid() {
