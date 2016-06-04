@@ -2,26 +2,18 @@
 
 <head>
     <title>JF WebRTC - Main Page</title>
-    <script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>
+    <!--<script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>-->
     <script src="https://cdn.jsdelivr.net/jquery/2.2.3/jquery.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
         crossorigin="anonymous"></script>
     <script src='/socket.io/socket.io.js'></script>
-    
-    <script src="/js/sio@0.0.43.js"></script>
-    <script src="/js/wrtc@0.0.43.js"></script>
+
+    <script src="/js/sio@0.0.44.js"></script>
+    <script src="/js/wrtc@0.0.44.js"></script>
     <link rel="shortcut icon" href="/static/favicon.ico" />
-    <link rel="stylesheet" href="/css/wrtc@0.0.43.css">
+    <link rel="stylesheet" href="/css/wrtc@0.0.44.css">
     <meta charset="utf-8">
     <meta name="author" content="Julian Frank" />
     <meta name="description" content="Blah Blah" />
-    <script>
-(function(e,c,a,g,f){function d(){var b=c.createElement("script");b.async=!0;
-b.src="//radar.cedexis.com/1/21113/radar.js";c.body.appendChild(b)}
-(function(){for(var b=[/\bMSIE (5|6)/i],a=b.length;a--;)if(b[a]
-.test(navigator.userAgent))return!1;return!0})()
-&&("complete"!==c.readyState?(a=e[a])?a(f,d,!1):(a=e[g])&&a("on"+f,d):d())})
-(window,document,"addEventListener","attachEvent","load");
-</script>
 </head>
 
 <body>
@@ -61,5 +53,18 @@ b.src="//radar.cedexis.com/1/21113/radar.js";c.body.appendChild(b)}
     <article>
         <label>Personal Message Received</label>
         <output id='o_personalChat'></output>
+    </article>
+    <article>
+        <button id="connectButton" name="connectButton" class="buttonleft" disabled>  Connect</button>
+        <button id="disconnectButton" name="disconnectButton" class="buttonright" disabled>  Disconnect</button>
+        <div class="messagebox">
+            <label for="message">Enter a message:<input type="text" name="message" id="message" placeholder="Message text" inputmode="latin" size=60 maxlength=120 disabled>    </label>
+            <button id="sendButton" name="sendButton" class="buttonright" disabled>Send</button>
+            <label>Receive Box</label> <output id='receivebox'></output>
+        </div>
+        <div>
+            <video id="localVideo" controls>No Local Video</video>
+            <video id="remoteVideo" controls>No Remote Video</video>
+        </div>
     </article>
 </body>

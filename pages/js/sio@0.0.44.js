@@ -7,7 +7,7 @@ let thisUser = serverSentVars.user || 'Guest',
 
 var signallingChannel = {
     localUser: null,
-    remoteUser: 'Guest@jfkalab.onmicrosoft.com',
+    remoteUser: 'Guest',
     channel: null,
     signalHandler: null,
 
@@ -18,7 +18,7 @@ var signallingChannel = {
             let cleanmsg = JSON.parse(String(JSON.stringify(msg)))
             switch (cleanmsg.event) {
                 case 'wrtcSignal':
-                    //log('going to handle signal->' + JSON.stringify(cleanmsg))
+                    //console.log('going to handle signal->' + JSON.stringify(cleanmsg))
                     signallingChannel.signalHandler(cleanmsg)
                     break;
                 case 'req':
@@ -30,16 +30,19 @@ var signallingChannel = {
                     signallingChannel.emit('c2sWRTC', ack)
                     break
                 case 'ack':
-                    log('Acknowledgement received from ' + cleanmsg.from)
+                    console.log('Acknowledgement received from ' + cleanmsg.from)
                     signallingChannel.remoteUser = cleanmsg.from
                     disconnectButton.disabled = false
                     disconnectButton.innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
                     break
                 default:
-                    log('s2cRTC got unhandled message->' + cleanmsg)
+                    console.log('s2cRTC got unhandled message->' + cleanmsg)
                     break
             }
         })
+    },
+    setHandler: function (handler) {
+        signallingChannel.signalHandler = handler
     },
     setTarget: function (target) {
         signallingChannel.remoteUser = target
@@ -70,7 +73,7 @@ $(document).ready(() => {
 
     let sharedio = io('/shared')  //open Connected on shared namespace
     sharedio.on('connect', () => {//Check for connect
-        sharedio.on('disconnect', () => { log('sharedio.disconnect event fired') })
+        sharedio.on('disconnect', () => { console.log('sharedio.disconnect event fired') })
         sharedio.emit('c2s', { event: 'userJoin', username: thisUser })
 
         //Initiate signalling for webrtc
@@ -83,9 +86,9 @@ $(document).ready(() => {
 
                 case 'ready':
                     thisSocketID = msg.socketID
-                    if (thisUser != msg.userID) { log('Something wrong - UserID mispatch - thisUser:' + thisUser + ' msg.userID:' + msg.userID) }
+                    if (thisUser != msg.userID) { console.log('Something wrong - UserID mispatch - thisUser:' + thisUser + ' msg.userID:' + msg.userID) }
                     $('#o_thisUserSoID').append(thisSocketID)
-                    //log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
+                    //console.log('Ready -> Socket ID:' + thisSocketID + ' User ID:' + thisUser)
                     break
 
                 case 'dirUpdated':
@@ -93,23 +96,23 @@ $(document).ready(() => {
                     break
 
                 case 'groupChatMsg':
-                    log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
+                    console.log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
                     $('#o_Groupchat').append('<br><span>' + msg.from + ':\t' + msg.message + '</span>')
                     break
 
                 case 'directChatMsg':
-                    log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
+                    console.log('Event:' + msg.event + '\t' + msg.from + ' says ' + msg.message)
                     $('#o_personalChat').append('<br><span>' + msg.from + ':\t' + msg.message + '</span>')
                     break
 
                 case 'socketID4email':
-                    log('socketID4email Returned SocketID:' + msg.socketID)
+                    console.log('socketID4email Returned SocketID:' + msg.socketID)
                     $('#o_targetUser').text(msg.email + ' -> ' + msg.socketID)
                     targetSocketID = msg.socketID
                     break
-                    
-                    case 'socketCacheSuccess':
-                    log('Socket details for '+msg.user+' updated as '+msg.socketID)
+
+                case 'socketCacheSuccess':
+                    console.log('Socket details for ' + msg.user + ' updated as ' + msg.socketID)
                     break
 
                 case 'msgToEmail':
@@ -117,7 +120,7 @@ $(document).ready(() => {
                     break
 
                 default:
-                    log("Unhandled message: sio says -> " + JSON.stringify(msg))
+                    console.log("Unhandled message: sio says -> " + JSON.stringify(msg))
                     break
             }
         })
@@ -142,7 +145,7 @@ $(document).ready(() => {
             from: thisUser,
             message: $('#i_GroupChat').val()
         })
-        log('Group sharedio.emit->' + $('#i_GroupChat').val())
+        console.log('Group sharedio.emit->' + $('#i_GroupChat').val())
     }
 
     //handle any entry in the direct chat box...send it to server
@@ -151,7 +154,7 @@ $(document).ready(() => {
     function sendDirectChatMsg() { sendMessageToEmail(targetEmailID, $('#i_directChat').val()) }
     //Shared function to send message to emailid...Email has to be full email id
     function sendMessageToEmail(emailID, message) {
-        log('Sending ->' + message + ' to ' + emailID)
+        console.log('Sending ->' + message + ' to ' + emailID)
         sharedio.emit('c2s', {
             event: 'msgToEmail',
             from: thisUser,
@@ -164,11 +167,14 @@ $(document).ready(() => {
     $('#o_LoggedUserList')
         .click((event) => {
             targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
-            $('#o_targetUser').text(targetEmailID)
-
-            signallingChannel.setTarget(targetEmailID)
-
-            $('#connectButton').click((ev) => { start(true) })
+            setTarget(targetEmailID)
+            $('#connectButton')
+                .click((ev) => { start(true) })
         })
 
 })
+
+function setTarget(email) {
+    $('#o_targetUser').text(email)
+    signallingChannel.setTarget(email)
+}
