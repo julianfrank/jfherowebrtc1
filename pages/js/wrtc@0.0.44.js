@@ -36,14 +36,15 @@ switch (detectBrowser().browser) {
         console.info('Chrome Browser Detected')
         var RTCPeerConnection = webkitRTCPeerConnection
         break
-        
-        case 'firefox':
+
+    case 'firefox':
         console.info('FireFox Browser Detected')
         var RTCPeerConnection = mozRTCPeerConnection
         break
 
     default:
-        break;
+        alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
+        break
 }
 
 function start(isCaller, signal) {
