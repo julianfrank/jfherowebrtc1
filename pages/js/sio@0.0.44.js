@@ -3,14 +3,14 @@
 let thisUser = serverSentVars.user || 'Guest',
     thisSocketID = null,
     targetSocketID = '',
-    targetEmailID = ''
+    targetEmailID = '',
+    iAmCaller = false
 
 var signallingChannel = {
     localUser: null,
     remoteUser: 'Guest',
     channel: null,
     signalHandler: null,
-
     init: function (local, channel) {
         signallingChannel.localUser = local
         signallingChannel.channel = channel
