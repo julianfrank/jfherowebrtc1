@@ -1,22 +1,16 @@
 'use strict'
 
 var peerConnectionConfig = {
-    rtcpMuxPolicy: 'negotiate',
-    bundlePolicy: 'max-compat',
-    RTCIceTransportPolicy: 'all',
+    //    rtcpMuxPolicy: 'negotiate',
+    //    bundlePolicy: 'max-compat',
+    //    RTCIceTransportPolicy: 'all',
     iceServers: [
         { urls: 'stun:stun.services.mozilla.com' },
         { urls: 'stun:stun.l.google.com:19302' }
     ]
 }
 var gumConstraints = { video: true, audio: true }
-var sdpConstraints = {
-    'mandatory':
-    {
-        'OfferToReceiveAudio': false,
-        'OfferToReceiveVideo': false
-    }
-}
+
 var pcOptions = {
     optional: [
         { DtlsSrtpKeyAgreement: true },
@@ -34,12 +28,14 @@ var pcLocal, pcRemote, dcLocal, dcRemote
 switch (detectBrowser().browser) {
     case 'chrome':
         console.info('Chrome Browser Detected')
-        var RTCPeerConnection = webkitRTCPeerConnection
+        var RTCPeerConnection = window.webkitRTCPeerConnection
+        var sdpConstraints = { mandatory: { 'OfferToReceiveAudio': false, 'OfferToReceiveVideo': false } }
         break
 
     case 'firefox':
         console.info('FireFox Browser Detected')
-        var RTCPeerConnection = mozRTCPeerConnection
+        var RTCPeerConnection = window.RTCPeerConnection
+        var sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
         break
 
     default:
@@ -64,7 +60,7 @@ function start(isCaller, signal) {
             pcLocal.ondatachannel = handleDataChannel
 
             //Creating Data Channel 'Before creating Offer'
-            dcLocal = pcLocal.createDataChannel('JFwrtc', dcOptions)
+            dcLocal = pcLocal.createDataChannel('JFwrtc1', dcOptions)
             console.info('dcLocal Initialised')
             dcLocal.name = 'dcLocal'
             dcLocal.onmessage = handleDCMessage
@@ -86,7 +82,7 @@ function start(isCaller, signal) {
 
             //Not needed according to https://hacks.mozilla.org/2013/07/webrtc-and-the-early-api/
             //Creating Data Channel
-            dcRemote = pcRemote.createDataChannel('JFwrtc', dcOptions)
+            dcRemote = pcRemote.createDataChannel('JFwrtc2', dcOptions)
             console.info('dcRemote Initialised')
             dcRemote.name = 'dcRemote'
             dcRemote.onmessage = handleDCMessage
@@ -115,7 +111,7 @@ function showPCStateChange(event) {
     if (thisPC.iceConnectionState === 'connected') {
         if (thisPC.name === 'pcLocal') {
             console.info(thisPC.name, '->Connected')
-
+            console.debug(dcLocal.readyState)
         }
     }
 }
@@ -146,12 +142,16 @@ function handleIceCandidate(event) {
             case 'pcLocal':
                 console.info('handleIceCandidate -> ', event.candidate.sdpMid, ' for ' + event.currentTarget.name)
                 signallingChannel.send(event.candidate)
-                //pcLocal.addIceCandidate(new RTCIceCandidate(event.candidate)).catch(errorHandler)
+                pcLocal.addIceCandidate(new RTCIceCandidate(event.candidate)).catch(errorHandler)
                 break
 
             case 'pcRemote':
-                console.info('handleIceCandidate -> ', event.candidate.sdpMid, ' for ' + event.currentTarget.name)
-                pcRemote.addIceCandidate(new RTCIceCandidate(event.candidate)).catch(errorHandler)
+                pcRemote.addIceCandidate(new RTCIceCandidate(event.candidate))
+                    .then((x) => {
+                        debugSTR = event
+                        console.info('handleIceCandidate -> ', event.candidate.sdpMid, ' for ' + event.currentTarget.name)
+                    })
+                    .catch(errorHandler)
                 signallingChannel.send(event.candidate)
                 break
 
@@ -178,14 +178,17 @@ function handleDCStateChange(event) {
 
 function gotLocalDesc(desc) {
     console.info('gotLocalDesc', desc.type)
-    pcLocal.setLocalDescription(new RTCSessionDescription(desc))
-    signallingChannel.send(desc)
+    pcLocal.setLocalDescription(new RTCSessionDescription(desc), () => {
+        signallingChannel.send(desc)
+    }, errorHandler)
+
 }
 
 function gotRemoteDesc(desc) {
     console.info('gotRemoteDesc', desc.type)
-    pcRemote.setLocalDescription(new RTCSessionDescription(desc))
-    signallingChannel.send(desc)
+    pcRemote.setLocalDescription(new RTCSessionDescription(desc), () => {
+        signallingChannel.send(desc)
+    }, errorHandler)
 }
 
 function errorHandler(err) {
