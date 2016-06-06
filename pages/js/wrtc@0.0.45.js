@@ -10,7 +10,6 @@ var peerConnectionConfig = {
     ]
 }
 var gumConstraints = { video: true, audio: true }
-
 var pcOptions = {
     optional: [
         { DtlsSrtpKeyAgreement: true },
@@ -18,12 +17,13 @@ var pcOptions = {
     ]
 }
 var dcOptions = {
+    reliable: true,
     ordered: false
 }
 
 var debugSTR = 'Nothing to debug'
 
-var pcLocal, pcRemote, dcLocal, dcRemote
+var pcLocal, pcRemote, dcLocal, dcRemote, readychannel
 
 switch (detectBrowser().browser) {
     case 'chrome':
@@ -60,12 +60,9 @@ function start(isCaller, signal) {
             pcLocal.ondatachannel = handleDataChannel
 
             //Creating Data Channel 'Before creating Offer'
-            dcLocal = pcLocal.createDataChannel('JFwrtc1', dcOptions)
+            dcLocal = pcLocal.createDataChannel('JFwrtc', dcOptions)
             console.info('dcLocal Initialised')
             dcLocal.name = 'dcLocal'
-            dcLocal.onmessage = handleDCMessage
-            dcLocal.onopen = handleDCStateChange
-            dcLocal.onclose = handleDCStateChange
             dcLocal.onerror = errorHandler
             break
 
@@ -82,17 +79,14 @@ function start(isCaller, signal) {
 
             //Not needed according to https://hacks.mozilla.org/2013/07/webrtc-and-the-early-api/
             //Creating Data Channel
-            dcRemote = pcRemote.createDataChannel('JFwrtc2', dcOptions)
+            dcRemote = pcRemote.createDataChannel('JFwrtc', dcOptions)
             console.info('dcRemote Initialised')
             dcRemote.name = 'dcRemote'
-            dcRemote.onmessage = handleDCMessage
-            dcRemote.onopen = handleDCStateChange
-            dcRemote.onclose = handleDCStateChange
             dcRemote.onerror = errorHandler
 
             pcRemote.setRemoteDescription(new RTCSessionDescription(signal))
             pcRemote.createAnswer(gotRemoteDesc, errorHandler, sdpConstraints)
-            pcRemote.onicecandidate = handleIceCandidate
+
             break
 
         default:
@@ -110,8 +104,7 @@ function showPCStateChange(event) {
 
     if (thisPC.iceConnectionState === 'connected') {
         if (thisPC.name === 'pcLocal') {
-            console.info(thisPC.name, '->Connected')
-            console.debug(dcLocal.readyState)
+            console.info(thisPC.name, '->Connected & dcLocal.readyState->', dcLocal.readyState)
         }
     }
 }
@@ -121,12 +114,13 @@ function handleNegNeeded(event) {
         case 'pcLocal':
             console.info('handleNegNeeded->pcLocal')
             //Create Offer to Remote
-            console.info('Creating Offer')
+            console.info('Creating Offer in pcLocal')
             pcLocal.createOffer(gotLocalDesc, errorHandler, sdpConstraints)
             break
 
         case 'pcRemote':
             console.info('handleNegNeeded->pcRemote')
+            pcRemote.onicecandidate = handleIceCandidate
             break
 
         default:
@@ -149,7 +143,7 @@ function handleIceCandidate(event) {
                 pcRemote.addIceCandidate(new RTCIceCandidate(event.candidate))
                     .then((x) => {
                         debugSTR = event
-                        console.info('handleIceCandidate -> ', event.candidate.sdpMid, ' for ' + event.currentTarget.name)
+                        console.info('handleIceCandidate -> ', event.candidate.sdpMid, ' for ' + event.target.name)
                     })
                     .catch(errorHandler)
                 signallingChannel.send(event.candidate)
@@ -161,21 +155,32 @@ function handleIceCandidate(event) {
         }
     } else {
         console.info('ICE Candidates Exhausted')
+        if (readychannel.readyState === 'open') readychannel.send(readychannel.name + ' is Ready')
     }
 }
 
-function handleDataChannel(event) {
-    console.debug('handleDataChannel -> ', event)
+function setDCHandlers() {
+    readychannel.onmessage = handleDCMessage
+    readychannel.onopen = handleDCStateChange
+    readychannel.onclose = handleDCStateChange
 }
 
-function handleDCMessage(event) {
-    console.debug('handleDCMessage -> ', event)
+function handleDataChannel(event) {
+    readychannel = event.channel
+    readychannel.name = iAmCaller ? dcLocal.name : dcRemote.name
+    console.info(readychannel.name, ' with label ', readychannel.label, ' is Ready')
+    setDCHandlers()
 }
 
 function handleDCStateChange(event) {
-    console.debug('handleDCStateChange -> ', event)
+    readychannel = iAmCaller ? dcLocal : dcRemote
+    setDCHandlers()
+    console.info('handleDCStateChange -> ', readychannel.label, ' State is now ->', readychannel.readyState)
 }
 
+function handleDCMessage(event) {
+    console.info('handleDCMessage -> ', event.data)
+}
 function gotLocalDesc(desc) {
     console.info('gotLocalDesc', desc.type)
     pcLocal.setLocalDescription(new RTCSessionDescription(desc), () => {
