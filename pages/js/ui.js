@@ -2,7 +2,7 @@
 
 let callStarted = false
 
-function wrtcUI() {
+let wrtcUI = function () {
 
     $('#title').text('JF WebRTC ver' + serverSentVars.appVer)
     $('#thisUser').text(serverSentVars.user.slice(0, -24))
@@ -34,6 +34,7 @@ function wrtcUI() {
             $('#button').click((ev) => {
                 callStarted = true
                 listRefresh()
+                wrtcApp().initPC()
             })
         })
 
@@ -47,5 +48,6 @@ function wrtcUI() {
             .text('Connect')
     }
 
+    return { updateListView }
 }
 $('document').ready(wrtcUI)//Call init when document is ready

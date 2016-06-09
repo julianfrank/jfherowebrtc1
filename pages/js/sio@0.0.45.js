@@ -90,7 +90,7 @@ $(document).ready(() => {
                     break
 
                 case 'dirUpdated':
-                    updateListView('#o_LoggedUserList', msg.newDir, thisUser.slice(0, -24))
+                    wrtcUI().updateListView('#o_LoggedUserList', msg.newDir, thisUser.slice(0, -24))
                     break
 
                 case 'groupChatMsg':

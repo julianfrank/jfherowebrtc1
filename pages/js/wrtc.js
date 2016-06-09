@@ -2,11 +2,12 @@
 
 let debugVar, isCaller
 
-function wrtcApp() {
+let RTCPeerConnection, sdpConstraints
+let pcConfig, gumConstraints, pcOptions, dcOptions
+
+var wrtcApp = function () {
 
     let pc, dc, localStream, RemoteStream, signal, initPCDone = false, localUser = null
-    let RTCPeerConnection, sdpConstraints
-    let pcConfig, gumConstraints, pcOptions, dcOptions
 
     function init() {
 
@@ -39,6 +40,7 @@ function wrtcApp() {
 
     function initPC() {
         if (!initPCDone) {
+            console.debug(pcConfig, pcOptions)
             pc = new RTCPeerConnection(pcConfig, pcOptions)
             updatePCStatus()
             pc.onaddstream = pcStreamAdded
