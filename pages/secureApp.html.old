@@ -1,0 +1,73 @@
+<!doctype html>
+
+<head>
+    <title>JF WebRTC - Secure Page</title>
+
+    <!--<script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>-->
+    <script src="https://cdn.jsdelivr.net/jquery/2.2.3/jquery.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
+        crossorigin="anonymous"></script>
+    <script src='/socket.io/socket.io.js'></script>
+
+    <script src='/js/browserDetect.js'></script>
+    <script src="/js/sio@0.0.45.js"></script>
+    <script src="/js/wrtc@0.0.45.js"></script>
+    <link rel="shortcut icon" href="/static/favicon.ico" />
+    <link rel="stylesheet" href="/css/wrtc@0.0.45.css">
+    <meta charset="utf-8">
+    <meta name="author" content="Julian Frank" />
+    <meta name="description" content="Blah Blah" />
+</head>
+
+<body>
+    <h1>JF WebRTC - Secure Page</h1>
+    <header>
+
+        <nav>
+            <ul>
+                <li><a href='/' id='o_appVer'>App Version:</a></li>
+                <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
+                <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
+                <li><a href='/logout'>Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <article>
+        <label>This User: </label><output id='o_thisUser'></output><br>
+        <label>This User Socket ID: </label><output id='o_thisUserSoID'></output><br> Currently useable IDs => jfmobile,
+        officechrome, officeff, pc, pcff, pcedge & user[1-4]
+    </article>
+    <article>
+        <label>Logged in Users</label>
+        <ul id='o_LoggedUserList'></ul>
+    </article>
+    <article>
+        <label><input id='i_GroupChat'><button id='b_Send'>Group Send</button></label>
+    </article>
+    <article>
+        <label>Group Message Received</label>
+        <output id='o_Groupchat'></output>
+    </article>
+    <article>
+        <label>Target : </label><output id='o_targetUser'></output><br>
+        <label><input id='i_directChat'><button id='b_directSend'>Direct Send</button></label>
+    </article>
+    <article>
+        <label>Personal Message Received</label>
+        <output id='o_personalChat'></output>
+    </article>
+    <article>
+        <button id="connectButton" name="connectButton" class="buttonleft" disabled>  Connect</button>
+        <button id="disconnectButton" name="disconnectButton" class="buttonright" disabled>  Disconnect</button>
+        <div class="messagebox">
+            <label for="message">Enter a message:<input type="text" name="message" id="message" placeholder="Message text" inputmode="latin" size=60 maxlength=120 disabled>    </label>
+            <button id="sendButton" name="sendButton" class="buttonright" disabled>Send</button>
+            <label>Receive Box</label> <output id='receivebox'></output>
+        </div>
+        <div>
+            <video id="localVideo" controls>No Local Video</video>
+            <video id="remoteVideo" controls>No Remote Video</video>
+        </div>
+    </article>
+
+</body>

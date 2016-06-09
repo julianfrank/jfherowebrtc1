@@ -2,7 +2,7 @@
 
 //const cluster = require('cluster')
 //var sticky = require('sticky-session')
-require('newrelic')
+//require('newrelic')
 let workerApp = require('./apps/workerApp').workerApp
 //const num_processes = require('os').cpus().length;
 const log = require('./apps/helpers').remoteLog

@@ -23,8 +23,8 @@ var signallingChannel = {
                     break;
                 case 'req':
                     signallingChannel.remoteUser = cleanmsg.from
-                    disconnectButton.disabled = false
-                    disconnectButton.innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
+                    //disconnectButton..disabled = false
+                    //disconnectButton..innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
                     var ack = { event: 'ack', from: signallingChannel.localUser, to: signallingChannel.remoteUser }
                     debugstr = ack
                     signallingChannel.emit('c2sWRTC', ack)
@@ -32,8 +32,8 @@ var signallingChannel = {
                 case 'ack':
                     console.log('Acknowledgement received from ' + cleanmsg.from)
                     signallingChannel.remoteUser = cleanmsg.from
-                    disconnectButton.disabled = false
-                    disconnectButton.innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
+                    //disconnectButton..disabled = false
+                    //disconnectButton..innerText = 'Disconnect ' + signallingChannel.remoteUser.slice(0, -24)
                     break
                 default:
                     console.log('s2cRTC got unhandled message->' + cleanmsg)
@@ -46,12 +46,12 @@ var signallingChannel = {
     },
     setTarget: function (target) {
         signallingChannel.remoteUser = target
-        connectButton.disabled = false
-        connectButton.innerText = 'Connect ' + signallingChannel.remoteUser.slice(0, -24)
+        //connectButton..disabled = false
+        //connectButton..innerText = 'Connect ' + signallingChannel.remoteUser.slice(0, -24)
     },
     connect: function () {
-        connectButton.disabled = true
-        disconnectButton.disabled = false
+        //connectButton..disabled = true
+        //disconnectButton..disabled = false
         var req = { event: 'req', to: signallingChannel.remoteUser, from: signallingChannel.localUser }
         signallingChannel.channel.emit('c2sWRTC', req)
     },
@@ -66,11 +66,6 @@ var signallingChannel = {
 
 $(document).ready(() => {
 
-    $('#o_appVer').text(serverSentVars.appVer)
-    $('#o_thisUser').text(serverSentVars.user)
-    $('#o_LoggedUserList').empty()
-    updateListView('#o_LoggedUserList', serverSentVars.loggedUserList, thisUser.slice(0, -24))
-
     let sharedio = io('/shared')  //open Connected on shared namespace
     sharedio.on('connect', () => {//Check for connect
         sharedio.on('disconnect', () => { console.log('sharedio.disconnect event fired') })
@@ -78,6 +73,9 @@ $(document).ready(() => {
 
         //Initiate signalling for webrtc
         signallingChannel.init(thisUser, sharedio)
+
+        //Initiate WebRTC Services
+        wrtcApp().init(thisUser)
 
         //log any data received from server
         sharedio.on('s2c', (msg) => {
@@ -126,16 +124,6 @@ $(document).ready(() => {
         })
     })
 
-    //Std Function to Update view based on provided data array
-    function updateListView(target, dataArray, filter) {
-        $(target).empty()
-        dataArray.map((val) => {
-            if ((val != filter) && (val != null)) {
-                $(target).append("<li id='" + val + "'>" + val + "</li>")
-            }
-        })
-    }
-
     //handle any entry in the Group chat box...send it to server
     $("#b_Send").click(sendGroupChatMsg)
     $('#i_GroupChat').change(sendGroupChatMsg)
@@ -162,19 +150,4 @@ $(document).ready(() => {
             message: message
         })
     }
-
-    //Select Target to send message
-    $('#o_LoggedUserList')
-        .click((event) => {
-            targetEmailID = event.target.id + '@jfkalab.onmicrosoft.com'
-            setTarget(targetEmailID)
-            $('#connectButton')
-                .click((ev) => { start(true) })
-        })
-
 })
-
-function setTarget(email) {
-    $('#o_targetUser').text(email)
-    signallingChannel.setTarget(email)
-}

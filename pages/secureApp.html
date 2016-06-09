@@ -1,73 +1,63 @@
-<!doctype html>
+<!DOCTYPE html>
+<html>
 
 <head>
-    <title>JF WebRTC - Secure Page</title>
+  <meta charset="utf-8">
+  <title>JF fbwrtc</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>-->
-    <script src="https://cdn.jsdelivr.net/jquery/2.2.3/jquery.min.js" integrity="sha256-a23g1Nt4dtEYOj7bR+vTu7+T8VP13humZFBJNIYoEJo="
-        crossorigin="anonymous"></script>
-    <script src='/socket.io/socket.io.js'></script>
+  <link rel="stylesheet" href="/css/w3.css">
 
-    <script src='/js/browserDetect.js'></script>
-    <script src="/js/sio@0.0.45.js"></script>
-    <script src="/js/wrtc@0.0.45.js"></script>
-    <link rel="shortcut icon" href="/static/favicon.ico" />
-    <link rel="stylesheet" href="/css/wrtc@0.0.45.css">
-    <meta charset="utf-8">
-    <meta name="author" content="Julian Frank" />
-    <meta name="description" content="Blah Blah" />
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src='/socket.io/socket.io.js'></script>
+  <script src="/js/browserDetect.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/sio@0.0.45.js"></script>
+  <script src="/js/wrtc.js"></script>
+
 </head>
 
-<body>
-    <h1>JF WebRTC - Secure Page</h1>
-    <header>
+<body class="w3-content">
+  <div class="w3-row-padding w3-indigo w3-border">
+    <div class="w3-row-padding w3-col s4">
+      <div class="w3-label w3-text-white w3-col s4">thisUser</div>
+      <div id="thisUser" class="w3-card w3-left-bar w3-col s8">Unauthorised User</div>
+      <div class="w3-label w3-text-white w3-col s4">targetUser</div>
+      <div id="targetUser" class="w3-card w3-leftbar w3-col s8">Nobody</div>
+    </div>
+    <div id='title' class=" w3-article w3-col s2 w3-center w3-rest">WebRTC Demo</div>
+    <div id='button' class="w3-btn w3-col s2 w3-disabled">Unassigned Button</div>
+    <div id='userList' class="w3-row-padding w3-rest">User List</div>
+    
+  </div>
 
-        <nav>
-            <ul>
-                <li><a href='/' id='o_appVer'>App Version:</a></li>
-                <li><a href='https://jfwrtc-60937.onmodulus.net/'>Modulus Instance</a></li>
-                <li><a href='https://jfwrtc.herokuapp.com'>Heroku Instance</a></li>
-                <li><a href='/logout'>Logout</a></li>
-            </ul>
-        </nav>
-    </header>
+  <div class="w3-row w3-black w3-border-white">
+    <div class="w3-card w3-col s3">
+      <div class="w3-card">pcSigState:
+        <div class="w3-badge w3-grey" id="pcSigState"></div>
+      </div>
+    </div>
+    <div class="w3-card w3-col s3">
+      <div class="w3-card">pcICEGatherState:
+        <div class="w3-badge w3-grey" id="pcICEGatherState"></div>
+      </div>
+    </div>
+    <div class="w3-card w3-col s3">
+      <div class="w3-card">pcICEConnState:
+        <div class="w3-badge w3-grey" id="pcICEConnState"></div>
+      </div>
+    </div>
+    <div class="w3-card w3-col s3">
+      <div class="w3-card">dcReadyState:
+        <div class="w3-badge w3-grey" id="dcReadyState"></div>
+      </div>
+    </div>
+  </div>
 
-    <article>
-        <label>This User: </label><output id='o_thisUser'></output><br>
-        <label>This User Socket ID: </label><output id='o_thisUserSoID'></output><br> Currently useable IDs => jfmobile,
-        officechrome, officeff, pc, pcff, pcedge & user[1-4]
-    </article>
-    <article>
-        <label>Logged in Users</label>
-        <ul id='o_LoggedUserList'></ul>
-    </article>
-    <article>
-        <label><input id='i_GroupChat'><button id='b_Send'>Group Send</button></label>
-    </article>
-    <article>
-        <label>Group Message Received</label>
-        <output id='o_Groupchat'></output>
-    </article>
-    <article>
-        <label>Target : </label><output id='o_targetUser'></output><br>
-        <label><input id='i_directChat'><button id='b_directSend'>Direct Send</button></label>
-    </article>
-    <article>
-        <label>Personal Message Received</label>
-        <output id='o_personalChat'></output>
-    </article>
-    <article>
-        <button id="connectButton" name="connectButton" class="buttonleft" disabled>  Connect</button>
-        <button id="disconnectButton" name="disconnectButton" class="buttonright" disabled>  Disconnect</button>
-        <div class="messagebox">
-            <label for="message">Enter a message:<input type="text" name="message" id="message" placeholder="Message text" inputmode="latin" size=60 maxlength=120 disabled>    </label>
-            <button id="sendButton" name="sendButton" class="buttonright" disabled>Send</button>
-            <label>Receive Box</label> <output id='receivebox'></output>
-        </div>
-        <div>
-            <video id="localVideo" controls>No Local Video</video>
-            <video id="remoteVideo" controls>No Remote Video</video>
-        </div>
-    </article>
-
+  <div class="w3-container w3-gray w3-border-black">
+    <video id="selfView">No Video Yet</video>
+    <video id="remoteView">No Video Yet</video>
+  </div>
 </body>
+
+</html>
