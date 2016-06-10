@@ -4,7 +4,7 @@ let debugVar, isCaller
 
 let RTCPeerConnection, sdpConstraints, getUserMedia
 let pcConfig, gumConstraints, pcOptions, dcOptions
-let pc, dc, localStream, RemoteStream, signal, initPCDone = false, localUser = null
+let pc, dc, localStream, remoteStream, localVideo, remoteVideo
 
 let wrtcApp = function () {
 
@@ -18,6 +18,8 @@ let wrtcApp = function () {
 
     let initVars = new Promise(function () {
         // Initialize RTC Specific Parameters
+        localVideo = document.getElementById('selfView')
+        remoteVideo = document.getElementById('remoteView')
         pcConfig = {
             //rtcpMuxPolicy: 'negotiate', bundlePolicy: 'max-compat', RTCIceTransportPolicy: 'all',//To be tested later
             iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
@@ -28,17 +30,26 @@ let wrtcApp = function () {
         switch (detectBrowser().browser) {
             case 'chrome':
                 console.info('Chrome Browser Detected')
-                //RTCPeerConnection = window.webkitRTCPeerConnection
                 sdpConstraints = { mandatory: { 'OfferToReceiveAudio': false, 'OfferToReceiveVideo': false } }
                 break
-
             case 'firefox':
                 console.info('FireFox Browser Detected')
-                //RTCPeerConnection = window.RTCPeerConnection
                 sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
-                //navigator.getUserMedia = navigator.mediaDevices.getUserMedia//Promise based. Equivalent not available in chrome, hence skipping
-                //getUserMedia = Navigator.mozGetUserMedia//Doesnt seem to work right
                 break
+            case 'edge':
+                console.info('Edge Browser Detected')
+                pcConfig =  new  RTCIceGatherOptions()
+                pcConfig.gatherPolicy  =  RTCIceGatherPolicy.all
+                pcConfig.iceServers = [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
+                //{
+                //rtcpMuxPolicy: 'negotiate', bundlePolicy: 'max-compat', RTCIceTransportPolicy: 'all',//To be tested later
+                //iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
+                //}
+                pcOptions = null//{ optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
+                dcOptions = { reliable: true, ordered: false }
+
+                sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
+                //break
 
             default:
                 alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
@@ -53,7 +64,7 @@ let wrtcApp = function () {
         try {
             //console.debug(pcConfig, pcOptions)
             pc = new window.RTCPeerConnection(pcConfig, pcOptions)
-            pc.onaddstream = pcStreamAdded
+            //pc.onaddstream = pcStreamAdded
             pc.ontrack = pcTrackAdded
             pc.ondatachannel = pcDCAdded
             pc.onicecandidate = pcICEReceived
@@ -135,7 +146,13 @@ let wrtcApp = function () {
     let initGUM = new Promise(function (resolve, reject) {
 
         let mediaReady = function (stream) {
-            console.debug('gum mediaReady ->', stream)
+            localStream = stream
+            console.debug('gum mediaReady ->', localStream)
+            if (window.URL) {
+                localVideo.src = window.URL.createObjectURL(localStream)
+            } else {
+                localVideo.src = localStream
+            }
             resolve()
         }
 
@@ -144,21 +161,9 @@ let wrtcApp = function () {
             reject(err)
         }
 
-        switch (detectBrowser().browser) {
-            case 'chrome':
-                navigator.webkitGetUserMedia(gumConstraints, mediaReady, mediaFail)
-                break
-            case 'firefox':
-                //setTimeout(function () {
-                navigator.mediaDevices.getUserMedia(gumConstraints)
-                    .then(mediaReady)
-                    .catch(mediaFail)
-                //}, 2000)
-                break
-            default:
-                alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
-                break
-        }
+        navigator.mediaDevices.getUserMedia(gumConstraints)
+            .then(mediaReady)
+            .catch(mediaFail)
 
         console.log('getUserMedia Called')
     })
