@@ -74,9 +74,6 @@ $(document).ready(() => {
         //Initiate signalling for webrtc
         signallingChannel.init(thisUser, sharedio)
 
-        //Initiate WebRTC Services
-        wrtcApp().init(thisUser)
-
         //log any data received from server
         sharedio.on('s2c', (msg) => {
 

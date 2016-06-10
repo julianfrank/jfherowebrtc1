@@ -34,7 +34,7 @@ let wrtcUI = function () {
             $('#button').click((ev) => {
                 callStarted = true
                 listRefresh()
-                wrtcApp().initPC()
+                wrtcApp().init()
             })
         })
 
@@ -50,4 +50,5 @@ let wrtcUI = function () {
 
     return { updateListView }
 }
-$('document').ready(wrtcUI)//Call init when document is ready
+$('document')//Call init when document is ready
+    .ready(wrtcUI)
