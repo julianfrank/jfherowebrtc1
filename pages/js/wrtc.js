@@ -9,7 +9,7 @@ let pc, dc, localStream, RemoteStream, signal, initPCDone = false, localUser = n
 let wrtcApp = function () {
 
     function init() {
-        return initVars
+        initVars
             .then(initGUM)
             .then(initPC)
             .then(initDC)
@@ -23,22 +23,21 @@ let wrtcApp = function () {
             iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
         }
         pcOptions = { optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
-        gumConstraints = { video: true, audio: false }
+        gumConstraints = { video: false, audio: true }
         dcOptions = { reliable: true, ordered: false }
         switch (detectBrowser().browser) {
             case 'chrome':
                 console.info('Chrome Browser Detected')
-                RTCPeerConnection = window.webkitRTCPeerConnection
+                //RTCPeerConnection = window.webkitRTCPeerConnection
                 sdpConstraints = { mandatory: { 'OfferToReceiveAudio': false, 'OfferToReceiveVideo': false } }
-                getUserMedia = navigator.webkitGetUserMedia
                 break
 
             case 'firefox':
                 console.info('FireFox Browser Detected')
-                RTCPeerConnection = window.RTCPeerConnection
+                //RTCPeerConnection = window.RTCPeerConnection
                 sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
-                //getUserMedia=navigator.mediaDevices.getUserMedia//Promise based. Equivalent not available in chrome, hence skipping
-                getUserMedia = Navigator.mozGetUserMedia
+                //navigator.getUserMedia = navigator.mediaDevices.getUserMedia//Promise based. Equivalent not available in chrome, hence skipping
+                //getUserMedia = Navigator.mozGetUserMedia//Doesnt seem to work right
                 break
 
             default:
@@ -53,7 +52,7 @@ let wrtcApp = function () {
     let initPC = new Promise(function (resolve, reject) {
         try {
             //console.debug(pcConfig, pcOptions)
-            pc = new RTCPeerConnection(pcConfig, pcOptions)
+            pc = new window.RTCPeerConnection(pcConfig, pcOptions)
             pc.onaddstream = pcStreamAdded
             pc.ontrack = pcTrackAdded
             pc.ondatachannel = pcDCAdded
@@ -135,16 +134,30 @@ let wrtcApp = function () {
 
     let initGUM = new Promise(function (resolve, reject) {
 
-        getUserMedia(gumConstraints, mediaReady, mediaFail)
-
-        function mediaReady(stream) {
+        let mediaReady = function (stream) {
             console.debug('gum mediaReady ->', stream)
             resolve()
         }
 
-        function mediaFail(err) {
+        let mediaFail = function (err) {
             console.error('mediaFail Error -> ', err)
             reject(err)
+        }
+
+        switch (detectBrowser().browser) {
+            case 'chrome':
+                navigator.webkitGetUserMedia(gumConstraints, mediaReady, mediaFail)
+                break
+            case 'firefox':
+                //setTimeout(function () {
+                navigator.mediaDevices.getUserMedia(gumConstraints)
+                    .then(mediaReady)
+                    .catch(mediaFail)
+                //}, 2000)
+                break
+            default:
+                alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
+                break
         }
 
         console.log('getUserMedia Called')

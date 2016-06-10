@@ -34,7 +34,7 @@ function initRedis(processObjects) {
                     processObjects.redisSessionStore = new processObjects.redisStore({// create new redis store for Session Management 
                         url: 'redis://' + redisLabURL,
                         client: processObjects.redisClient,
-                        ttl: 1 * 10 * 60,//TTL in Seconds...Set to 10 minutes
+                        ttl: 1 * 60 * 60,//TTL in Seconds...Set to 60 minutes
                         prefix: 'redisSessionStore.'
                     })
                     processObjects.redisSessionStore.client.info((err, reply) => {
