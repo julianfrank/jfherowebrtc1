@@ -10,9 +10,9 @@ let wrtcApp = function () {
 
     function init() {
         return initVars
+            .then(initGUM)
             .then(initPC)
             .then(initDC)
-            .then(initGUM)
             .catch(function (err) { console.error('initCall Error->', err) })
     }
 
@@ -23,7 +23,7 @@ let wrtcApp = function () {
             iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
         }
         pcOptions = { optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
-        gumConstraints = { video: true, audio: true }
+        gumConstraints = { video: true, audio: false }
         dcOptions = { reliable: true, ordered: false }
         switch (detectBrowser().browser) {
             case 'chrome':
@@ -50,8 +50,8 @@ let wrtcApp = function () {
     }, function (err) { console.error('initVars Error->', err) }
     )
 
-    let initPC = new Promise(function () {
-        if (!initPCDone) {
+    let initPC = new Promise(function (resolve, reject) {
+        try {
             //console.debug(pcConfig, pcOptions)
             pc = new RTCPeerConnection(pcConfig, pcOptions)
             pc.onaddstream = pcStreamAdded
@@ -64,6 +64,8 @@ let wrtcApp = function () {
             pc.onremovestream = pcStreamRemoved
             console.log('Peerchannel Initialised')
             updatePCStatus()
+        } catch (error) {
+            console.error('PC Error -> ', error)
         }
 
         function pcStreamAdded(stream) {
@@ -95,11 +97,18 @@ let wrtcApp = function () {
             $('#pcICEGatherState').text(pc.iceGatheringState)
             $('#pcICEConnState').text(pc.iceConnectionState)
         }
-    }, function (err) { console.error('PC Error -> ', err) }
-    )
 
-    let initDC = new Promise(function () {
-        dc = pc.createDataChannel('jfwrtc', dcOptions)
+        resolve()
+    })
+
+    let initDC = new Promise(function (resolve, reject) {
+        try {
+            dc = pc.createDataChannel('jfwrtc', dcOptions)
+        } catch (error) {
+            console.error('DC Error -> ', error)
+            reject(error)
+        }
+
         dc.onopen = dcOpened
         dc.onclose = dcClosed
         dc.onmessage = dcMessage
@@ -120,23 +129,26 @@ let wrtcApp = function () {
             console.log('dc.onerror->', x)
         }
         function updateDCStatus() { $('#dcReadyState').text(dc.readyState) }
-    }, function (err) { console.error('DC Error -> ', err) }
-    )
 
-    let initGUM = new Promise(function () {
+        resolve()
+    })
+
+    let initGUM = new Promise(function (resolve, reject) {
+
+        getUserMedia(gumConstraints, mediaReady, mediaFail)
 
         function mediaReady(stream) {
             console.debug('gum mediaReady ->', stream)
+            resolve()
         }
 
         function mediaFail(err) {
             console.error('mediaFail Error -> ', err)
+            reject(err)
         }
 
-        getUserMedia(gumConstraints, mediaReady, mediaFail)
         console.log('getUserMedia Called')
-    }, function (err) { console.error('GUM Error -> ', err) }
-    )
+    })
 
     function signalHandler(msg) {
         console.log('Received Message->', msg)
@@ -144,8 +156,3 @@ let wrtcApp = function () {
 
     return { init, signalHandler }
 }
-/*
-$('document')//Call init when document is ready
-    .ready(function () {
-        wrtcApp().init()
-    })*/
