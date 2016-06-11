@@ -6,6 +6,9 @@ let RTCPeerConnection, sdpConstraints, getUserMedia
 let pcConfig, gumConstraints, pcOptions, dcOptions
 let pc, dc, localStream, remoteStream, localVideo, remoteVideo
 
+let VideoReadyStates = ['Nothing', 'MetaData', 'CurrentData', 'FutureData', 'EnoughData'],
+    VideoNetworkStates = ['Empty', 'Idle', 'Loading', 'NoSource']
+
 let wrtcApp = function () {
 
     function init() {
@@ -25,21 +28,24 @@ let wrtcApp = function () {
             iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
         }
         pcOptions = { optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
-        gumConstraints = { video: false, audio: true }
         dcOptions = { reliable: true, ordered: false }
         switch (detectBrowser().browser) {
             case 'chrome':
                 console.info('Chrome Browser Detected')
+                gumConstraints = { video: true, audio: true }
                 sdpConstraints = { mandatory: { 'OfferToReceiveAudio': false, 'OfferToReceiveVideo': false } }
                 break
             case 'firefox':
                 console.info('FireFox Browser Detected')
+                let getSupportedConstraints = navigator.mediaDevices.getSupportedConstraints(); console.debug(getSupportedConstraints)
+                navigator.mediaDevices.enumerateDevices().then(function (x) { console.debug(x) })
+                gumConstraints = { video: true, audio: true }
                 sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
                 break
             case 'edge':
                 console.info('Edge Browser Detected')
-                pcConfig =  new  RTCIceGatherOptions()
-                pcConfig.gatherPolicy  =  RTCIceGatherPolicy.all
+                pcConfig = new RTCIceGatherOptions()
+                pcConfig.gatherPolicy = RTCIceGatherPolicy.all
                 pcConfig.iceServers = [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
                 //{
                 //rtcpMuxPolicy: 'negotiate', bundlePolicy: 'max-compat', RTCIceTransportPolicy: 'all',//To be tested later
@@ -49,7 +55,7 @@ let wrtcApp = function () {
                 dcOptions = { reliable: true, ordered: false }
 
                 sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
-                //break
+            //break
 
             default:
                 alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
@@ -148,15 +154,35 @@ let wrtcApp = function () {
         let mediaReady = function (stream) {
             localStream = stream
             console.debug('gum mediaReady ->', localStream)
-            if (window.URL) {
-                localVideo.src = window.URL.createObjectURL(localStream)
-            } else {
-                localVideo.src = localStream
+            switch (detectBrowser().browser) {
+                case 'chrome':
+                    localVideo.srcObject = localStream
+                    break
+                case 'firefox':
+                    localVideo.srcObject = localStream
+                    break
+                default:
+                    alert('Unsupported Browser -> ' + JSON.stringify(detectBrowser()))
+                    localVideo.srcObject = localStream
+                    break
+            }
+            updateLocalVideoStats()
+            localVideo.oncanplay = function () {
+                console.log('oncanplay')
+                localVideo.play()
+                localVideo.muted = true
+                updateLocalVideoStats()
             }
             resolve()
         }
 
-        let mediaFail = function (err) {
+        function updateLocalVideoStats() {
+            $('#LVreadyState').text(VideoReadyStates[localVideo.readyState])
+            $('#LVnetworkState').text(VideoNetworkStates[localVideo.networkState])
+            $('#LVsize').text(localVideo.videoWidth + '*' + localVideo.videoHeight)
+        }
+
+        function mediaFail(err) {
             console.error('mediaFail Error -> ', err)
             reject(err)
         }
