@@ -34,7 +34,7 @@ let wrtcUI = function () {
             $('#button').click((ev) => {
                 callStarted = true
                 listRefresh()
-                wrtcApp().call(true)
+                wrtcApp().call({ type: 'newCall' })
             })
         })
 

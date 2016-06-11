@@ -11,15 +11,11 @@ let VideoReadyStates = ['Nothing', 'MetaData', 'CurrentData', 'FutureData', 'Eno
 
 function wrtcApp() {
 
-    function call(isCaller) {
-        initVars()
-            .then(initGUM)
-            .then(initPC)
-            .then(initDC)
-            .catch(function (err) { console.error('initCall Error->', err) })
+    function call(callParams) {
+        initVars(callParams).then(initGUM).then(initPC).then(initDC).catch(function (err) { console.error('initCall Error->', err) })
     }
 
-    let initVars = function (isCaller) {
+    function initVars(callParams) {
         return new Promise(function (resolve, reject) {
 
             // Initialize RTC Specific Parameters
@@ -35,14 +31,14 @@ function wrtcApp() {
                 case 'chrome':
                     console.info('Chrome Browser Detected')
                     gumConstraints = { video: true, audio: true }
-                    sdpConstraints = { mandatory: { 'OfferToReceiveAudio': false, 'OfferToReceiveVideo': false } }
+                    sdpConstraints = { mandatory: { 'OfferToReceiveAudio': true, 'OfferToReceiveVideo': true } }
                     break
                 case 'firefox':
                     console.info('FireFox Browser Detected')
                     let getSupportedConstraints = navigator.mediaDevices.getSupportedConstraints(); console.info(getSupportedConstraints)
                     navigator.mediaDevices.enumerateDevices().then(function (x) { console.info(x) })
                     gumConstraints = { video: true, audio: true }
-                    sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
+                    sdpConstraints = { mandatory: { 'offerToReceiveAudio': true, 'offerToReceiveVideo': true } }
                     break
                 case 'edge':
                     console.info('Edge Browser Detected')
@@ -56,7 +52,7 @@ function wrtcApp() {
                     pcOptions = null//{ optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
                     dcOptions = { reliable: true, ordered: false }
 
-                    sdpConstraints = { mandatory: { 'offerToReceiveAudio': false, 'offerToReceiveVideo': false } }
+                    sdpConstraints = { mandatory: { 'offerToReceiveAudio': true, 'offerToReceiveVideo': true } }
                 //break
 
                 default:
@@ -65,16 +61,16 @@ function wrtcApp() {
                     break
             }
             console.info('wrtcApp Initialized')
-            resolve(isCaller)
+            resolve(callParams)
         })
     }
 
-    let initPC = function (isCaller) {
+    function initPC(callParams) {
         return new Promise(function (resolve, reject) {
             try {
                 //console.info(pcConfig, pcOptions)
                 pc = new window.RTCPeerConnection(pcConfig, pcOptions)
-                //pc.onaddstream = pcStreamAdded
+                pc.onaddstream = pcStreamAdded
                 pc.ontrack = pcTrackAdded
                 pc.ondatachannel = pcDCAdded
                 pc.onicecandidate = pcICEReceived
@@ -100,8 +96,8 @@ function wrtcApp() {
             function pcStreamRemoved(x) {
                 console.info('onremovestream', x)
             }
-            function pcICEReceived(x) {
-                console.info('onicecandidate', x)
+            function pcICEReceived(RTCIceCandidateEvent) {
+                console.info('onicecandidate', RTCIceCandidateEvent.candidate)
             }
             function pcICEStateChanged(x) {
                 console.info('oniceconnectionstatechange', x)
@@ -113,14 +109,47 @@ function wrtcApp() {
             }
             function pcNegNeeded(event) {
                 console.info('onnegotiationneeded')
-                return pc.createOffer().then(offerReady).catch(pcError)
+                switch (callParams.type) {
+                    case 'newCall':
+                        pc.createOffer().then(offerReady).catch(pcError)
+                        break
+                    case 'incomingCall':
+                        //console.debug(callParams.sdp)
+                        offerReceived(new RTCSessionDescription(callParams.sdp))
+                        break
+                    default:
+                        console.error('Invalid Call Params -> ', callParams)
+                        break
+                }
             }
             function offerReady(sdp) {
                 console.info('offer ready')
-                return (pc.signalingState === "have-local-offer") ? pcError('Skipping setLocalDescription') : pc.setLocalDescription(sdp).then(localSDPset).catch(pcError)
-                function localSDPset() {//Nothing gets passed here hence moving the function definition inside offerReady to use the sdp
-                    console.info('Local Desciption is Set ->', sdp)
-                    signallingChannel.send({ type: 'sdp', message: sdp })
+                let offerSDP = new window.RTCSessionDescription(sdp)
+                return (pc.signalingState === "have-local-offer") ? pcError('setLocalDescription already set...Skipping') : pc.setLocalDescription(offerSDP).then(sendOfferSDP).catch(pcError)
+                function sendOfferSDP() {//Nothing gets passed here hence moving the function definition inside offerReady to use the sdp
+                    console.info('Local Desciption is Set with Offer')
+                    signallingChannel.send({ type: 'sdp', message: offerSDP })
+                }
+            }
+            function offerReceived(sdp) {
+                console.info('Offer received')
+                pc.setRemoteDescription(sdp).then(remoteSDPset).then(prepareResponseSDP).catch(pcError)//[KNOWN PROBLEM]Firefox SDP is not accepted in Chrome
+                function remoteSDPset() {//Nothing gets passed here hence moving the function definition inside offerReady to use the sdp
+                    console.info('Remote Desciption is Set')
+                    //signallingChannel.send({ type: 'sdp', message: sdp })
+                }
+                function prepareResponseSDP() {
+                    console.info('createAnswer Initiated')
+                    pc.createAnswer(sdpConstraints).then(replyReady).catch(pcError)
+                }
+                function replyReady(sdp) {
+                    console.info('Answer ready', sdp)
+                    let answerSDP = new window.RTCSessionDescription(sdp)
+                    return (pc.signalingState === "stable") ? pcError('State is Stable...Skipping') : pc.setLocalDescription(answerSDP).then(sendReplySDP).catch(pcError)
+                    function sendReplySDP() {//Nothing gets passed here hence moving the function definition inside offerReady to use the sdp
+                        console.info('Local Desciption is Set with Answer'); alert('stop')
+                        signallingChannel.send({ type: 'sdp', message: answerSDP })
+                    }
                 }
             }
 
@@ -133,11 +162,11 @@ function wrtcApp() {
                 $('#pcICEConnState').text(pc.iceConnectionState)
             }
 
-            resolve(isCaller)
+            resolve(callParams)
         })
     }
 
-    let initDC = function (isCaller) {
+    function initDC(callParams) {
         return new Promise(function (resolve, reject) {
             try {
                 dc = pc.createDataChannel('jfwrtc', dcOptions)
@@ -167,11 +196,11 @@ function wrtcApp() {
             }
             function updateDCStatus() { $('#dcReadyState').text(dc.readyState) }
 
-            resolve(isCaller)
+            resolve(callParams)
         })
     }
 
-    let initGUM = function (isCaller) {
+    function initGUM(callParams) {
         return new Promise(function (resolve, reject) {
 
             let mediaReady = function (stream) {
@@ -195,8 +224,9 @@ function wrtcApp() {
                     localVideo.play()
                     localVideo.muted = true
                     updateLocalVideoStats()
+                    pc.addStream(localStream)
                 }
-                resolve(isCaller)
+                resolve(callParams)
             }
 
             function updateLocalVideoStats() {
@@ -210,20 +240,60 @@ function wrtcApp() {
                 reject(err)
             }
 
-            navigator.mediaDevices.getUserMedia(gumConstraints)
-                .then(mediaReady)
-                .catch(mediaFail)
+            switch (callParams.type) {
+                case 'newCall':
+                    navigator.mediaDevices.getUserMedia(gumConstraints).then(mediaReady).catch(mediaFail)
+                    break
+                case 'incomingCall':
+                    //[TODO]Incoming Call handler in UI -> Send Local Video Option to be aded later
+                    //[TODO]change video to true when testing across different machines
+                    navigator.mediaDevices.getUserMedia({ audio: true, video: false }).then(mediaReady).catch(mediaFail)
+                    break
+                default:
+                    console.error('Invalid Call Params -> ', callParams)
+                    break
+            }
+
 
             console.info('getUserMedia Called')
         })
     }
 
-    function signalHandler(msg) {
-        console.info('Received Message->', msg)
-    }
-
     function sigHandlerExport() {
-        return signalHandler
+
+        return function (msg) {
+            let remoteMsg = msg.message
+            switch (remoteMsg.type) {
+
+                case 'sdp':
+                    let sdpMsg = remoteMsg.message
+
+                    switch (sdpMsg.type) {
+                        case 'offer':
+                            targetEmailID = signallingChannel.setTarget(msg.from)
+                            console.info('SDP Offer Message->', sdpMsg)
+                            call({ type: 'incomingCall', sdp: sdpMsg })
+                            break
+                        case 'answer':
+                            console.info('SDP Answer Message->', sdpMsg)
+                            pc.setRemoteDescription(sdpMsg)
+                            break
+                        default:
+                            console.error('Unknown SDP Message->', sdpMsg)
+                            break
+                    }
+
+                    break
+
+                case 'ice':
+                    console.info('ICE Message->', remoteMsg.message)
+                    break
+
+                default:
+                    console.error('Unknown Message->', remoteMsg)
+                    break
+            }
+        }
     }
 
     return { call, sigHandlerExport }
