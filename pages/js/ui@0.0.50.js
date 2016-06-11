@@ -34,14 +34,13 @@ let wrtcUI = function () {
             $('#button').click((ev) => {
                 callStarted = true
                 listRefresh()
-                wrtcApp().init()
+                wrtcApp().call(true)
             })
         })
 
     function setTarget(email) {
         $('#targetUser').text(email.slice(0, -24))
         signallingChannel.setTarget(email)
-        isCaller = true
         $('#button')
             .removeClass('w3-disabled')
             .addClass('w3-light-green w3-hover-green w3-padding')
