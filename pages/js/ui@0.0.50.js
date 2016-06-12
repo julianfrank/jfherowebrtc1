@@ -17,9 +17,9 @@ let wrtcUI = function () {
         dataArray.map((val) => {
             if ((val != filter) && (val.length > 1)) {
                 if (callStarted) {
-                    $(target).append("<div class = 'w3-btn w3-disabled' id='" + val + "'>" + val + "</div>")
+                    $(target).append("<div class = 'w3-tag w3-disabled' id='" + val + "'>" + val + "</div>")
                 } else {
-                    $(target).append("<div class = 'w3-btn w3-hover-indigo' id='" + val + "'>" + val + "</div>")
+                    $(target).append("<div class = 'w3-tag w3-hover-indigo' id='" + val + "'>" + val + "</div>")
                 }
 
             }

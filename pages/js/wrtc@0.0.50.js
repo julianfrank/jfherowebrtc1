@@ -12,7 +12,11 @@ let VideoReadyStates = ['Nothing', 'MetaData', 'CurrentData', 'FutureData', 'Eno
 function wrtcApp() {
 
     function call(callParams) {
-        initVars(callParams).then(initPC).then(initGUM).then(initDC).catch(function (err) { console.error('initCall Error->', err) })
+        initVars(callParams)
+            .then(initPC)
+            .then(initGUM)
+            //.then(initDC)
+            .catch(function (err) { console.error('initCall Error->', err) })
     }
 
     function initVars(callParams) {
@@ -23,7 +27,7 @@ function wrtcApp() {
             remoteVideo = document.getElementById('remoteView')
             pcConfig = {
                 //rtcpMuxPolicy: 'negotiate', bundlePolicy: 'max-compat', RTCIceTransportPolicy: 'all',//To be tested later
-                iceServers: [{ urls: 'stun:stun.services.mozilla.com' }]//, { urls: 'stun:stun.l.google.com:19302' }]
+                iceServers: [{ urls: 'stun:stun.services.mozilla.com' }, { urls: 'stun:stun.l.google.com:19302' }]
             }
             pcOptions = { optional: [{ DtlsSrtpKeyAgreement: true }, { RtpDataChannels: true }] }
             dcOptions = { reliable: true, ordered: false }
@@ -86,8 +90,8 @@ function wrtcApp() {
 
             function pcStreamAdded(MediaStreamEvent) {
                 console.info('onaddstream', MediaStreamEvent.stream.id)
-                //remoteStream = MediaStreamEvent.stream
-                //addRemoteStream(MediaStreamEvent.stream)
+                remoteStream = MediaStreamEvent.stream
+                addRemoteStream(MediaStreamEvent.stream)
             }
             function pcTrackAdded(event) {
                 console.info('ontrack', event.streams[0].id)
@@ -127,7 +131,11 @@ function wrtcApp() {
             function pcICEStateChanged(Eventx) {
                 console.info('oniceconnectionstatechange', pc.iceConnectionState, callParams.type)
                 updatePCStatus()
-                if (pc.iceConnectionState === 'completed') { pc.addStream(localStream) }
+                if (pc.iceConnectionState === 'completed') {
+                    console.info('Adding Local Stream to pc ', localStream.id)
+                    pc.addStream(localStream)
+                    //initDC().catch(function (err) { console.error('initDC Error->', err) })
+                }
             }
             function pcSIGChanged(signalingstatechange) {
                 //console.info('onsignalingstatechange', signalingstatechange )
@@ -166,7 +174,7 @@ function wrtcApp() {
                 }
                 function prepareResponseSDP() {
                     console.info('createAnswer Initiated')
-                    pc.createAnswer(sdpConstraints).then(replyReady).catch(pcError)
+                    pc.createAnswer(/*sdpConstraints*/).then(replyReady).catch(pcError)
                 }
                 function replyReady(sdp) {
                     console.info('Answer ready')
@@ -258,7 +266,7 @@ function wrtcApp() {
                     localVideo.play()
                     localVideo.muted = true
                     updateLocalVideoStats()
-                    //pc.addStream(localStream)
+                    pc.addStream(localStream)
                 }
                 resolve(callParams)
             }
@@ -322,8 +330,8 @@ function wrtcApp() {
 
                 case 'ice':
                     console.info('ICE Message->', remoteMsg.iceMsg.sdpMid)
-                    pc.addIceCandidate(new window.RTCIceCandidate(remoteMsg.iceMsg))
-                        .catch(function (err) { console.error('Error while addICE ', err) })
+                    if (pc.iceConnectionState != 'new') pc.addIceCandidate(new window.RTCIceCandidate(remoteMsg.iceMsg))
+                        .catch(function (err) { console.error('Error while addICE ', err + pc.iceConnectionState) })
                     break
 
                 default:

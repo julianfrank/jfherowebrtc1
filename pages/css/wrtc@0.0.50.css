@@ -1,4 +1,4 @@
-#selfView{position: absolute;left:4%;top:4%; z-index: 10 ;opacity: 0.5}
+#selfView{position: absolute;right:4%;bottom:4%; z-index: 10 ;opacity: 0.5; height: 50%}
 #remoteView{z-index: 0}
 
 #videoBar{position: relative;top:0; }
