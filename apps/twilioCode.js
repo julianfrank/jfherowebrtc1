@@ -27,10 +27,11 @@ let initTwilio = (processObjects) => {
                 capArray.map((val, ind, array) => {
                     switch (val) {
                         case 'in':
-                            twCap.allowClientIncoming(user)
+                            twCap.allowClientIncoming('client:' + user)
                             break
                         case 'out':
                             twCap.allowClientOutgoing(outtwiMLSID)
+                            //twCap.allowClientOutgoing('APabe7650f654fc34655fc81ae71caa3ff')
                             break
                         default:
                             log('error', 'Unknown twilio Capability code provided -> ' + val, logMeta)
@@ -59,16 +60,21 @@ let initTwilio = (processObjects) => {
         app.get('/twilioApp', (req, res) => {
             res.contentType('text/html')
             userMan.getLoggedUsers().then((userList) => {
-                let userInfo = {
-                    user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),
-                    appVer: helpers.readPackageJSON(__dirname, "version"),
-                    loggedUserList: userList
-                }
-                if (req.isAuthenticated()) {
-                    res.render('twilioApp.html', userInfo)
-                } else {
-                    res.render('jfmain.html', userInfo)
-                }
+                let thisUser = (req.session.passport) ? (req.session.passport.user) : ('Guest')
+                processObjects.genTwCap(thisUser, ['in', 'out']).then((token) => {
+                    let userInfo = {
+                        user: thisUser,
+                        appVer: helpers.readPackageJSON(__dirname, "version"),
+                        loggedUserList: userList,
+                        twToken: token
+                    }
+                    if (req.isAuthenticated()) {
+                        res.render('twilioApp.html', userInfo)
+                    } else {
+                        res.render('jfmain.html', userInfo)
+                    }
+                })
+
             })
         })
 

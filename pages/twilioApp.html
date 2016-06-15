@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="/css/twilioapp@0.0.50.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src="https://media.twiliocdn.com/sdk/js/client/v1.3/twilio.min.js" type="text/javascript"></script>
   <script src='/socket.io/socket.io.js'></script>
 
   <script src="/js/twilioappui@0.0.50.js"></script>
@@ -26,40 +27,17 @@
       <div id="targetUser" class="w3-card w3-leftbar w3-col s8">Nobody</div>
     </div>
     <div id='title' class=" w3-article w3-col s2 w3-center">Twilio Demo</div>
-    <div id='button' class="w3-btn w3-col s2 w3-disabled">Unassigned Button</div>
+    <div id='callButton' class="w3-btn w3-col s2 w3-disabled">Call</div>
     <div id='userList' class="w3-row-padding w3-rest">Logged User List</div>
   </div>
 
   <div class="w3-row w3-dark-grey w3-border-grey w3-small">
     <div class="w3-card w3-col s12">
       <div class="w3-card">
-        pcSigState:
-        <div class="w3-tag w3-light-grey" id="pcSigState"></div>
-        pcICEGatherState:
-        <div class="w3-tag w3-light-grey" id="pcICEGatherState"></div>
-        pcICEConnState:
-        <div class="w3-tag w3-light-grey" id="pcICEConnState"></div>
-        dcReadyState:
-        <div class="w3-tag w3-light-grey" id="dcReadyState"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="w3-row w3-dark-grey w3-border-grey w3-small">
-    <div class="w3-card w3-col s12">
-      <div class="w3-card">
-        LocalVideo->readyState:
-        <div class="w3-tag w3-light-grey" id="LVreadyState">_</div>
-        networkState:
-        <div class="w3-tag w3-light-grey" id="LVnetworkState">_</div>
-        Size
-        <div class="w3-tag w3-light-grey" id="LVsize">_</div>
-        RemoteVideo->readyState:
-        <div class="w3-tag w3-light-grey" id="RVreadyState">_</div>
-        networkState:
-        <div class="w3-tag w3-light-grey" id="RVnetworkState">_</div>
-        Size
-        <div class="w3-tag w3-light-grey" id="RVsize">_</div>
+        tbd:
+        <div class="w3-tag w3-light-grey" id="tbd1">_tbd1_</div>
+        tbd:
+        <div class="w3-tag w3-light-grey" id="tbd2">_tbd2_</div>
       </div>
     </div>
   </div>
