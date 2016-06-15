@@ -37,6 +37,40 @@ let addSocketIOServices = (processObjects) => {
                         })
                 })
 
+                let sendReady = (user) => {
+                    userMan.getLoggedUsers()
+                        .then((newDir) => {
+                            socket.broadcast.emit('s2c', {
+                                event: 'ready',
+                                socketID: socket.id,
+                                userID: user,
+                                newDir: newDir
+                            })
+                        })
+                }
+                let sendDirUpdate = () => {
+                    userMan.getLoggedUsers()
+                        .then((newDir) => {
+                            socket.broadcast.emit('s2c', {
+                                event: 'dirUpdated',
+                                newDir: newDir
+                            })
+                        })
+                }
+                socket.on('disconnect', () => {
+                    log('info', socket.id + ' has Disconnected', logMeta)
+                    log('info', 'Going to remove socketid ' + socket.id, logMeta)
+                    userMan.removeSocket(socket.id, (status, err) => {
+                        if (status) {
+                            socket.emit('s2c', log('info', socket.id + ' Removed', logMeta))
+                        } else {
+                            socket.emit('s2c', log('error', socket.id + ' Remove Failed with error -> ' + err, logMeta))
+                        }
+                    })
+                    sendDirUpdate()
+                })
+                socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
+
                 socket.on('c2s', (msg) => {
                     log('info', 'shared Client says ' + JSON.stringify(msg), logMeta)
                     switch (msg.event) {
@@ -45,14 +79,12 @@ let addSocketIOServices = (processObjects) => {
                             log('info', 'Going to update username ' + msg.username + ' to ' + socket.id, logMeta)
                             userMan.addSocket(socket.id, msg.username, (status, err) => {
                                 if (status) {
-                                    socket.emit('s2c', { event: 'socketCacheSuccess', socketID: socket.id, user: msg.username })
+                                    //socket.emit('s2c', { event: 'socketCacheSuccess', socketID: socket.id, user: msg.username })
                                 } else {
                                     socket.emit('s2c', { event: 'socketCacheFail', socketID: socket.id, error: err })
                                 }
                             })
-                            processObjects.sendReady(msg.username)
-                            userMan.getLoggedUsers().then((newDir) => { socket.broadcast.emit('s2c', { event: 'dirUpdated', newDir: newDir }) })
-
+                            sendReady(msg.username)
                             break
 
                         case 'groupChatMsg':
@@ -95,26 +127,6 @@ let addSocketIOServices = (processObjects) => {
                     }
                 })
 
-                processObjects.sendReady = (user) => {
-                    socket.emit('s2c', {
-                        event: 'ready',
-                        socketID: socket.id,
-                        userID: user
-                    })
-                }
-                socket.on('disconnect', () => {
-                    log('info', socket.id + ' has Disconnected', logMeta)
-                    log('info', 'Going to remove socketid ' + socket.id, logMeta)
-                    userMan.removeSocket(socket.id, (status, err) => {
-                        if (status) {
-                            socket.emit('s2c', log('info', socket.id + ' Removed', logMeta))
-                        } else {
-                            socket.emit('s2c', log('error', socket.id + ' Remove Failed with error -> ' + err, logMeta))
-                        }
-                    })
-                    userMan.getLoggedUsers().then((newDir) => { socket.broadcast.emit('s2c', { event: 'dirUpdated', newDir: newDir }) })
-                })
-                socket.on('error', (err) => { log('error', socket.id + '\t:Error in sharedio Socket Service->' + err, logMeta) })
             })
 
         process.nextTick(() => resolve(processObjects))

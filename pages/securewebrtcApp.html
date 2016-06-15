@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <title>JF fbwrtc - Secure WebRTC App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="/css/w3@0.0.50.css">
+  <link rel="stylesheet" href="/css/wrtc@0.0.50.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+  <script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>
+  <script src='/socket.io/socket.io.js'></script>
+
+  <script src="/js/browserDetect@0.0.50.js"></script>
+  <script src="/js/ui@0.0.50.js"></script>
+  <script src="/js/sio@0.0.50.js"></script>
+  <script src="/js/wrtc@0.0.50.js"></script>
+</head>
+
+<body class="w3-content">
+  <div class="w3-row-padding w3-indigo w3-border">
+    <div class="w3-row-padding w3-col s4">
+      <div class="w3-label w3-text-white w3-col s4">thisUser</div>
+      <div id="thisUser" class="w3-card w3-left-bar w3-col s8">Unauthorised User</div>
+      <div class="w3-label w3-text-white w3-col s4">targetUser</div>
+      <div id="targetUser" class="w3-card w3-leftbar w3-col s8">Nobody</div>
+    </div>
+    <div id='title' class=" w3-article w3-col s2 w3-center">WebRTC Demo</div>
+    <div id='button' class="w3-btn w3-col s2 w3-disabled">Unassigned Button</div>
+    <div id='userList' class="w3-row-padding w3-rest">User List</div>
+  </div>
+
+  <div class="w3-row w3-dark-grey w3-border-grey w3-small">
+    <div class="w3-card w3-col s12">
+      <div class="w3-card">
+        pcSigState:
+        <div class="w3-tag w3-light-grey" id="pcSigState"></div>
+        pcICEGatherState:
+        <div class="w3-tag w3-light-grey" id="pcICEGatherState"></div>
+        pcICEConnState:
+        <div class="w3-tag w3-light-grey" id="pcICEConnState"></div>
+        dcReadyState:
+        <div class="w3-tag w3-light-grey" id="dcReadyState"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="w3-row w3-dark-grey w3-border-grey w3-small">
+    <div class="w3-card w3-col s12">
+      <div class="w3-card">
+        LocalVideo->readyState:
+        <div class="w3-tag w3-light-grey" id="LVreadyState">_</div>
+        networkState:
+        <div class="w3-tag w3-light-grey" id="LVnetworkState">_</div>
+        Size
+        <div class="w3-tag w3-light-grey" id="LVsize">_</div>
+        RemoteVideo->readyState:
+        <div class="w3-tag w3-light-grey" id="RVreadyState">_</div>
+        networkState:
+        <div class="w3-tag w3-light-grey" id="RVnetworkState">_</div>
+        Size
+        <div class="w3-tag w3-light-grey" id="RVsize">_</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="videoBar" class="w3-container w3-gray w3-border-black">
+    <div class="w3-card w3-center">
+      <video id="selfView" autoplay="true" controls="true">No Video Yet</video>
+    </div>
+    <div class="w3-card">
+      <video id="remoteView" autoplay="true" controls="true">No Video Yet</video>
+    </div>
+  </div>
+</body>
+
+</html>

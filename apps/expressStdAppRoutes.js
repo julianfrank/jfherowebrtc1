@@ -12,17 +12,17 @@ let addAppRoutes = (processObjects) => {
         let app = processObjects.app
         let userMan = processObjects.userManager
 
-        app.all('/loaderio-25e297b4d9d2c6ecdb00afc5a49519f4', (req, res) => {// Need this to load test using loader.io
+        app.get('/loaderio-25e297b4d9d2c6ecdb00afc5a49519f4', (req, res) => {// Need this to load test using loader.io
             res.contentType('text/html')
             res.render('loaderio-25e297b4d9d2c6ecdb00afc5a49519f4.html')
         })
 
-        app.all('/favicon.ico', (req, res) => {// Show my Pretty Face ;) on the favicon area
+        app.get('/favicon.ico', (req, res) => {// Show my Pretty Face ;) on the favicon area
             res.contentType('image/x-icon')
             res.redirect('/static/favicon.ico')//[TODO] Try to implement cache so file need not be read for each request
         })
 
-        app.all('/', (req, res) => {// Main page
+        app.get('/', (req, res) => {// Main page
             res.contentType('text/html')
             userMan.getLoggedUsers().then((userList) => {
                 let userInfo = {
@@ -31,7 +31,23 @@ let addAppRoutes = (processObjects) => {
                     loggedUserList: userList
                 }
                 if (req.isAuthenticated()) {
-                    res.render('secureApp.html', userInfo)
+                    res.render('secureMenu.html', userInfo)
+                } else {
+                    res.render('jfmain.html', userInfo)
+                }
+            })
+        })
+
+        app.get('/adapterRTC', (req, res) => {// Adapter rTC Page
+            res.contentType('text/html')
+            userMan.getLoggedUsers().then((userList) => {
+                let userInfo = {
+                    user: (req.session.passport) ? (req.session.passport.user) : ('Guest'),
+                    appVer: helpers.readPackageJSON(__dirname, "version"),
+                    loggedUserList: userList
+                }
+                if (req.isAuthenticated()) {
+                    res.render('securewebrtcApp.html', userInfo)
                 } else {
                     res.render('jfmain.html', userInfo)
                 }

@@ -2,10 +2,10 @@ function workerApp() {
     'use strict'
     //Add-on Modules
     const helpers = require('../apps/helpers')
-    const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 80
     const log = helpers.remoteLog
     let logMeta = { js: 'workerApp.js' }
-    const check = helpers.checkLog
+    //const check = helpers.checkLog
+    const port = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 80
 
     //Key Libraries
     const express = require('express')
@@ -22,7 +22,6 @@ function workerApp() {
     //Mongoose for Database
     const mongoose = require('mongoose')
     let mongoConnection = mongoose.connection
-    // array to hold logged in users
 
     //User Manager Initialization
     const addUserManager = require('../apps/userManager').addUserManager
@@ -52,6 +51,10 @@ function workerApp() {
     const initMongoose = require('../apps/mongooseCode').initMongoose
     const closeMongoose = require('../apps/mongooseCode').closeMongoose
 
+    //Twilio Initialisaton
+    const initTwilio = require('../apps/twilioCode').initTwilio
+    const closeTwilio = require('../apps/twilioCode').closeTwilio
+
     //Start Server
     const startServer = () => {
         log('info', 'Going to start ' + app.locals.name + '. Press Control+C to Exit', logMeta)
@@ -67,6 +70,7 @@ function workerApp() {
     const stopProcess = (reason) => {
         log('warn', 'About to exit due to ' + reason, logMeta)
         closeMongoose(thisProcessObjects)
+            .then(closeTwilio)
             .then(quitRedis)
             .then(quitUMRedis)
             .then(quitSIOPubRedis)
@@ -88,7 +92,7 @@ function workerApp() {
     process.on('SIGINT', () => { stopProcess('SIGINT') });
 
     //Object Packaged to be passed between Boot Loader and Unloaders
-    const thisProcessObjects = {
+    const thisProcessObjects = {//[TODO]To be cleaned up with only variables initialised in workerApp to be placed here
         server: server, port: port, io: io,
         express: express, app: app, expressSession: expressSession, passport: passport,
         redis: redis, redisStore: redisStore,
@@ -109,6 +113,7 @@ function workerApp() {
         .then(addAzAdRoutes)
         .then(addSignalRoutes)
         .then(addAppRoutes)
+        .then(initTwilio)
         .then(addLastRoute)
         .then(startServer)
         .catch(stopProcess)

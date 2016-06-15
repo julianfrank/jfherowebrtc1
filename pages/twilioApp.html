@@ -3,20 +3,18 @@
 
 <head>
   <meta charset="utf-8">
-  <title>JF fbwrtc</title>
+  <title>JF fbwrtc - Secure Twilio App</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link rel="stylesheet" href="/css/w3@0.0.50.css">
-  <link rel="stylesheet" href="/css/wrtc@0.0.50.css">
+  <link rel="stylesheet" href="/css/twilioapp@0.0.50.css">
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
-  <script src='https://webrtc.github.io/adapter/adapter-latest.js'></script>
   <script src='/socket.io/socket.io.js'></script>
 
-  <script src="/js/browserDetect@0.0.50.js"></script>
-  <script src="/js/ui@0.0.50.js"></script>
-  <script src="/js/sio@0.0.50.js"></script>
-  <script src="/js/wrtc@0.0.50.js"></script>
+  <script src="/js/twilioappui@0.0.50.js"></script>
+  <script src="/js/twiliosio@0.0.50.js"></script>
+  <script src="/js/twilioapp@0.0.50.js"></script>
 </head>
 
 <body class="w3-content">
@@ -27,10 +25,9 @@
       <div class="w3-label w3-text-white w3-col s4">targetUser</div>
       <div id="targetUser" class="w3-card w3-leftbar w3-col s8">Nobody</div>
     </div>
-    <div id='title' class=" w3-article w3-col s2 w3-center w3-rest">WebRTC Demo</div>
+    <div id='title' class=" w3-article w3-col s2 w3-center">Twilio Demo</div>
     <div id='button' class="w3-btn w3-col s2 w3-disabled">Unassigned Button</div>
-    <div id='userList' class="w3-row-padding w3-rest">User List</div>
-
+    <div id='userList' class="w3-row-padding w3-rest">Logged User List</div>
   </div>
 
   <div class="w3-row w3-dark-grey w3-border-grey w3-small">
