@@ -7,7 +7,7 @@ const inspect = require('util').inspect
 
 const twASID = process.env.TWASID || require('../secrets.js').twAccountSid
 const twAuthToken = process.env.TWAUTHTOKEN || require('../secrets.js').twAuthToken
-const outtwiMLSID = process.env.TWAUTHTOKEN || require('../secrets.js').twOUTTwiMLSID
+const outtwiMLSID = process.env.TWTWIMLSID || require('../secrets.js').twOUTTwiMLSID
 
 let initTwilio = (processObjects) => {
     log('info', 'Initializing Twilio-node Service', logMeta)

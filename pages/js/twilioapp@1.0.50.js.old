@@ -1,5 +1,4 @@
 function twApp() {
-    
     Twilio.Device.setup(serverSentVars.twToken, { debug: true })
 
     Twilio.Device.ready(function (device) {
