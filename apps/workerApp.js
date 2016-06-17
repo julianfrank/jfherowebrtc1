@@ -55,6 +55,10 @@ function workerApp() {
     const initTwilio = require('../apps/twilioCode').initTwilio
     const closeTwilio = require('../apps/twilioCode').closeTwilio
 
+    //Bandwidth Initialisaton
+    const initBandwidth = require('../apps/bandwidthCode').initBandwidth
+    const closeBandwidth = require('../apps/bandwidthCode').closeBandwidth
+
     //Start Server
     const startServer = () => {
         log('info', 'Going to start ' + app.locals.name + '. Press Control+C to Exit', logMeta)
@@ -70,6 +74,7 @@ function workerApp() {
     const stopProcess = (reason) => {
         log('warn', 'About to exit due to ' + reason, logMeta)
         closeMongoose(thisProcessObjects)
+            .then(closeBandwidth)
             .then(closeTwilio)
             .then(quitRedis)
             .then(quitUMRedis)
@@ -113,6 +118,7 @@ function workerApp() {
         .then(addAzAdRoutes)
         .then(addSignalRoutes)
         .then(addAppRoutes)
+        .then(initBandwidth)
         .then(initTwilio)
         .then(addLastRoute)
         .then(startServer)

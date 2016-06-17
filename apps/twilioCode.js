@@ -2,7 +2,7 @@
 
 const helpers = require('../apps/helpers')
 const log = helpers.remoteLog
-let logMeta = { js: 'twillioCode.js' }
+let logMeta = { js: 'twilioCode.js' }
 const inspect = require('util').inspect
 
 const twASID = process.env.TWASID || require('../secrets.js').twAccountSid
