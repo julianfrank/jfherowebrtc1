@@ -1,6 +1,6 @@
 'use strict'
 
-let thisUser = serverSentVars.user || 'Guest', targetEmailID = ''
+let thisUser = serverSentVars.user || 'Guest'
 
 $(document).ready(() => {
     let sharedio = io('/shared')  //open Connected on shared namespace
