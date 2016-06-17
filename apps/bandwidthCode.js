@@ -23,14 +23,32 @@ let initBandwidth = (processObjects) => {
         //Assign bandwidth and client to Global ProcessObjects
         processObjects.bandwidth = bandwidth
         processObjects.bwClient = bwClient
-                // bandwidth handler for Incoming Calls
-                app.get('/bwcall', function (req, res) {
-                    res.status(200).send('bwcall works').end()
-                })
-                // bandwidth Message HAndler for Incoming messages
-                app.get('/bwmsg', function (req, res) {
-                    res.status(200).send('bwmsg works').end()
-                })
+        // bandwidth handler for Incoming Calls
+        app.get('/bwcall', function (req, res) {
+            res.status(200).send('bwcall works').end()
+        })
+        // bandwidth Message HAndler for Incoming messages
+        app.get('/bwmsg', function (req, res) {
+            res.status(200).send('bwmsg works').end()
+        })
+
+        // Insert the Bandwidth App here
+        app.get('/bwApp', (req, res) => {
+            res.contentType('text/html')
+            userMan.getLoggedUsers().then((userList) => {
+                let thisUser = (req.session.passport) ? (req.session.passport.user) : ('Guest')
+                let userInfo = {
+                    user: thisUser,
+                    appVer: helpers.readPackageJSON(__dirname, "version"),
+                    loggedUserList: userList
+                }
+                if (req.isAuthenticated()) {
+                    res.render('bandwidthApp.html', userInfo)
+                } else {
+                    res.render('jfmain.html', userInfo)
+                }
+            })
+        })
         resolve(processObjects)
     })
 }
