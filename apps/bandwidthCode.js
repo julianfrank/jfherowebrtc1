@@ -11,9 +11,7 @@ const bwSecret = process.env.BWSECRET || require('../secrets.js').bwSecret
 
 //Initialise bandwidth with Authorisation codes
 let bandwidth = require('node-bandwidth')
-console.log(bandwidth)
 let bwClient = new bandwidth.Client(bwUserID, bwToken, bwSecret)
-console.log(bwClient)
 
 let initBandwidth = (processObjects) => {
     log('info', 'Initializing bandwidth-node Service', logMeta)
@@ -25,7 +23,6 @@ let initBandwidth = (processObjects) => {
         //Assign bandwidth and client to Global ProcessObjects
         processObjects.bandwidth = bandwidth
         processObjects.bwClient = bwClient
-
         /*        // bandwidth request authentication for Requests FROM bandwidth
                 app.get('/twauth', function (req, res) {
                     if (bandwidth.validateExpressRequest(req, twAuthToken)) {
